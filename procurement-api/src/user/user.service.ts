@@ -1,8 +1,9 @@
 import { UpdateUserDto } from './dto/update-user.dto';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from './entities/user.entity';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Injectable()
 export class UserService {
@@ -15,6 +16,7 @@ export class UserService {
   }
 
   async createUser(data: {
+    name: string;
     email: string;
     password: string;
     role?: UserRole;
@@ -25,6 +27,7 @@ export class UserService {
       throw new BadRequestException('User with this email already exists');
     }
     const user = this.users.create({
+      name: data.name,
       email: data.email.toLowerCase(),
       password: data.password,
       role: data.role ?? UserRole.USER,
