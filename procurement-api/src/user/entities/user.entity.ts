@@ -2,8 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Vendor } from '../../vendor/entities/vendor.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -39,4 +41,7 @@ export class User {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @OneToOne(() => Vendor, (vendor) => vendor.user)
+  vendor?: Vendor;
 }

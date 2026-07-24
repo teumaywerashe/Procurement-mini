@@ -19,7 +19,7 @@ import type { JwtPayload } from '../auth/decorators/current-user.decorator';
 import { UserRole } from './entities/user.entity';
 
 @ApiTags('Users')
-@ApiBearerAuth()
+// @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('user')
 export class UserController {
@@ -33,7 +33,7 @@ export class UserController {
   }
 
   @Get('me')
-  @ApiBearerAuth()
+  // @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   getProfile(@CurrentUser() user: JwtPayload) {
     return this.userService.findOne(user.sub);
@@ -41,6 +41,7 @@ export class UserController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID (own profile or admin)' })
+  // @ApiBearerAuth()
   findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     if (user.role !== UserRole.ADMIN && user.sub !== id) {
       throw new ForbiddenException('Access denied');

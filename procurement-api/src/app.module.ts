@@ -5,6 +5,9 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { User } from './user/entities/user.entity';
 import * as dotenv from 'dotenv';
+import { UserModule } from './user/user.module';
+import { VendorModule } from './vendor/vendor.module';
+import { Vendor } from './vendor/entities/vendor.entity';
 dotenv.config();
 
 @Module({
@@ -13,10 +16,12 @@ dotenv.config();
       type: 'postgres',
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
-      entities: [User],
+      entities: [User, Vendor],
       synchronize: true,
     }),
     AuthModule,
+    UserModule,
+    VendorModule,
   ],
   controllers: [AppController],
   providers: [AppService],

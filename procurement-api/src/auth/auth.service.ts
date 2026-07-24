@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -8,20 +9,22 @@ import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
+import { VendorService } from '../vendor/vendor.service';
+import { UserRole } from '../user/entities/user.entity';
 
 type User = {
-    id: string;
-    email: string;
-    role: string;
-    vendorId: string | null;
-  }
-
+  id: string;
+  email: string;
+  role: string;
+  vendorId: string | null;
+};
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly vendorService: VendorService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -30,10 +33,18 @@ export class AuthService {
       throw new ConflictException('An account with this email already exists');
     }
 
+    if (registerDto.vendorId) {
+      const vendor = await this.vendorService.findOne(registerDto.vendorId);
+      if (!vendor) {
+        throw new NotFoundException('Vendor not found');
+      }
+    }
+
     const password = await this.hashPassword(registerDto.password);
     const user = await this.userService.createUser({
       ...registerDto,
       password,
+      role: registerDto.vendorId ? UserRole.VENDOR : UserRole.USER,
     });
     return this.toAuthResponse(user);
   }
@@ -60,7 +71,7 @@ export class AuthService {
     return bcrypt.compare(password, storedPassword);
   }
 
-  private toAuthResponse(user:User) {
+  private toAuthResponse(user: User) {
     return {
       accessToken: this.jwtService.sign({
         sub: user.id,

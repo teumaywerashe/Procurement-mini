@@ -1,9 +1,8 @@
 import { UpdateUserDto } from './dto/update-user.dto';
-import { BadRequestException, Injectable, UseGuards } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User, UserRole } from './entities/user.entity';
-import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Injectable()
 export class UserService {
