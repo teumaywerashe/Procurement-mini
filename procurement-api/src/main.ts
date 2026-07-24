@@ -27,6 +27,11 @@ async function bootstrap() {
     'api/docs',
     app,
     SwaggerModule.createDocument(app, swaggerConfig),
+    {
+      swaggerOptions: {
+        docExpansion: 'none',
+      },
+    },
   );
   await app.listen(process.env.PORT ?? 3000);
 }

@@ -8,7 +8,7 @@ import {
   UseGuards,
   ForbiddenException,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -19,21 +19,21 @@ import type { JwtPayload } from '../auth/decorators/current-user.decorator';
 import { UserRole } from './enum/userRole..enum';
 
 @ApiTags('Users')
-// @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @Roles(UserRole.ADMIN)
+  // @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all users (admin only)' })
   async findAll() {
     return await this.userService.findAll();
   }
 
   @Get('me')
-  // @ApiBearerAuth()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Get current user profile' })
   async getProfile(@CurrentUser() user: JwtPayload) {
     return await this.userService.findOne(user.uid);
@@ -42,7 +42,7 @@ export class UserController {
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID (own profile or admin)' })
   async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    if (user.role !== UserRole.ADMIN && user.uid !== id) {
+    if (user.role !== (UserRole.ADMIN as string) && user.uid !== id) {
       throw new ForbiddenException(
         'You can only view your own profile or you should be an admin to view other users',
       );
@@ -57,7 +57,7 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    if (user.role !== UserRole.ADMIN && user.uid !== id) {
+    if (user.role !== (UserRole.ADMIN as string) && user.uid !== id) {
       throw new ForbiddenException(
         'You can only update your own profile or you should be an admin to update other users',
       );

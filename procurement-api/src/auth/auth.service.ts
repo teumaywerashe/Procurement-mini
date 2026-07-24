@@ -10,7 +10,6 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
 import { VendorService } from '../vendor/vendor.service';
-import { UserRole } from '../user/enum/userRole..enum';
 
 type User = {
   id: string;
@@ -44,7 +43,6 @@ export class AuthService {
     const user = await this.userService.createUser({
       ...registerDto,
       password,
-      role: registerDto.vendorId ? UserRole.VENDOR : UserRole.USER,
     });
     return this.toAuthResponse(user);
   }
