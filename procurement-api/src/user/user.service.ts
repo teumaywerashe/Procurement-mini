@@ -2,7 +2,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User, UserRole } from './entities/user.entity';
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -14,24 +15,12 @@ export class UserService {
     return this.users.findOneBy({ email: email.toLowerCase() });
   }
 
-  async createUser(data: {
-    name: string;
-    email: string;
-    password: string;
-    role?: UserRole;
-    vendorId?: string;
-  }) {
+  async createUser(data: CreateUserDto) {
     const existingUser = await this.findByEmail(data.email);
     if (existingUser) {
       throw new BadRequestException('User with this email already exists');
     }
-    const user = this.users.create({
-      name: data.name,
-      email: data.email.toLowerCase(),
-      password: data.password,
-      role: data.role ?? UserRole.USER,
-      vendorId: data.vendorId ?? null,
-    });
+    const user = this.users.create(data);
     return this.users.save(user);
   }
 
@@ -39,15 +28,15 @@ export class UserService {
     return this.users.find();
   }
 
-  findOne(id: string) {
-    return this.users.findOneBy({ id });
+  async findOne(id: string) {
+    return await this.users.findOneBy({ id });
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.users.update({ id }, updateUserDto);
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    return await this.users.update({ id }, updateUserDto);
   }
 
-  remove(id: string) {
-    return this.users.delete({ id });
+  async remove(id: string) {
+    return await this.users.delete({ id });
   }
 }

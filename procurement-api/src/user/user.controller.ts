@@ -8,7 +8,7 @@ import {
   UseGuards,
   ForbiddenException,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -16,7 +16,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/decorators/current-user.decorator';
-import { UserRole } from './entities/user.entity';
+import { UserRole } from './enum/userRole..enum';
 
 @ApiTags('Users')
 // @ApiBearerAuth()
@@ -28,44 +28,47 @@ export class UserController {
   @Get()
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all users (admin only)' })
-  findAll() {
-    return this.userService.findAll();
+  async findAll() {
+    return await this.userService.findAll();
   }
 
   @Get('me')
   // @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
-  getProfile(@CurrentUser() user: JwtPayload) {
-    return this.userService.findOne(user.sub);
+  async getProfile(@CurrentUser() user: JwtPayload) {
+    return await this.userService.findOne(user.uid);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID (own profile or admin)' })
-  // @ApiBearerAuth()
-  findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    if (user.role !== UserRole.ADMIN && user.sub !== id) {
-      throw new ForbiddenException('Access denied');
+  async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    if (user.role !== UserRole.ADMIN && user.uid !== id) {
+      throw new ForbiddenException(
+        'You can only view your own profile or you should be an admin to view other users',
+      );
     }
-    return this.userService.findOne(id);
+    return await this.userService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update user (own profile or admin)' })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    if (user.role !== UserRole.ADMIN && user.sub !== id) {
-      throw new ForbiddenException('Access denied');
+    if (user.role !== UserRole.ADMIN && user.uid !== id) {
+      throw new ForbiddenException(
+        'You can only update your own profile or you should be an admin to update other users',
+      );
     }
-    return this.userService.update(id, updateUserDto);
+    return await this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete user (admin only)' })
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.userService.remove(id);
   }
 }

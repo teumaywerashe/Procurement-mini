@@ -12,11 +12,6 @@ export class VendorController {
     return this.vendorService.create(createVendorDto);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all vendors' })
-  async findAll() {
-    return await this.vendorService.findAll();
-  }
   @Get(':id')
   @ApiOperation({ summary: 'Get a vendor by ID' })
   async findOne(@Param('id') id: string) {

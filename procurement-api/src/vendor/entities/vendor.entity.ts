@@ -14,14 +14,15 @@ export class Vendor {
   id!: string;
 
   @Column({ length: 255 })
+  @IsString({ message: 'Name must be a string' })
   name!: string;
-  @IsString()
+
   @Column({ unique: true })
   registrationNumber!: string;
-  @IsString()
+  @IsString({ message: 'Email must be a string' })
   @Column({ nullable: true })
   email?: string;
-  @IsString()
+  @IsString({ message: 'Phone number must be a string' })
   @Column({ nullable: true })
   phoneNumber?: string;
 

@@ -10,7 +10,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
 import { VendorService } from '../vendor/vendor.service';
-import { UserRole } from '../user/entities/user.entity';
+import { UserRole } from '../user/enum/userRole..enum';
 
 type User = {
   id: string;
@@ -74,7 +74,7 @@ export class AuthService {
   private toAuthResponse(user: User) {
     return {
       accessToken: this.jwtService.sign({
-        sub: user.id,
+        uid: user.id,
         email: user.email,
         role: user.role,
       }),

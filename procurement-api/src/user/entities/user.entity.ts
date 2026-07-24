@@ -6,12 +6,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Vendor } from '../../vendor/entities/vendor.entity';
-
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  VENDOR = 'vendor',
-}
+import { IsDate, IsEmail, IsString, MinLength } from 'class-validator';
+import { UserRole } from '../enum/userRole..enum';
 
 @Entity('users')
 export class User {
@@ -19,14 +15,17 @@ export class User {
   id!: string;
 
   @Column()
+  @IsString({ message: 'Name must be a string' })
   name!: string;
 
   @Column({
     unique: true,
   })
+  @IsEmail({}, { message: 'Email must be a valid email address' })
   email!: string;
 
   @Column()
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
   password!: string;
 
   @Column({
@@ -40,6 +39,7 @@ export class User {
   vendorId!: string | null;
 
   @CreateDateColumn()
+  @IsDate({ message: 'createdAt must be a valid date' })
   createdAt!: Date;
 
   @OneToOne(() => Vendor, (vendor) => vendor.user)
