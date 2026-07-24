@@ -20,20 +20,23 @@ import { UserRole } from './enum/userRole..enum';
 
 @ApiTags('Users')
 @ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  // @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all users (admin only)' })
-  async findAll() {
+  async findAll(@CurrentUser() user: JwtPayload) {
+    if (user.role !== (UserRole.ADMIN as string)) {
+      throw new ForbiddenException('Only admins can view all users');
+    }
     return await this.userService.findAll();
   }
 
   @Get('me')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Get current user profile' })
   async getProfile(@CurrentUser() user: JwtPayload) {
     return await this.userService.findOne(user.uid);

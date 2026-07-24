@@ -13,6 +13,7 @@ async function bootstrap() {
   const httpAdapterHost = app.get(HttpAdapterHost);
 
   app.useGlobalFilters(new CatchEverythingFilter(httpAdapterHost));
+  console.log(process.env.DATABASE_URL);
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const swaggerConfig = new DocumentBuilder()
