@@ -1,9 +1,8 @@
 services:
-
   postgres:
     image: postgres:17
     container_name: procurement-db
-    restart: always
+    restart: unless-stopped
 
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -22,16 +21,13 @@ services:
       timeout: 5s
       retries: 10
 
-
   backend:
     build:
       context: ./procurement-api
 
     image: procurement-api
-
     container_name: procurement-backend
-
-    restart: always
+    restart: unless-stopped
 
     ports:
       - "3000:3000"
@@ -49,16 +45,18 @@ services:
       - ./procurement-api:/app
       - /app/node_modules
 
-    command: sh -c "npx drizzle-kit migrate && npm run start:dev"
+    command: >
+      sh -c "npx drizzle-kit migrate && npm run start:dev"
 
+    stdin_open: true
+    tty: true
 
   frontend:
     build:
       context: ./procurement-fe
 
     container_name: procurement-frontend
-
-    restart: always
+    restart: unless-stopped
 
     ports:
       - "3001:3000"
@@ -70,13 +68,18 @@ services:
       - ./procurement-fe:/app
       - /app/node_modules
 
+    stdin_open: true
+    tty: true
 
   drizzle-studio:
     image: procurement-api
-
     container_name: procurement-drizzle-studio
+    restart: unless-stopped
 
     working_dir: /app
+
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
 
     volumes:
       - ./procurement-api:/app
@@ -85,15 +88,32 @@ services:
     ports:
       - "4984:4984"
 
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
-    command: npx drizzle-kit studio --host 0.0.0.0
+    command: >
+      npx drizzle-kit studio --host 0.0.0.0 --port 4984
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: procurement-pgadmin
+    restart: unless-stopped
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+
+    ports:
+      - "5050:80"
 
     depends_on:
       postgres:
         condition: service_healthy
 
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
 volumes:
   postgres_data:
+  pgadmin_data:
