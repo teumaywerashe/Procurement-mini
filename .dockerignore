@@ -1,0 +1,14 @@
+procurement-api/.dockerignore
+procurement-api/node_modules
+procurement-api/.env
+procurement-api/.temp
+procurement-fe/.dockerignore
+procurement-fe/node_modules
+procurement-fe/.env
+procurement-fe/.temp
+node_modules
+dist
+.git
+.env
+Dockerfile
+npm-debug.log
