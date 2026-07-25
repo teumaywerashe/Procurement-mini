@@ -28,7 +28,7 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const existingUser = await db
+    const [existingUser] = await db
       .select()
       .from(users)
       .where(eq(users.email, registerDto.email))
@@ -38,7 +38,7 @@ export class AuthService {
     }
 
     if (registerDto.vendorId) {
-      const existingVendor = await db
+      const [existingVendor] = await db
         .select()
         .from(vendor)
         .where(eq(vendor.id, registerDto.vendorId))
@@ -66,12 +66,18 @@ export class AuthService {
       .from(users)
       .where(eq(users.email, loginDto.email))
       .execute();
-    if (
-      !user ||
-      !(await this.verifyPassword(loginDto.password, user.password))
-    ) {
+    if (!user) {
+      throw new NotFoundException('no user with this email was found');
+    }
+
+    const passwordMatch = await this.verifyPassword(
+      loginDto.password,
+      user.password,
+    );
+    if (!passwordMatch) {
       throw new UnauthorizedException('Invalid email or password');
     }
+
     return this.toAuthResponse(user);
   }
 

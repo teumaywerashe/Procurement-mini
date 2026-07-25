@@ -5,7 +5,7 @@ import { db } from './db';
 async function main() {
   try {
     await migrate(db, {
-      migrationsFolder: './migrations',
+      migrationsFolder: './drizzle',
     });
 
     console.log('Migration successful');
