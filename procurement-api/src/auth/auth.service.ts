@@ -5,50 +5,67 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
-import { VendorService } from '../vendor/vendor.service';
-
+import { users } from '../database/schema/user.schema';
+import { eq } from 'drizzle-orm/sql/expressions/conditions';
+import { db } from '../database/db';
+import { vendor } from '../database/schema/vendor.schema';
 type User = {
-  id: string;
+  id: number;
   email: string;
   role: string;
-  vendorId: string | null;
+  vendorId: number | null;
 };
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
+    // private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly vendorService: VendorService,
+    // private readonly vendorService: VendorService,
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const existingUser = await this.userService.findByEmail(registerDto.email);
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, registerDto.email))
+      .execute();
     if (existingUser) {
       throw new ConflictException('An account with this email already exists');
     }
 
     if (registerDto.vendorId) {
-      const vendor = await this.vendorService.findOne(registerDto.vendorId);
-      if (!vendor) {
+      const existingVendor = await db
+        .select()
+        .from(vendor)
+        .where(eq(vendor.id, registerDto.vendorId))
+        .execute();
+      if (!existingVendor) {
         throw new NotFoundException('Vendor not found');
       }
     }
 
     const password = await this.hashPassword(registerDto.password);
-    const user = await this.userService.createUser({
-      ...registerDto,
-      password,
-    });
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...registerDto,
+        password,
+      })
+      .returning()
+      .execute();
     return this.toAuthResponse(user);
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.userService.findByEmail(loginDto.email);
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, loginDto.email))
+      .execute();
     if (
       !user ||
       !(await this.verifyPassword(loginDto.password, user.password))

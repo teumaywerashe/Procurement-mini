@@ -5,50 +5,59 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateVendorDto } from './dto/create-vendor.dto';
-import { Vendor } from './entities/vendor.entity';
-import { Repository } from 'typeorm/repository/Repository.js';
-
-import { InjectRepository } from '@nestjs/typeorm/dist/common/typeorm.decorators';
 import { LoginVendorDto } from './dto/login-vendor';
+import { eq } from 'drizzle-orm/sql/expressions/conditions';
+import { db } from '../database/db';
+import { vendor } from '../database/schema/vendor.schema';
 
 @Injectable()
 export class VendorService {
-  constructor(
-    @InjectRepository(Vendor)
-    private readonly vendorRepository: Repository<Vendor>,
-  ) {}
+  constructor() {}
   async create(createVendorDto: CreateVendorDto) {
-    const existingVendor = await this.vendorRepository.findOneBy({
-      registrationNumber: createVendorDto.registrationNumber,
-    });
+    const existingVendor = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.registrationNumber, createVendorDto.registrationNumber))
+      .execute();
     if (existingVendor) {
       throw new ConflictException(
         'Vendor with this registration number already exists',
       );
     }
-    const vendor = this.vendorRepository.create(createVendorDto);
-    return this.vendorRepository.save(vendor);
+
+    const newVendor = await db
+      .insert(vendor)
+      .values(createVendorDto)
+      .returning()
+      .execute();
+    return newVendor;
   }
   async login(loginVendorDto: LoginVendorDto) {
-    const vendor = await this.vendorRepository.findOneBy({
-      registrationNumber: loginVendorDto.registrationNumber,
-    });
-    if (!vendor) {
+    const existingVendor = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.registrationNumber, loginVendorDto.registrationNumber))
+      .execute();
+    if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
     }
-    return vendor;
+    return existingVendor;
   }
   async findAll() {
-    return await this.vendorRepository.find();
+    return await db.select().from(vendor).execute();
   }
   async findOne(id: string) {
     if (!id) {
       throw new BadRequestException('Vendor ID is required');
     }
-    const vender = await this.vendorRepository.findOneBy({ id });
-    if (!vender) {
+    const existingVendor = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.id, id as any as number))
+      .execute();
+    if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
     }
-    return vender;
+    return existingVendor;
   }
 }

@@ -1,5 +1,11 @@
-import { pgTable, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { user } from './user.shema';
+import {
+  integer,
+  pgTable,
+  serial,
+  timestamp,
+  varchar,
+} from 'drizzle-orm/pg-core';
+import { users } from './user.schema';
 import { relations } from 'drizzle-orm/_relations';
 export const tender = pgTable('tender', {
   id: serial('id').primaryKey(),
@@ -9,13 +15,13 @@ export const tender = pgTable('tender', {
   title: varchar('title', { length: 255 }).notNull(),
   closingDate: timestamp('closing_date').notNull(),
   estimatedValue: varchar('estimated_value', { length: 255 }).notNull(),
-  createdBy: varchar('created_by', { length: 255 })
+  createdBy: integer('created_by')
     .notNull()
-    .references((): any => user.id),
+    .references((): any => users.id),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const tenderRelations = relations(tender, ({ one }) => ({
-  user: one(user, { fields: [tender.createdBy], references: [user.id] }),
+  user: one(users, { fields: [tender.createdBy], references: [users.id] }),
 }));

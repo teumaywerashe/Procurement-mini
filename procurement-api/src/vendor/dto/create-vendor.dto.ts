@@ -14,6 +14,7 @@ export class CreateVendorDto {
   @IsEmail()
   @IsOptional()
   email?: string;
+
   @ApiPropertyOptional({ example: '+251-914101234' })
   @IsOptional()
   @IsString()

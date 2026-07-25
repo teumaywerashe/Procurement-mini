@@ -8,16 +8,16 @@ import {
 import { vendor } from './vendor.schema';
 import { relations } from 'drizzle-orm/_relations';
 
-export const user = pgTable('users', {
+export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
-  email: varchar('email', { length: 255 }),
+  email: varchar('email', { length: 255 }).notNull().unique(),
   role: varchar('role', { length: 255 }).notNull().default('Vendor'),
   password: varchar('password', { length: 255 }).notNull(),
   vendorId: integer('vendor_id').references(() => vendor.id),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-export const userRelations = relations(user, ({ one }) => ({
-  vendor: one(vendor, { fields: [user.vendorId], references: [vendor.id] }),
+export const userRelations = relations(users, ({ one }) => ({
+  vendor: one(vendor, { fields: [users.vendorId], references: [vendor.id] }),
 }));
