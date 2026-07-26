@@ -1,4 +1,10 @@
-import { pgTable, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
+import {
+  integer,
+  pgTable,
+  serial,
+  timestamp,
+  varchar,
+} from 'drizzle-orm/pg-core';
 import { bid } from './bid.schema';
 import { relations } from 'drizzle-orm/_relations';
 import { users } from './user.schema';
@@ -7,6 +13,7 @@ export const vendor = pgTable('vendor', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }).unique(),
+  ownerId: integer('owner_id').references(() => users.id),
   registrationNumber: varchar('registration_number', { length: 255 })
     .notNull()
     .unique(),
@@ -16,5 +23,5 @@ export const vendor = pgTable('vendor', {
 
 export const vendorRelations = relations(vendor, ({ many, one }) => ({
   bids: many(bid),
-  user: one(users, { fields: [vendor.id], references: [users.vendorId] }),
+  user: one(users, { fields: [vendor.ownerId], references: [users.id] }),
 }));

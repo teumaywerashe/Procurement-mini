@@ -11,12 +11,10 @@ import * as bcrypt from 'bcryptjs';
 import { users } from '../database/schema/user.schema';
 import { eq } from 'drizzle-orm/sql/expressions/conditions';
 import { db } from '../database/db';
-import { vendor } from '../database/schema/vendor.schema';
 type User = {
   id: number;
   email: string;
   role: string;
-  vendorId: number | null;
 };
 
 @Injectable()
@@ -35,17 +33,6 @@ export class AuthService {
       .execute();
     if (existingUser) {
       throw new ConflictException('An account with this email already exists');
-    }
-
-    if (registerDto.vendorId) {
-      const [existingVendor] = await db
-        .select()
-        .from(vendor)
-        .where(eq(vendor.id, registerDto.vendorId))
-        .execute();
-      if (!existingVendor) {
-        throw new NotFoundException('Vendor not found');
-      }
     }
 
     const password = await this.hashPassword(registerDto.password);
@@ -103,7 +90,6 @@ export class AuthService {
         id: user.id,
         email: user.email,
         role: user.role,
-        vendorId: user.vendorId,
       },
     };
   }

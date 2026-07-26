@@ -5,15 +5,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateVendorDto } from './dto/create-vendor.dto';
-import { LoginVendorDto } from './dto/login-vendor';
 import { eq } from 'drizzle-orm/sql/expressions/conditions';
 import { db } from '../database/db';
 import { vendor } from '../database/schema/vendor.schema';
+import { JwtPayload } from '../auth/decorators/current-user.decorator';
 
 @Injectable()
 export class VendorService {
   constructor() {}
-  async create(createVendorDto: CreateVendorDto) {
+  async create(createVendorDto: CreateVendorDto, user: JwtPayload) {
     const existingVendor = await db
       .select()
       .from(vendor)
@@ -24,7 +24,16 @@ export class VendorService {
         'Vendor with this registration number already exists',
       );
     }
-
+    const userOwneVendor = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.ownerId, user.uid))
+      .execute();
+    if (userOwneVendor.length > 0) {
+      throw new ConflictException(
+        'You already own a vendor. Each user can only register one vendor.',
+      );
+    }
     const newVendor = await db
       .insert(vendor)
       .values(createVendorDto)
@@ -32,17 +41,7 @@ export class VendorService {
       .execute();
     return newVendor;
   }
-  async login(loginVendorDto: LoginVendorDto) {
-    const existingVendor = await db
-      .select()
-      .from(vendor)
-      .where(eq(vendor.registrationNumber, loginVendorDto.registrationNumber))
-      .execute();
-    if (!existingVendor) {
-      throw new NotFoundException('Vendor not found');
-    }
-    return existingVendor;
-  }
+
   async findAll() {
     return await db.select().from(vendor).execute();
   }

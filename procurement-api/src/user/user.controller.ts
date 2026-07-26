@@ -6,7 +6,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  ForbiddenException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
@@ -28,10 +27,7 @@ export class UserController {
   @Get()
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all users (admin only)' })
-  async findAll(@CurrentUser() user: JwtPayload) {
-    if (user.role !== (UserRole.ADMIN as string)) {
-      throw new ForbiddenException('Only admins can view all users');
-    }
+  async findAll() {
     return await this.userService.findAll();
   }
 
@@ -39,32 +35,20 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   async getProfile(@CurrentUser() user: JwtPayload) {
-    return await this.userService.findOne(user.uid);
+    return await this.userService.findOne(user.uid as unknown as string);
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get user by ID (own profile or admin)' })
-  async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    if (user.role !== (UserRole.ADMIN as string) && user.uid !== id) {
-      throw new ForbiddenException(
-        'You can only view your own profile or you should be an admin to view other users',
-      );
-    }
+  async findOne(@Param('id') id: string) {
     return await this.userService.findOne(id);
   }
 
   @Patch(':id')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update user (own profile or admin)' })
-  async update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    if (user.role !== (UserRole.ADMIN as string) && user.uid !== id) {
-      throw new ForbiddenException(
-        'You can only update your own profile or you should be an admin to update other users',
-      );
-    }
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.userService.update(id, updateUserDto);
   }
 
