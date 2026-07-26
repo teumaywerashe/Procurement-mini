@@ -1,26 +1,51 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTenderDto } from './dto/create-tender.dto';
 import { UpdateTenderDto } from './dto/update-tender.dto';
+import { JwtPayload } from '../auth/decorators/current-user.decorator';
+import { db } from '../database/db';
+import { tender } from '../database/schema/tender.schema';
+import { eq } from 'drizzle-orm/sql/expressions/conditions';
 
 @Injectable()
 export class TenderService {
-  create(createTenderDto: CreateTenderDto) {
-    return 'This action adds a new tender';
+  async create(createTenderDto: CreateTenderDto, user: JwtPayload) {
+    const [newTender] = await db
+      .insert(tender)
+      .values({ ...createTenderDto, createdBy: user.uid })
+      .returning()
+      .execute();
+    return newTender;
   }
 
-  findAll() {
-    return `This action returns all tender`;
+  async findAll() {
+    return await db.select().from(tender).execute();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tender`;
+  async findOne(id: number) {
+    const [existingTender] = await db
+      .select()
+      .from(tender)
+      .where(eq(tender.id, id))
+      .execute();
+    return existingTender;
   }
 
-  update(id: number, updateTenderDto: UpdateTenderDto) {
-    return `This action updates a #${id} tender`;
+  async update(id: number, updateTenderDto: UpdateTenderDto) {
+    const [updatedTender] = await db
+      .update(tender)
+      .set(updateTenderDto)
+      .where(eq(tender.id, id))
+      .returning()
+      .execute();
+    return updatedTender;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tender`;
+  async remove(id: number) {
+    const [deletedTender] = await db
+      .delete(tender)
+      .where(eq(tender.id, id))
+      .returning()
+      .execute();
+    return deletedTender;
   }
 }

@@ -1,4 +1,5 @@
 import {
+  decimal,
   integer,
   pgTable,
   serial,
@@ -14,7 +15,11 @@ export const tender = pgTable('tender', {
   status: varchar('status', { length: 255 }).notNull().default('Draft'),
   title: varchar('title', { length: 255 }).notNull(),
   closingDate: timestamp('closing_date').notNull(),
-  estimatedValue: varchar('estimated_value', { length: 255 }).notNull(),
+  estimatedValue: decimal('estimated_value', {
+    precision: 10,
+    scale: 2,
+    mode: 'number',
+  }).notNull(),
   createdBy: integer('created_by')
     .notNull()
     .references((): any => users.id),

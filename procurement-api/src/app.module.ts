@@ -7,7 +7,6 @@ import { AuthModule } from './auth/auth.module';
 import * as dotenv from 'dotenv';
 import { UserModule } from './user/user.module';
 import { VendorModule } from './vendor/vendor.module';
-import { JwtModule, JwtService } from '@nestjs/jwt';
 // import { Vendor } from './vendor/entities/vendor.entity';
 import { TenderModule } from './tender/tender.module';
 dotenv.config({ path: '../.env' });

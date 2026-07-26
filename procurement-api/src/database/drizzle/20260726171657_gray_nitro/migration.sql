@@ -1,0 +1,1 @@
+ALTER TABLE "tender" ALTER COLUMN "estimated_value" SET DATA TYPE numeric(10,2) USING "estimated_value"::numeric(10,2);

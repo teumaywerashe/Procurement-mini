@@ -6,37 +6,56 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { TenderService } from './tender.service';
 import { CreateTenderDto } from './dto/create-tender.dto';
 import { UpdateTenderDto } from './dto/update-tender.dto';
-
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../auth/enum/userRole..enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { JwtPayload } from '../auth/decorators/current-user.decorator';
 @Controller('tender')
+@ApiTags('Tenders')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class TenderController {
   constructor(private readonly tenderService: TenderService) {}
 
   @Post()
-  create(@Body() createTenderDto: CreateTenderDto) {
-    return this.tenderService.create(createTenderDto);
+  @Roles(UserRole.ADMIN)
+  create(
+    @Body() createTenderDto: CreateTenderDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.tenderService.create(createTenderDto, user);
   }
 
   @Get()
-  findAll() {
-    return this.tenderService.findAll();
+  async findAll() {
+    return await this.tenderService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tenderService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.tenderService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTenderDto: UpdateTenderDto) {
-    return this.tenderService.update(+id, updateTenderDto);
+  @Roles(UserRole.ADMIN)
+  async update(
+    @Param('id') id: string,
+    @Body() updateTenderDto: UpdateTenderDto,
+  ) {
+    return await this.tenderService.update(+id, updateTenderDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tenderService.remove(+id);
+  @Roles(UserRole.ADMIN)
+  async remove(@Param('id') id: string) {
+    return await this.tenderService.remove(+id);
   }
 }
