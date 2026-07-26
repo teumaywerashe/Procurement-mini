@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import { VendorModule } from './vendor/vendor.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 // import { Vendor } from './vendor/entities/vendor.entity';
+import { TenderModule } from './tender/tender.module';
 dotenv.config({ path: '../.env' });
 
 @Module({
@@ -22,6 +23,7 @@ dotenv.config({ path: '../.env' });
     AuthModule,
     UserModule,
     VendorModule,
+    TenderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

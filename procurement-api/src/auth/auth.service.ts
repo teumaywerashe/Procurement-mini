@@ -68,7 +68,7 @@ export class AuthService {
     return this.toAuthResponse(user);
   }
 
-  private async hashPassword(password: string): Promise<string> {
+  async hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, 10);
   }
 

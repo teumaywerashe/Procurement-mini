@@ -16,10 +16,12 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/decorators/current-user.decorator';
 import { UserRole } from './enum/userRole..enum';
+import { AdminOrOwner } from '../auth/decorators/adminOrOwner.decorator';
+import { AdminOrOwnerGuard } from '../auth/guards/adminOrOwner.guard';
 
 @ApiTags('Users')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwnerGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -46,14 +48,14 @@ export class UserController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN)
+  @AdminOrOwner()
   @ApiOperation({ summary: 'Update user (own profile or admin)' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return await this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN)
+  @AdminOrOwner()
   @ApiOperation({ summary: 'Delete user (admin only)' })
   async remove(@Param('id') id: string) {
     return await this.userService.remove(id);

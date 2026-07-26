@@ -9,12 +9,22 @@ import { eq } from 'drizzle-orm/sql/expressions/conditions';
 import { db } from '../database/db';
 import { vendor } from '../database/schema/vendor.schema';
 import { JwtPayload } from '../auth/decorators/current-user.decorator';
+import { UpdateVendorDto } from './dto/update-vendor.dto';
 
 @Injectable()
 export class VendorService {
   constructor() {}
   async create(createVendorDto: CreateVendorDto, user: JwtPayload) {
-    const existingVendor = await db
+    const [existingVendorWithEmail] = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.email, createVendorDto.email as any as string))
+      .execute();
+
+    if (existingVendorWithEmail) {
+      throw new ConflictException('Email already exists');
+    }
+    const [existingVendor] = await db
       .select()
       .from(vendor)
       .where(eq(vendor.registrationNumber, createVendorDto.registrationNumber))
@@ -24,32 +34,63 @@ export class VendorService {
         'Vendor with this registration number already exists',
       );
     }
-    const userOwneVendor = await db
+    const [userOwneVendor] = await db
       .select()
       .from(vendor)
       .where(eq(vendor.ownerId, user.uid))
       .execute();
-    if (userOwneVendor.length > 0) {
+    console.log(userOwneVendor);
+    if (userOwneVendor) {
       throw new ConflictException(
         'You already own a vendor. Each user can only register one vendor.',
       );
     }
-    const newVendor = await db
+    const [newVendor] = await db
       .insert(vendor)
-      .values(createVendorDto)
+      .values({ ...createVendorDto, ownerId: user.uid })
       .returning()
       .execute();
+
     return newVendor;
   }
 
   async findAll() {
     return await db.select().from(vendor).execute();
   }
-  async findOne(id: string) {
+  async findOne(id: number) {
     if (!id) {
       throw new BadRequestException('Vendor ID is required');
     }
     const existingVendor = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.id, id))
+      .execute();
+    if (!existingVendor) {
+      throw new NotFoundException('Vendor not found');
+    }
+    return existingVendor;
+  }
+  async findByOwnerId(ownerId: number) {
+    if (!ownerId) {
+      throw new BadRequestException('Owner ID is required');
+    }
+    const [existingVendor] = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.ownerId, ownerId))
+      .execute();
+    if (!existingVendor) {
+      throw new NotFoundException('Vendor not found for this owner');
+    }
+    return existingVendor;
+  }
+
+  async updateVendor(id: string, updateVendorDto: UpdateVendorDto) {
+    if (!id) {
+      throw new BadRequestException('Vendor ID is required');
+    }
+    const [existingVendor] = await db
       .select()
       .from(vendor)
       .where(eq(vendor.id, id as any as number))
@@ -57,6 +98,31 @@ export class VendorService {
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
     }
-    return existingVendor;
+    const [updatedVendor] = await db
+      .update(vendor)
+      .set(updateVendorDto as any as Partial<typeof vendor>)
+      .where(eq(vendor.id, id as any as number))
+      .returning()
+      .execute();
+    return updatedVendor;
+  }
+  async deleteVendor(id: number) {
+    if (!id) {
+      throw new BadRequestException('Vendor ID is required');
+    }
+    const [existingVendor] = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.id, id))
+      .execute();
+    if (!existingVendor) {
+      throw new NotFoundException('Vendor not found');
+    }
+    const [deletedVendor] = await db
+      .delete(vendor)
+      .where(eq(vendor.id, id))
+      .returning()
+      .execute();
+    return deletedVendor;
   }
 }

@@ -5,6 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { eq } from 'drizzle-orm/sql/expressions/conditions';
 import { users } from '../database/schema/user.schema';
 import { db } from '../database/db';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UserService {
@@ -44,19 +45,43 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    return await db
+    const [user] = await this.findOne(id);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+    const [updated] = await db
       .update(users)
       .set(updateUserDto as any as Partial<typeof users>)
       .where(eq(users.id, id as any as number))
       .returning()
       .execute();
+    return { updated, success: true, message: 'User updated successfully' };
   }
+  //   return await db
+  //     .update(users)
+  //     .set(updateUserDto as any as Partial<typeof users>)
+  //     .where(eq(users.id, id as any as number))
+  //     .returning()
+  //     .execute();
+  // }
 
   async remove(id: string) {
-    return await db
+    const [user] = await this.findOne(id);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    const [deleted] = await db
       .delete(users)
       .where(eq(users.id, id as any as number))
       .returning()
       .execute();
+    return {
+      deleted: deleted,
+      success: true,
+      message: 'User deleted successfully',
+    };
   }
 }
