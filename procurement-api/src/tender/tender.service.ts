@@ -5,6 +5,8 @@ import { JwtPayload } from '../auth/decorators/current-user.decorator';
 import { db } from '../database/db';
 import { tender } from '../database/schema/tender.schema';
 import { eq } from 'drizzle-orm/sql/expressions/conditions';
+import { TenderFilterDto } from './dto/tender-filter.dto';
+import { and, ilike, lte } from 'drizzle-orm';
 
 @Injectable()
 export class TenderService {
@@ -20,7 +22,23 @@ export class TenderService {
   async findAll() {
     return await db.select().from(tender).execute();
   }
+  async findAllByFilter(filter: TenderFilterDto) {
+    const conditions: ReturnType<typeof ilike>[] = [];
 
+    if (filter.title) {
+      conditions.push(ilike(tender.title, `%${filter.title}%`));
+    }
+
+    if (filter.price) {
+      conditions.push(lte(tender.estimatedValue, filter.price));
+    }
+
+    return await db
+      .select()
+      .from(tender)
+      .where(conditions.length ? and(...conditions) : undefined)
+      .execute();
+  }
   async findOne(id: number) {
     const [existingTender] = await db
       .select()

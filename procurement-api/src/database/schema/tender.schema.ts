@@ -8,11 +8,12 @@ import {
 } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
 import { relations } from 'drizzle-orm/_relations';
+import { tenderStatus } from '../../tender/enum/tenderStatus.enum';
 export const tender = pgTable('tender', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   description: varchar('description', { length: 255 }),
-  status: varchar('status', { length: 255 }).notNull().default('Draft'),
+  status: varchar('status', { length: 255 }).default(tenderStatus.DRAFT),
   title: varchar('title', { length: 255 }).notNull(),
   closingDate: timestamp('closing_date').notNull(),
   estimatedValue: decimal('estimated_value', {

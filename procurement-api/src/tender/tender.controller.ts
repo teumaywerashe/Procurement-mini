@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TenderService } from './tender.service';
 import { CreateTenderDto } from './dto/create-tender.dto';
@@ -18,6 +19,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/enum/userRole..enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/decorators/current-user.decorator';
+import { TenderFilterDto } from './dto/tender-filter.dto';
 @Controller('tender')
 @ApiTags('Tenders')
 @ApiBearerAuth()
@@ -38,7 +40,10 @@ export class TenderController {
   async findAll() {
     return await this.tenderService.findAll();
   }
-
+  @Get('all')
+  findAllByFilter(@Query() filter: TenderFilterDto) {
+    return this.tenderService.findAllByFilter(filter);
+  }
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.tenderService.findOne(+id);
