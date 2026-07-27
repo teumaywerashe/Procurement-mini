@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/layout/Navbar"
+    // import React, { useEffect, useState, useCallback } from "react";
+    // import Navbar from "../../components/layout/Navbar"
+
 import Link from "next/link";
 import {
   IconSearch,
@@ -37,27 +40,12 @@ interface Tender {
   createdBy: number;
 }
 
-const STATUS_COLORS: Record<
-  TenderStatus,
-  { bg: string; text: string; dot: string }
-> = {
-  published: {
-    bg: "bg-green-900/40",
-    text: "text-green-400",
-    dot: "bg-green-400",
-  },
-  draft: { bg: "bg-gray-800", text: "text-gray-400", dot: "bg-gray-400" },
-  closed: { bg: "bg-red-900/40", text: "text-red-400", dot: "bg-red-400" },
-  awarded: {
-    bg: "bg-indigo-900/40",
-    text: "text-indigo-400",
-    dot: "bg-indigo-400",
-  },
-  cancelled: {
-    bg: "bg-orange-900/40",
-    text: "text-orange-400",
-    dot: "bg-orange-400",
-  },
+const STATUS_COLORS: Record<TenderStatus, { bg: string; text: string; dot: string }> = {
+  published: { bg: "bg-green-900/40", text: "text-green-400", dot: "bg-green-400" },
+  draft:     { bg: "bg-gray-800",      text: "text-gray-400",  dot: "bg-gray-400"  },
+  closed:    { bg: "bg-red-900/40",    text: "text-red-400",   dot: "bg-red-400"   },
+  awarded:   { bg: "bg-indigo-900/40", text: "text-indigo-400",dot: "bg-indigo-400"},
+  cancelled: { bg: "bg-orange-900/40", text: "text-orange-400",dot: "bg-orange-400"},
 };
 
 function timeAgo(dateStr: string) {
@@ -93,9 +81,7 @@ function TenderCard({ tender }: { tender: Tender }) {
           <div className="flex items-center gap-2 text-xs text-gray-500 mb-1.5 flex-wrap">
             <span>{timeAgo(tender.createdAt)}</span>
             <span>·</span>
-            <span
-              className={`flex items-center gap-1 font-medium ${isUrgent && closing !== "Closed" ? "text-orange-400" : "text-gray-400"}`}
-            >
+            <span className={`flex items-center gap-1 font-medium ${isUrgent && closing !== "Closed" ? "text-orange-400" : "text-gray-400"}`}>
               <IconClock size={12} />
               {closing}
             </span>
@@ -130,9 +116,7 @@ function TenderCard({ tender }: { tender: Tender }) {
 
           {/* Status badge */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${status.bg} ${status.text}`}
-            >
+            <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${status.bg} ${status.text}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
               {tender.status.charAt(0).toUpperCase() + tender.status.slice(1)}
             </span>
@@ -171,12 +155,8 @@ function ProfileSidebar() {
             JD
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-white text-sm leading-tight">
-              John Doe
-            </p>
-            <p className="text-xs text-gray-400 mt-0.5 truncate">
-              Vendor · Infrastructure
-            </p>
+            <p className="font-semibold text-white text-sm leading-tight">John Doe</p>
+            <p className="text-xs text-gray-400 mt-0.5 truncate">Vendor · Infrastructure</p>
           </div>
         </div>
 
@@ -187,10 +167,7 @@ function ProfileSidebar() {
             <span className="text-xs font-semibold text-green-400">78%</span>
           </div>
           <div className="w-full bg-[#2a2620] rounded-full h-1.5">
-            <div
-              className="bg-green-400 h-1.5 rounded-full"
-              style={{ width: "78%" }}
-            />
+            <div className="bg-green-400 h-1.5 rounded-full" style={{ width: "78%" }} />
           </div>
         </div>
 
@@ -206,9 +183,7 @@ function ProfileSidebar() {
       <div className="bg-[#1c1a16] border border-[#2a2620] rounded-xl p-5">
         <div className="flex items-center gap-2 mb-1">
           <IconShieldCheck size={18} className="text-indigo-400" />
-          <span className="text-sm font-semibold text-white">
-            Identity verification
-          </span>
+          <span className="text-sm font-semibold text-white">Identity verification</span>
         </div>
         <p className="text-xs text-gray-400 mb-3 leading-relaxed">
           Increase your bid visibility in search results and win more contracts.
@@ -246,23 +221,14 @@ function ProfileSidebar() {
           <span className="text-xs text-gray-500">3 active</span>
         </div>
         <div className="space-y-2">
-          {[
-            "Road Construction – Phase 2",
-            "IT Infrastructure Upgrade",
-            "Office Supplies Q4",
-          ].map((bid, i) => (
+          {["Road Construction – Phase 2", "IT Infrastructure Upgrade", "Office Supplies Q4"].map((bid, i) => (
             <div key={i} className="flex items-center justify-between text-xs">
               <span className="text-gray-400 truncate mr-2">{bid}</span>
-              <span className="shrink-0 text-green-400 font-medium">
-                Pending
-              </span>
+              <span className="shrink-0 text-green-400 font-medium">Pending</span>
             </div>
           ))}
         </div>
-        <Link
-          href="/bids"
-          className="block mt-3 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-        >
+        <Link href="/bids" className="block mt-3 text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
           View all bids →
         </Link>
       </div>
@@ -271,9 +237,7 @@ function ProfileSidebar() {
       <div className="bg-[#1c1a16] border border-[#2a2620] rounded-xl p-5">
         <div className="flex items-center gap-2 mb-3">
           <IconUser size={16} className="text-gray-400" />
-          <span className="text-sm font-semibold text-white">
-            Account stats
-          </span>
+          <span className="text-sm font-semibold text-white">Account stats</span>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {[
@@ -320,7 +284,6 @@ export default function TendersPage() {
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch tenders");
       const data: Tender[] = await res.json();
-      console.log(data);
       setTenders(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -339,7 +302,7 @@ export default function TendersPage() {
     if (!statusFilter) return true;
     if (statusFilter === "closing") {
       const days = Math.ceil(
-        (new Date(t.closingDate).getTime() - now) / 86_400_000,
+        (new Date(t.closingDate).getTime() - now) / 86_400_000
       );
       return days >= 0 && days <= 7;
     }
@@ -349,19 +312,18 @@ export default function TendersPage() {
   const sorted =
     activeTab === 1
       ? [...filtered].sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
       : filtered;
 
   return (
-    <div className="min-h-screen min-w-full bg-[#14120e] text-white flex flex-col">
+    <div className="min-h-screen bg-[#14120e] text-white flex flex-col">
       <Navbar />
 
       {/* Banner */}
-      {/* <div className="bg-[#1c1a16] border-b border-[#2a2620] px-6 py-8"> */}
-        {/* <div className="max-w-5xl mx-auto"> */}
-          {/* <div className="bg-linear-to-r from-[#2a2620] to-[#1c1a16] rounded-xl p-6 flex items-center justify-between gap-6 border border-[#3a3630]">
+      <div className="bg-[#1c1a16] border-b border-[#2a2620] px-6 py-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-linear-to-r from-[#2a2620] to-[#1c1a16] rounded-xl p-6 flex items-center justify-between gap-6 border border-[#3a3630]">
             <div>
               <p className="text-xs font-semibold text-[#9fef00] uppercase tracking-widest mb-1">
                 Vendor Plus
@@ -370,16 +332,15 @@ export default function TendersPage() {
                 Priority access to new tenders
               </h2>
               <p className="text-sm text-gray-400">
-                Get notified first and increase your bid visibility across all
-                categories.
+                Get notified first and increase your bid visibility across all categories.
               </p>
             </div>
             <button className="shrink-0 px-5 py-2.5 border border-gray-500 hover:border-white text-sm font-medium text-white rounded-lg transition-colors">
               Learn more
             </button>
-          </div> */}
-        {/* </div> */}
-      {/* </div> */}
+          </div>
+        </div>
+      </div>
 
       {/* Main layout */}
       <div className="flex-1 max-w-6xl mx-auto w-full px-6 py-6 flex gap-6 items-start">
@@ -455,9 +416,7 @@ export default function TendersPage() {
                 Loading tenders...
               </div>
             ) : error ? (
-              <div className="py-16 text-center text-red-400 text-sm">
-                {error}
-              </div>
+              <div className="py-16 text-center text-red-400 text-sm">{error}</div>
             ) : sorted.length === 0 ? (
               <div className="py-16 text-center text-gray-500 text-sm">
                 No tenders found
