@@ -11,7 +11,7 @@ async function bootstrap() {
   app.enableCors();
 
   app.useGlobalFilters(new HttpExceptionFilter());
-  console.log(process.env.DATABASE_URL);
+  // console.log(process.env.DATABASE_URL);
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const swaggerConfig = new DocumentBuilder()
