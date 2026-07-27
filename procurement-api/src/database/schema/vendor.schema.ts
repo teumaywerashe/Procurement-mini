@@ -11,7 +11,9 @@ export const vendor = pgTable('vendor', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
   email: varchar('email', { length: 255 }).unique(),
-  ownerId: integer('owner_id').references(() => users.id),
+  ownerId: integer('owner_id').references(() => users.id, {
+    onDelete: 'cascade',
+  }),
   registrationNumber: varchar('registration_number', { length: 255 })
     .notNull()
     .unique(),

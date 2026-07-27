@@ -23,7 +23,7 @@ export const tender = pgTable('tender', {
   }).notNull(),
   createdBy: integer('created_by')
     .notNull()
-    .references((): any => users.id),
+    .references((): any => users.id, { onDelete: 'cascade' }),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
