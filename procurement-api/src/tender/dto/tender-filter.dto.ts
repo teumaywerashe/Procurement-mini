@@ -16,5 +16,5 @@ export class TenderFilterDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  price?: number;
+  estimatedValue?: number;
 }

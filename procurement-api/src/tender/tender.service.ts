@@ -16,7 +16,7 @@ export class TenderService {
       .values({
         ...createTenderDto,
         createdBy: user.uid,
-        referenceNumber: `Tender-${user.uid}`,
+        referenceNumber: `Tender-${new Date().getTime()}`, // Generate a unique reference number
       })
       .returning()
       .execute();
@@ -33,8 +33,8 @@ export class TenderService {
       conditions.push(ilike(tender.title, `%${filter.title}%`));
     }
 
-    if (filter.price) {
-      conditions.push(lte(tender.estimatedValue, filter.price));
+    if (filter.estimatedValue) {
+      conditions.push(lte(tender.estimatedValue, filter.estimatedValue));
     }
 
     return await db

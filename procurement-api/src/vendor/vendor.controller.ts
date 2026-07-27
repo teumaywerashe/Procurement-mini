@@ -47,7 +47,6 @@ export class VendorController {
     return await this.vendorService.findOne(id);
   }
   @Get('owner/me')
-  // @AdminOrOwner()
   @ApiOperation({ summary: 'Get logged-in vendor' })
   async findByOwnerId(@CurrentUser() user: JwtPayload) {
     return await this.vendorService.findByOwnerId(user.uid);
