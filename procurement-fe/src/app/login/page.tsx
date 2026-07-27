@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useState } from "react";
+import { useState } from "react";
 import {
   TextInput,
   PasswordInput,
@@ -18,9 +18,10 @@ import {
 import { useForm } from "@mantine/form";
 import { IconShoppingBag, IconAlertCircle } from "@tabler/icons-react";
 import Link from "next/link";
-import { navigate } from "next/dist/client/components/segment-cache/navigation";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -46,7 +47,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || "Login failed");
       // TODO: store token and redirect
       console.log(data);
-      // navigate("/registration"); // Replace with your dashboard route
+      router.push("/tender");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
