@@ -6,7 +6,7 @@ import { db } from '../database/db';
 import { tender } from '../database/schema/tender.schema';
 import { eq } from 'drizzle-orm/sql/expressions/conditions';
 import { TenderFilterDto } from './dto/tender-filter.dto';
-import { and, ilike, lte } from 'drizzle-orm';
+import { and, desc, ilike, lte } from 'drizzle-orm';
 
 @Injectable()
 export class TenderService {
@@ -16,7 +16,7 @@ export class TenderService {
       .values({
         ...createTenderDto,
         createdBy: user.uid,
-        referenceNumber: `Tender-${new Date().getTime()}`, // Generate a unique reference number
+        referenceNumber: `Tender-${new Date().getTime()}`,
       })
       .returning()
       .execute();
@@ -24,7 +24,11 @@ export class TenderService {
   }
 
   async findAll() {
-    return await db.select().from(tender).execute();
+    return await db
+      .select()
+      .from(tender)
+      .orderBy(desc(tender.createdAt))
+      .execute();
   }
   async findAllByFilter(filter: TenderFilterDto) {
     const conditions: ReturnType<typeof ilike>[] = [];
@@ -40,6 +44,7 @@ export class TenderService {
     return await db
       .select()
       .from(tender)
+      .orderBy(desc(tender.createdAt))
       .where(conditions.length ? and(...conditions) : undefined)
       .execute();
   }
