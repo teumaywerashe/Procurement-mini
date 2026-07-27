@@ -12,18 +12,7 @@ import { TenderModule } from './tender/tender.module';
 dotenv.config({ path: '../.env' });
 
 @Module({
-  imports: [
-    // TypeOrmModule.forRoot({
-    //   type: 'postgres',
-    //   url: process.env.DATABASE_URL,
-    //   autoLoadEntities: true,
-    //   entities: [User, Vendor],
-    // }),
-    AuthModule,
-    UserModule,
-    VendorModule,
-    TenderModule,
-  ],
+  imports: [AuthModule, UserModule, VendorModule, TenderModule],
   controllers: [AppController],
   providers: [AppService],
 })

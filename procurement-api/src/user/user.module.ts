@@ -4,6 +4,8 @@ import { UserController } from './user.controller';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 import { JwtModule } from '@nestjs/jwt';
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
 
 @Module({
   imports: [

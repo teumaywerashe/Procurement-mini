@@ -5,8 +5,6 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/pg-core';
-import { bid } from './bid.schema';
-import { relations } from 'drizzle-orm/_relations';
 import { users } from './user.schema';
 
 export const vendor = pgTable('vendor', {
@@ -20,8 +18,3 @@ export const vendor = pgTable('vendor', {
   phoneNumber: varchar('phone_number', { length: 255 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
-
-export const vendorRelations = relations(vendor, ({ many, one }) => ({
-  bids: many(bid),
-  user: one(users, { fields: [vendor.ownerId], references: [users.id] }),
-}));

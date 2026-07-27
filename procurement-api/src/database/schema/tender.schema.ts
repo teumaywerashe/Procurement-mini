@@ -7,7 +7,6 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
-import { relations } from 'drizzle-orm/_relations';
 import { tenderStatus } from '../../tender/enum/tenderStatus.enum';
 export const tender = pgTable('tender', {
   id: serial('id').primaryKey(),
@@ -16,6 +15,7 @@ export const tender = pgTable('tender', {
   status: varchar('status', { length: 255 }).default(tenderStatus.DRAFT),
   title: varchar('title', { length: 255 }).notNull(),
   closingDate: timestamp('closing_date').notNull(),
+  referenceNumber: varchar('reference_number', { length: 255 }).notNull(),
   estimatedValue: decimal('estimated_value', {
     precision: 10,
     scale: 2,
@@ -27,7 +27,3 @@ export const tender = pgTable('tender', {
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
-
-export const tenderRelations = relations(tender, ({ one }) => ({
-  user: one(users, { fields: [tender.createdBy], references: [users.id] }),
-}));

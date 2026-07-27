@@ -13,7 +13,11 @@ export class TenderService {
   async create(createTenderDto: CreateTenderDto, user: JwtPayload) {
     const [newTender] = await db
       .insert(tender)
-      .values({ ...createTenderDto, createdBy: user.uid })
+      .values({
+        ...createTenderDto,
+        createdBy: user.uid,
+        referenceNumber: `Tender-${user.uid}`,
+      })
       .returning()
       .execute();
     return newTender;

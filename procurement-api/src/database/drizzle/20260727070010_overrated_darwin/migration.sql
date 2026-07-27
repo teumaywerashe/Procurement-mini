@@ -1,0 +1,1 @@
+ALTER TABLE "tender" ADD COLUMN "reference_number" varchar(255) NOT NULL;
