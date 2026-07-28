@@ -40,6 +40,8 @@
         "cookie-parser": "^1.4.7",
         "dotenv": "^17.4.2",
         "drizzle-orm": "^1.0.0-rc.4",
+        "i": "^0.3.7",
+        "npm": "^12.0.1",
         "passport": "^0.7.0",
         "passport-jwt": "^4.0.1",
         "pg": "^8.22.0",

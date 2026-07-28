@@ -44,23 +44,17 @@ export default function LoginPage() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       const result: AuthResponse = await loginUser(values).unwrap();
-      // .catch((err) => {
-      //   setError(err.data?.message || "An error occurred");
-      // });
+      // console.log(result);
       dispatch(logIn(result.user));
       console.log(result.user);
       router.push("/tender");
     } catch (error: unknown) {
+      console.log("error occurred");
       setError(
         (error as { data?: { message?: string } }).data?.message ||
           "An error occurred",
       );
       console.log(error);
-      // notifications.show({
-      //   title: "Login Failed",
-      //   message: (error as { data?: { message?: string } }).data?.message || "An error occurred",
-      //   color: "red",
-      // });
     }
   };
 
