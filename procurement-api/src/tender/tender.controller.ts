@@ -12,7 +12,7 @@ import {
 import { TenderService } from './tender.service';
 import { CreateTenderDto } from './dto/create-tender.dto';
 import { UpdateTenderDto } from './dto/update-tender.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -22,7 +22,6 @@ import type { JwtPayload } from '../auth/decorators/current-user.decorator';
 import { TenderFilterDto } from './dto/tender-filter.dto';
 @Controller('tender')
 @ApiTags('Tenders')
-@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class TenderController {
   constructor(private readonly tenderService: TenderService) {}

@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiOperation } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -21,7 +21,6 @@ import { AdminOrOwnerGuard } from '../auth/guards/adminOrOwner.guard';
 import { AdminOrOwner } from '../auth/decorators/adminOrOwner.decorator';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 @Controller('vendor')
-@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwnerGuard)
 export class VendorController {
   constructor(private readonly vendorService: VendorService) {}

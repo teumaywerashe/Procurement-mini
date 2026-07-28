@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { MethodNotAllowedException, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './filters/exception-filters';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const cookieParser = require('cookie-parser');
+
+import cookieParser from 'cookie-parser';
 dotenv.config();
 
 async function bootstrap() {
@@ -22,7 +23,9 @@ async function bootstrap() {
       if (!origin || allowed.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error(`CORS: origin ${origin} not allowed`));
+        callback(
+          new MethodNotAllowedException(`CORS: origin ${origin} not allowed`),
+        );
       }
     },
     credentials: true,
@@ -37,7 +40,6 @@ async function bootstrap() {
       'API documentation for procurement platform authentication and resources.',
     )
     .setVersion('1.0')
-    .addBearerAuth()
     .build();
   SwaggerModule.setup(
     'api/docs',

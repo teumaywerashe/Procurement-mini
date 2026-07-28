@@ -7,7 +7,7 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -20,7 +20,7 @@ import { AdminOrOwner } from '../auth/decorators/adminOrOwner.decorator';
 import { AdminOrOwnerGuard } from '../auth/guards/adminOrOwner.guard';
 
 @ApiTags('Users')
-@ApiBearerAuth()
+//
 @UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwnerGuard)
 @Controller('user')
 export class UserController {
@@ -34,7 +34,6 @@ export class UserController {
   }
 
   @Get('me')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user profile' })
   async getProfile(@CurrentUser() user: JwtPayload) {
     return await this.userService.findOne(user.uid as unknown as string);

@@ -10,14 +10,25 @@ import { bid } from '../database/schema/bid.schema';
 import { db } from '../database/db';
 import type { JwtPayload } from '../auth/decorators/current-user.decorator';
 import { eq } from 'drizzle-orm';
+import { vendor } from '../database/schema/vendor.schema';
 @Injectable()
 export class BidService {
   async create(createBidDto: CreateBidDto, user: JwtPayload) {
+    const [creatingVendor] = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.ownerId, user.uid))
+      .execute();
+    if (!creatingVendor) {
+      throw new UnauthorizedException(
+        'You cant create a bid with user accound create a vendor first',
+      );
+    }
     const [createdBid] = await db
       .insert(bid)
       .values({
         ...createBidDto,
-        vendorId: user.uid,
+        vendorId: creatingVendor.id,
         referenceNumber: `RF-BID-${Date.now()}${user.uid}`,
       })
       .returning();
@@ -28,7 +39,18 @@ export class BidService {
     return await db.select().from(bid);
   }
   async findByVendorId(vendorId: number) {
-    return await db.select().from(bid).where(eq(bid.vendorId, vendorId));
+    const [existingVendor] = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.ownerId, vendorId))
+      .limit(1);
+    if (!existingVendor) {
+      throw new NotFoundException(`Vendor with ID ${vendorId} not found`);
+    }
+    return await db
+      .select()
+      .from(bid)
+      .where(eq(bid.vendorId, existingVendor.id));
   }
 
   async findByTenderId(tenderId: number) {
@@ -55,7 +77,15 @@ export class BidService {
     if (!foundBid) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }
-    if (foundBid.vendorId !== user.uid) {
+    const [creatingVendor] = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.id, foundBid.vendorId))
+      .limit(1);
+    if (!creatingVendor) {
+      throw new UnauthorizedException('Vendor not found');
+    }
+    if (creatingVendor.ownerId !== user.uid) {
       throw new UnauthorizedException(
         `Vendor ID mismatch. Cannot update bid with a different vendor ID.`,
       );
@@ -80,12 +110,21 @@ export class BidService {
     if (!foundBid) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }
-    if (foundBid.vendorId !== user.uid) {
+    const [creatingVendor] = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.id, foundBid.vendorId))
+      .limit(1);
+    if (!creatingVendor) {
+      throw new UnauthorizedException('Vendor not found');
+    }
+    if (creatingVendor.ownerId !== user.uid) {
       throw new UnauthorizedException(
         `Vendor ID mismatch. Cannot delete bid with a different vendor ID.`,
       );
     }
 
-    return await db.delete(bid).where(eq(bid.id, id)).returning();
+    const [deleted] = await db.delete(bid).where(eq(bid.id, id)).returning();
+    return { deleted: deleted, success: true, message: 'deleted succefully' };
   }
 }
