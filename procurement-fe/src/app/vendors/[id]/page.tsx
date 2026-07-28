@@ -1,0 +1,109 @@
+"use client";
+
+import React, { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import Navbar from "@/src/components/layout/Navbar";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/src/store/store";
+import { useGetVendorQuery } from "@/src/store/api/vendorApi";
+import {
+  IconArrowLeft,
+  IconBuilding,
+  IconPhone,
+  IconMapPin,
+  IconCalendar,
+  IconAlertTriangle,
+  IconHash,
+} from "@tabler/icons-react";
+
+export default function VendorDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const user = useSelector((s: RootState) => s.auth.user);
+  const isAdmin = user?.role === "admin";
+
+  useEffect(() => {
+    if (user && !isAdmin) router.push("/dashboard");
+  }, [user, isAdmin, router]);
+
+  const { data: vendor, isLoading, isError } = useGetVendorQuery(Number(id));
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center text-zinc-500 text-sm">Loading...</div>
+      </div>
+    );
+  }
+
+  if (isError || !vendor) {
+    return (
+      <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <IconAlertTriangle size={36} className="text-red-400" />
+          <p className="text-sm text-red-400">Vendor not found.</p>
+          <Link href="/vendors" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+            ← Back to vendors
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const details = [
+    { icon: <IconHash size={15} className="text-zinc-500" />,     label: "Vendor ID",     value: `#${vendor.id}` },
+    { icon: <IconBuilding size={15} className="text-zinc-500" />,  label: "Company",       value: vendor.companyName },
+    { icon: <IconPhone size={15} className="text-zinc-500" />,     label: "Phone",         value: vendor.contactPhone ?? "—" },
+    { icon: <IconMapPin size={15} className="text-zinc-500" />,    label: "Address",       value: vendor.address ?? "—" },
+    {
+      icon: <IconCalendar size={15} className="text-zinc-500" />,
+      label: "Registered",
+      value: new Date(vendor.createdAt).toLocaleDateString("en-US", {
+        month: "long", day: "numeric", year: "numeric",
+      }),
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
+      <Navbar />
+
+      <div className="max-w-2xl mx-auto w-full px-6 py-8 flex-1">
+        <Link
+          href="/vendors"
+          className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors mb-6"
+        >
+          <IconArrowLeft size={15} />
+          Back to vendors
+        </Link>
+
+        <div className="bg-[#1c1a16] border border-[#2a2620] rounded-2xl overflow-hidden">
+          {/* Header */}
+          <div className="px-8 py-6 border-b border-[#2a2620] flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-indigo-950/60 flex items-center justify-center shrink-0">
+              <IconBuilding size={26} className="text-indigo-400" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-white">{vendor.companyName}</h1>
+              <p className="text-xs text-zinc-500 mt-0.5">Vendor profile</p>
+            </div>
+          </div>
+
+          {/* Details */}
+          <div className="divide-y divide-[#1e1c18]">
+            {details.map((d) => (
+              <div key={d.label} className="flex items-center gap-4 px-8 py-4">
+                {d.icon}
+                <span className="text-xs text-zinc-600 w-24 shrink-0">{d.label}</span>
+                <span className="text-sm text-zinc-300">{d.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -14,15 +14,11 @@ import { useLogoutMutation } from "@/src/store/api/userApi";
 import { logOut } from "@/src/store/auth/authSlice";
 import type { RootState } from "@/src/store/store";
 
-const NAV_LINKS = [
-  { label: "Tenders", href: "/tender" },
-  { label: "My Bids", href: "/bids" },
-  { label: "Vendors", href: "/vendor" },
-];
-
 export default function Navbar() {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
   const user = useSelector((state: RootState) => state.auth.user);
+  const isAdmin = user?.role === "admin";
+  const isVendor = user?.role === "vendor";
   const dispatch = useDispatch();
   const router = useRouter();
   const [logoutApi] = useLogoutMutation();
@@ -31,6 +27,20 @@ export default function Navbar() {
     setMounted(true);
   }, []);
   const authed = mounted && isLoggedIn;
+
+  const navLinks = authed
+    ? [
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Tenders", href: "/tender" },
+        ...(isVendor ? [{ label: "My Bids", href: "/bids/my" }] : []),
+        ...(isAdmin
+          ? [
+              { label: "Manage", href: "/tender/manage" },
+              { label: "Vendors", href: "/vendors" },
+            ]
+          : []),
+      ]
+    : [];
 
   async function handleLogout() {
     await logoutApi();
@@ -51,7 +61,10 @@ export default function Navbar() {
     <header className="w-full bg-[#0f0e0b] border-b border-[#2a2620] shrink-0 sticky top-0 z-40">
       <div className="w-full px-6 h-14 flex items-center gap-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
+        <Link
+          href={isLoggedIn ? "/dashboard" : "/"}
+          className="flex items-center gap-2 shrink-0"
+        >
           <IconShoppingBag size={22} className="text-[#9fef00]" />
           <span className="font-bold text-base tracking-tight text-white">
             ProcureHub
@@ -64,7 +77,7 @@ export default function Navbar() {
         {/* Nav links */}
         {authed && (
           <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

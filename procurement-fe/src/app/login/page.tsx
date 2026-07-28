@@ -47,7 +47,7 @@ export default function LoginPage() {
       // console.log(result);
       dispatch(logIn(result.user));
       console.log(result.user);
-      router.push("/tender");
+      router.push("/dashboard");
     } catch (error: unknown) {
       console.log("error occurred", error);
       const data = (error as { data?: unknown }).data;

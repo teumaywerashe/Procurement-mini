@@ -1,0 +1,5 @@
+ALTER TABLE "bid" ALTER COLUMN "reference_number" SET DATA TYPE varchar USING "reference_number"::varchar;--> statement-breakpoint
+ALTER TABLE "bid" DROP CONSTRAINT "bid_vendor_id_vendor_id_fkey", ADD CONSTRAINT "bid_vendor_id_vendor_id_fkey" FOREIGN KEY ("vendor_id") REFERENCES "vendor"("id") ON DELETE CASCADE;--> statement-breakpoint
+ALTER TABLE "bid" DROP CONSTRAINT "bid_tender_id_tender_id_fkey", ADD CONSTRAINT "bid_tender_id_tender_id_fkey" FOREIGN KEY ("tender_id") REFERENCES "tender"("id") ON DELETE CASCADE;--> statement-breakpoint
+ALTER TABLE "tender" DROP CONSTRAINT "tender_created_by_users_id_fkey", ADD CONSTRAINT "tender_created_by_users_id_fkey" FOREIGN KEY ("created_by") REFERENCES "users"("id") ON DELETE CASCADE;--> statement-breakpoint
+ALTER TABLE "vendor" DROP CONSTRAINT "vendor_owner_id_users_id_fkey", ADD CONSTRAINT "vendor_owner_id_users_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "users"("id") ON DELETE CASCADE;
