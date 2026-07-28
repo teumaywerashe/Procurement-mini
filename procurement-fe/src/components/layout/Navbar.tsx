@@ -22,13 +22,17 @@ export default function Navbar() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [logoutApi] = useLogoutMutation();
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-  const authed = mounted && isLoggedIn;
-
-  const navLinks = authed
+  // const [mounted, setMounted] = React.useState(false);
+  // const updateMounted = () => {
+  //   setMounted(true);
+  // };
+  // React.useEffect(() => {
+  //   if (!mounted) {
+  //     updateMounted();
+  //   }
+  // }, []);
+ 
+  const navLinks = isLoggedIn
     ? [
         { label: "Dashboard", href: "/dashboard" },
         { label: "Tenders", href: "/tender" },
@@ -45,7 +49,7 @@ export default function Navbar() {
   async function handleLogout() {
     await logoutApi();
     dispatch(logOut());
-    router.push("/login");
+    router.push("/");
   }
 
   const initials = user?.name
@@ -75,7 +79,7 @@ export default function Navbar() {
         <div className="w-px h-5 bg-[#2a2620] shrink-0" />
 
         {/* Nav links */}
-        {authed && (
+        {isLoggedIn && (
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
@@ -90,7 +94,7 @@ export default function Navbar() {
         )}
 
         {/* Global search */}
-        {authed && (
+        {isLoggedIn && (
           <div className="hidden lg:flex flex-1 max-w-sm items-center bg-[#1c1a16] border border-[#2a2620] rounded-lg px-3 py-1.5 gap-2 ml-2">
             <IconSearch size={14} className="text-gray-500 shrink-0" />
             <input
@@ -106,7 +110,7 @@ export default function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-2 shrink-0">
-          {authed ? (
+          {isLoggedIn ? (
             <>
               <button className="relative p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
                 <IconBell size={18} />

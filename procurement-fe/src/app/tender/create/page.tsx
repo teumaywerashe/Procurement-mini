@@ -185,9 +185,17 @@ export default function CreateTenderPage() {
 
             {/* Error */}
             {error && (
-              <p className="text-xs text-red-400 bg-red-900/20 border border-red-800/40 rounded-lg px-4 py-2.5">
-                Failed to create tender. Please try again.
-              </p>
+              <div className="text-xs text-red-400 bg-red-900/20 border border-red-800/40 rounded-lg px-4 py-2.5 space-y-1">
+                {(() => {
+                  // RTK Query wraps HTTP errors as { status, data }
+                  const data = ("data" in error ? error.data : null) as {
+                    message?: string | string[];
+                  } | null;
+                  const raw = data?.message;
+                  const messages = Array.isArray(raw) ? raw : raw ? [raw] : ["Failed to create tender. Please try again."];
+                  return messages.map((m, i) => <p key={i}>{m}</p>);
+                })()}
+              </div>
             )}
 
             {/* Actions */}

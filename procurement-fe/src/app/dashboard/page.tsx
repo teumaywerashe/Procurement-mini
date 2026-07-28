@@ -17,6 +17,7 @@ import {
   IconChevronRight,
   IconPlus,
   IconTrendingUp,
+  IconLayoutDashboard,
 } from "@tabler/icons-react";
 
 function StatCard({
@@ -71,152 +72,174 @@ export default function DashboardPage() {
   const pendingBids = myBids.filter((b) => b.status === "pending");
   const acceptedBids = myBids.filter((b) => b.status === "accepted");
 
+  const quickLinks = [
+    { href: "/tender", icon: <IconFileText size={15} />, label: "Browse tenders", color: "text-indigo-400", always: true },
+    { href: "/bids/my", icon: <IconGavel size={15} />, label: "My bids", color: "text-yellow-400", always: false, vendorOnly: true },
+    { href: "/tender/create", icon: <IconPlus size={15} />, label: "Create tender", color: "text-emerald-400", always: false, adminOnly: true },
+    { href: "/tender/manage", icon: <IconFileText size={15} />, label: "Manage tenders", color: "text-orange-400", always: false, adminOnly: true },
+    { href: "/vendors", icon: <IconUsers size={15} />, label: "Manage vendors", color: "text-purple-400", always: false, adminOnly: true },
+  ].filter((l) => l.always || (l.adminOnly && isAdmin) || (l.vendorOnly && isVendor));
+
   return (
     <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
       <Navbar />
 
-      <div className="max-w-6xl mx-auto w-full px-6 py-8 flex-1">
-        {/* Page header */}
-        <div className="mb-8">
-          <h1 className="text-xl font-bold text-white">
-            Welcome back, {user?.name?.split(" ")[0] ?? "User"}
-          </h1>
-          <p className="text-sm text-zinc-500 mt-1 capitalize">{user?.role} account</p>
-        </div>
+      <div className="flex flex-1 w-full overflow-hidden">
 
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <StatCard
-            icon={<IconFileText size={18} className="text-indigo-400" />}
-            label="Total Tenders"
-            value={tendersLoading ? "—" : tenders.length}
-            sub={`${published.length} active`}
-            color="bg-indigo-950/60"
-          />
-          <StatCard
-            icon={<IconClock size={18} className="text-orange-400" />}
-            label="Closing Soon"
-            value={tendersLoading ? "—" : closingSoon.length}
-            sub="Within 7 days"
-            color="bg-orange-950/60"
-          />
-          {isAdmin ? (
-            <StatCard
-              icon={<IconUsers size={18} className="text-emerald-400" />}
-              label="Registered Vendors"
-              value={vendorsLoading ? "—" : vendors.length}
-              color="bg-emerald-950/60"
-            />
-          ) : (
-            <StatCard
-              icon={<IconGavel size={18} className="text-yellow-400" />}
-              label="My Bids"
-              value={bidsLoading ? "—" : myBids.length}
-              sub={`${pendingBids.length} pending`}
-              color="bg-yellow-950/60"
-            />
-          )}
-          <StatCard
-            icon={<IconTrendingUp size={18} className="text-purple-400" />}
-            label={isAdmin ? "Awarded" : "Accepted Bids"}
-            value={
-              isAdmin
-                ? tenders.filter((t) => t.status === "awarded").length
-                : acceptedBids.length
-            }
-            color="bg-purple-950/60"
-          />
-        </div>
+        {/* ── Left sidebar ── */}
+        <aside className="hidden lg:flex flex-col shrink-0 border-r border-[#1e1c18] bg-[#0f0e0b] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%" }}>
+          <div className="p-4 space-y-6">
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Recent tenders */}
-          <div className="lg:col-span-2 bg-[#1c1a16] border border-[#2a2620] rounded-xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-[#2a2620] flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-white">Recent Tenders</h2>
-              <Link href="/tender" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
-                View all <IconChevronRight size={13} />
-              </Link>
-            </div>
-            <div>
-              {tendersLoading ? (
-                <div className="p-5 space-y-3">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-10 bg-[#14120e] rounded animate-pulse" />
-                  ))}
+            {/* Overview stats */}
+            <div className="space-y-1">
+              <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">Overview</p>
+              {[
+                { label: "Total tenders", value: tendersLoading ? "—" : tenders.length },
+                { label: "Active",        value: tendersLoading ? "—" : published.length },
+                { label: "Closing soon",  value: tendersLoading ? "—" : closingSoon.length },
+                ...(isAdmin ? [{ label: "Vendors", value: vendorsLoading ? "—" : vendors.length }] : []),
+                ...(isVendor ? [{ label: "My bids", value: bidsLoading ? "—" : myBids.length }] : []),
+              ].map((s) => (
+                <div key={s.label} className="flex items-center justify-between px-2 py-1.5">
+                  <span className="text-xs text-zinc-500">{s.label}</span>
+                  <span className="text-xs font-semibold text-white tabular-nums">{s.value}</span>
                 </div>
-              ) : recentTenders.length === 0 ? (
-                <div className="px-5 py-10 text-center text-sm text-zinc-600">No tenders yet.</div>
-              ) : (
-                recentTenders.map((t) => (
-                  <Link
-                    key={t.id}
-                    href={`/tender/${t.id}`}
-                    className="flex items-center justify-between px-5 py-3.5 border-b border-[#1e1c18] hover:bg-[#161410] transition-colors group"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-white group-hover:text-indigo-300 transition-colors truncate">
-                        {t.title}
-                      </p>
-                      <p className="text-xs text-zinc-600 mt-0.5">{t.referenceNumber}</p>
-                    </div>
-                    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 ml-3 ${
-                      t.status === "published" ? "bg-emerald-950/60 text-emerald-400"
-                      : t.status === "awarded"  ? "bg-indigo-950/60 text-indigo-400"
-                      : t.status === "closed"   ? "bg-red-950/60 text-red-400"
-                      : "bg-zinc-800 text-zinc-400"
-                    }`}>
-                      {t.status}
-                    </span>
-                  </Link>
-                ))
-              )}
+              ))}
             </div>
-            {isAdmin && (
-              <div className="px-5 py-3 border-t border-[#2a2620]">
-                <Link
-                  href="/tender/create"
-                  className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
-                >
-                  <IconPlus size={13} /> Create new tender
-                </Link>
-              </div>
-            )}
-          </div>
 
-          {/* Quick actions / bids summary */}
-          <div className="space-y-4">
-            <div className="bg-[#1c1a16] border border-[#2a2620] rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-[#2a2620]">
-                <h2 className="text-sm font-semibold text-white">Quick Actions</h2>
+            <div className="h-px bg-[#1e1c18]" />
+
+            {/* Quick Actions nav */}
+            <div>
+              <div className="flex items-center gap-2 px-2 mb-2">
+                <IconLayoutDashboard size={12} className="text-zinc-600" />
+                <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">Quick Actions</p>
               </div>
-              <div className="p-3 space-y-1">
-                <Link href="/tender" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#14120e] transition-colors group">
-                  <IconFileText size={16} className="text-indigo-400 shrink-0" />
-                  <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">Browse tenders</span>
-                </Link>
-                {isVendor && (
-                  <Link href="/bids/my" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#14120e] transition-colors group">
-                    <IconGavel size={16} className="text-yellow-400 shrink-0" />
-                    <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">My bids</span>
+              <nav className="space-y-0.5">
+                {quickLinks.map((l) => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    className="w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-xs text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    <span className={l.color}>{l.icon}</span>
+                    {l.label}
                   </Link>
-                )}
-                {isAdmin && (
-                  <>
-                    <Link href="/tender/create" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#14120e] transition-colors group">
-                      <IconPlus size={16} className="text-emerald-400 shrink-0" />
-                      <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">Create tender</span>
+                ))}
+              </nav>
+            </div>
+
+          </div>
+        </aside>
+
+        {/* ── Main content ── */}
+        <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+          <div className="max-w-4xl w-full mx-auto px-6 py-8 flex-1">
+
+            {/* Page header */}
+            <div className="mb-8">
+              <h1 className="text-xl font-bold text-white">
+                Welcome back, {user?.name?.split(" ")[0] ?? "User"}
+              </h1>
+              <p className="text-sm text-zinc-500 mt-1 capitalize">{user?.role} account</p>
+            </div>
+
+            {/* Stats grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <StatCard
+                icon={<IconFileText size={18} className="text-indigo-400" />}
+                label="Total Tenders"
+                value={tendersLoading ? "—" : tenders.length}
+                sub={`${published.length} active`}
+                color="bg-indigo-950/60"
+              />
+              <StatCard
+                icon={<IconClock size={18} className="text-orange-400" />}
+                label="Closing Soon"
+                value={tendersLoading ? "—" : closingSoon.length}
+                sub="Within 7 days"
+                color="bg-orange-950/60"
+              />
+              {isAdmin ? (
+                <StatCard
+                  icon={<IconUsers size={18} className="text-emerald-400" />}
+                  label="Registered Vendors"
+                  value={vendorsLoading ? "—" : vendors.length}
+                  color="bg-emerald-950/60"
+                />
+              ) : (
+                <StatCard
+                  icon={<IconGavel size={18} className="text-yellow-400" />}
+                  label="My Bids"
+                  value={bidsLoading ? "—" : myBids.length}
+                  sub={`${pendingBids.length} pending`}
+                  color="bg-yellow-950/60"
+                />
+              )}
+              <StatCard
+                icon={<IconTrendingUp size={18} className="text-purple-400" />}
+                label={isAdmin ? "Awarded" : "Accepted Bids"}
+                value={
+                  isAdmin
+                    ? tenders.filter((t) => t.status === "awarded").length
+                    : acceptedBids.length
+                }
+                color="bg-purple-950/60"
+              />
+            </div>
+
+            {/* Recent tenders */}
+            <div className="bg-[#1c1a16] border border-[#2a2620] rounded-xl overflow-hidden mb-6">
+              <div className="px-5 py-4 border-b border-[#2a2620] flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-white">Recent Tenders</h2>
+                <Link href="/tender" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+                  View all <IconChevronRight size={13} />
+                </Link>
+              </div>
+              <div>
+                {tendersLoading ? (
+                  <div className="p-5 space-y-3">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="h-10 bg-[#14120e] rounded animate-pulse" />
+                    ))}
+                  </div>
+                ) : recentTenders.length === 0 ? (
+                  <div className="px-5 py-10 text-center text-sm text-zinc-600">No tenders yet.</div>
+                ) : (
+                  recentTenders.map((t) => (
+                    <Link
+                      key={t.id}
+                      href={`/tender/${t.id}`}
+                      className="flex items-center justify-between px-5 py-3.5 border-b border-[#1e1c18] hover:bg-[#161410] transition-colors group"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-white group-hover:text-indigo-300 transition-colors truncate">
+                          {t.title}
+                        </p>
+                        <p className="text-xs text-zinc-600 mt-0.5">{t.referenceNumber}</p>
+                      </div>
+                      <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 ml-3 ${
+                        t.status === "published" ? "bg-emerald-950/60 text-emerald-400"
+                        : t.status === "awarded"  ? "bg-indigo-950/60 text-indigo-400"
+                        : t.status === "closed"   ? "bg-red-950/60 text-red-400"
+                        : "bg-zinc-800 text-zinc-400"
+                      }`}>
+                        {t.status}
+                      </span>
                     </Link>
-                    <Link href="/tender/manage" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#14120e] transition-colors group">
-                      <IconFileText size={16} className="text-orange-400 shrink-0" />
-                      <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">Manage tenders</span>
-                    </Link>
-                    <Link href="/vendors" className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#14120e] transition-colors group">
-                      <IconUsers size={16} className="text-purple-400 shrink-0" />
-                      <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">Manage vendors</span>
-                    </Link>
-                  </>
+                  ))
                 )}
               </div>
+              {isAdmin && (
+                <div className="px-5 py-3 border-t border-[#2a2620]">
+                  <Link
+                    href="/tender/create"
+                    className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+                  >
+                    <IconPlus size={13} /> Create new tender
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Vendor: recent bids */}
@@ -257,8 +280,10 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
+
           </div>
-        </div>
+        </main>
+
       </div>
     </div>
   );

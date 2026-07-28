@@ -258,7 +258,7 @@ export default function TenderDetailPage() {
         {/* Bid section placeholder */}
         <Button className="mt-6 bg-[#1c1a16] border border-[#2a2620] rounded-2xl px-8 py-6">
           <h2 className="text-sm font-semibold text-white mb-1">
-            Submit a Bid
+            {isAdmin ? "View Tender's Bids" : "Submit a Bid"}
           </h2>
         </Button>
       </div>

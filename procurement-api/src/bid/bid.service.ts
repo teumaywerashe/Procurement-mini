@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateBidDto } from './dto/create-bid.dto';
 import { UpdateBidDto } from './dto/update-bid.dto';
 import { bid } from '../database/schema/bid.schema';
@@ -22,15 +27,25 @@ export class BidService {
   async findAll() {
     return await db.select().from(bid);
   }
+  async findByVendorId(vendorId: number) {
+    return await db.select().from(bid).where(eq(bid.vendorId, vendorId));
+  }
+
+  async findByTenderId(tenderId: number) {
+    return await db.select().from(bid).where(eq(bid.tenderId, tenderId));
+  }
 
   async findOne(id: number) {
     const [bidById] = await db.select().from(bid).where(eq(bid.id, id));
+    if (!bidById) {
+      throw new NotFoundException(`Bid with ID ${id} not found`);
+    }
     return bidById;
   }
 
-  async update(id: number, updateBidDto: UpdateBidDto) {
+  async update(id: number, updateBidDto: UpdateBidDto, user: JwtPayload) {
     if (!id) {
-      throw new Error('Bid ID is required for update');
+      throw new BadRequestException('Bid ID is required for update');
     }
     const [foundBid] = await db
       .select()
@@ -38,7 +53,12 @@ export class BidService {
       .where(eq(bid.id, id))
       .limit(1);
     if (!foundBid) {
-      throw new Error(`Bid with ID ${id} not found`);
+      throw new NotFoundException(`Bid with ID ${id} not found`);
+    }
+    if (foundBid.vendorId !== user.uid) {
+      throw new UnauthorizedException(
+        `Vendor ID mismatch. Cannot update bid with a different vendor ID.`,
+      );
     }
     const [updatedBid] = await db
       .update(bid)
@@ -48,9 +68,9 @@ export class BidService {
     return updatedBid;
   }
 
-  async remove(id: number) {
+  async remove(id: number, user: JwtPayload) {
     if (!id) {
-      throw new Error('Bid ID is required for deletion');
+      throw new UnauthorizedException('Bid ID is required for deletion');
     }
     const [foundBid] = await db
       .select()
@@ -58,7 +78,12 @@ export class BidService {
       .where(eq(bid.id, id))
       .limit(1);
     if (!foundBid) {
-      throw new Error(`Bid with ID ${id} not found`);
+      throw new NotFoundException(`Bid with ID ${id} not found`);
+    }
+    if (foundBid.vendorId !== user.uid) {
+      throw new UnauthorizedException(
+        `Vendor ID mismatch. Cannot delete bid with a different vendor ID.`,
+      );
     }
 
     return await db.delete(bid).where(eq(bid.id, id)).returning();
