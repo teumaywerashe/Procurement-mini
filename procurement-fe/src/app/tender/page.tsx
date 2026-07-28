@@ -20,11 +20,14 @@ import {
   IconLeaf,
   IconArrowRight,
   IconFilter,
+  IconGavel,
 } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import { useGetTendersQuery } from "@/src/store/api/tenderApi";
+import { useGetBidsByVendorQuery } from "@/src/store/api/bidApi";
+import { useGetVendorQuery } from "@/src/store/api/vendorApi";
 import type { RootState } from "@/src/store/store";
-import type { Tender, TenderStatus } from "@/src/types";
+import type { Bid, Tender, TenderStatus } from "@/src/types";
 
 const STATUS_COLORS: Record<TenderStatus, { bg: string; text: string; dot: string }> = {
   published: { bg: "bg-emerald-950/60", text: "text-emerald-400", dot: "bg-emerald-400" },
@@ -32,6 +35,12 @@ const STATUS_COLORS: Record<TenderStatus, { bg: string; text: string; dot: strin
   closed:    { bg: "bg-red-950/60",     text: "text-red-400",     dot: "bg-red-400"     },
   awarded:   { bg: "bg-indigo-950/60",  text: "text-indigo-400",  dot: "bg-indigo-400"  },
   cancelled: { bg: "bg-orange-950/60",  text: "text-orange-400",  dot: "bg-orange-400"  },
+};
+
+const BID_STATUS_COLORS: Record<Bid["status"], { bg: string; text: string }> = {
+  pending:  { bg: "bg-yellow-950/60", text: "text-yellow-400" },
+  accepted: { bg: "bg-emerald-950/60", text: "text-emerald-400" },
+  rejected: { bg: "bg-red-950/60",    text: "text-red-400"    },
 };
 
 const CATEGORIES = [
@@ -45,12 +54,12 @@ const CATEGORIES = [
 ];
 
 const STATUS_FILTERS = [
-  { label: "All",           value: "" },
-  { label: "Published",     value: "published" },
-  { label: "Closing soon",  value: "closing" },
-  { label: "Awarded",       value: "awarded" },
-  { label: "Draft",         value: "draft" },
-  { label: "Cancelled",     value: "cancelled" },
+  { label: "All",          value: "" },
+  { label: "Published",    value: "published" },
+  { label: "Closing soon", value: "closing" },
+  { label: "Awarded",      value: "awarded" },
+  { label: "Draft",        value: "draft" },
+  { label: "Cancelled",    value: "cancelled" },
 ];
 
 function timeAgo(dateStr: string, now: number) {
@@ -78,62 +87,49 @@ function TenderRow({ tender, now }: { tender: Tender; now: number }) {
   return (
     <Link
       href={`/tender/${tender.id}`}
-      className="group flex items-start gap-4 px-6 py-5 border-b border-[#1e1c18] hover:bg-[#161410] transition-colors"
+      className="group flex items-start gap-5 px-8 py-6 border-b border-[#1e1c18] hover:bg-[#161410] transition-colors"
     >
-      {/* Icon */}
-      <div className="w-10 h-10 rounded-lg bg-[#1e1c18] border border-[#2a2620] flex items-center justify-center shrink-0 mt-0.5">
-        <IconFileText size={18} className="text-indigo-400" />
+      <div className="w-12 h-12 rounded-xl bg-[#1e1c18] border border-[#2a2620] flex items-center justify-center shrink-0 mt-0.5">
+        <IconFileText size={22} className="text-indigo-400" />
       </div>
 
-      {/* Body */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <span
-                className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full ${status.bg} ${status.text}`}
-              >
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap mb-1.5">
+              <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full ${status.bg} ${status.text}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
                 {tender.status.charAt(0).toUpperCase() + tender.status.slice(1)}
               </span>
-              <span className="text-[11px] text-zinc-600">{tender.referenceNumber}</span>
-              <span className="text-[11px] text-zinc-600">·</span>
-              <span className="text-[11px] text-zinc-500">{timeAgo(tender.createdAt, now)}</span>
+              <span className="text-xs text-zinc-600">{tender.referenceNumber}</span>
+              <span className="text-xs text-zinc-600">·</span>
+              <span className="text-xs text-zinc-500">{timeAgo(tender.createdAt, now)}</span>
             </div>
 
-            <h3 className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors leading-snug mb-1 truncate pr-4">
+            <h3 className="text-base font-semibold text-white group-hover:text-indigo-300 transition-colors leading-snug mb-1.5 pr-4">
               {tender.title}
             </h3>
 
             {tender.description && (
-              <p className="text-xs text-zinc-500 line-clamp-1 mb-2">
-                {tender.description}
-              </p>
+              <p className="text-sm text-zinc-500 line-clamp-2 mb-3">{tender.description}</p>
             )}
 
-            <div className="flex items-center gap-4 text-xs text-zinc-500">
+            <div className="flex items-center gap-5 text-sm text-zinc-500">
               <span className="flex items-center gap-1">
-                <IconCurrencyDollar size={12} className="text-zinc-600" />
-                <span className="text-zinc-300 font-medium">
-                  ${Number(tender.estimatedValue).toLocaleString()}
-                </span>
+                <IconCurrencyDollar size={14} className="text-zinc-600" />
+                <span className="text-zinc-300 font-medium">${Number(tender.estimatedValue).toLocaleString()}</span>
               </span>
-              <span className="capitalize text-zinc-500">{tender.name}</span>
+              <span className="capitalize">{tender.name}</span>
             </div>
           </div>
 
-          {/* Right meta */}
           <div className="flex flex-col items-end gap-2 shrink-0">
-            <span
-              className={`flex items-center gap-1 text-xs font-medium whitespace-nowrap ${
-                isUrgent && closing !== "Closed"
-                  ? "text-orange-400"
-                  : closing === "Closed"
-                  ? "text-zinc-600"
-                  : "text-zinc-400"
-              }`}
-            >
-              <IconClock size={12} />
+            <span className={`flex items-center gap-1 text-sm font-medium whitespace-nowrap ${
+              isUrgent && closing !== "Closed" ? "text-orange-400"
+              : closing === "Closed" ? "text-zinc-600"
+              : "text-zinc-400"
+            }`}>
+              <IconClock size={14} />
               {closing}
             </span>
             <button
@@ -141,37 +137,118 @@ function TenderRow({ tender, now }: { tender: Tender; now: number }) {
               className="p-1.5 rounded-md text-zinc-700 hover:text-zinc-400 hover:bg-[#2a2620] opacity-0 group-hover:opacity-100 transition-all"
               title="Save"
             >
-              <IconBookmark size={14} />
+              <IconBookmark size={15} />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Arrow */}
-      <IconChevronRight
-        size={15}
-        className="text-zinc-700 group-hover:text-zinc-400 transition-colors shrink-0 mt-3"
-      />
+      <IconChevronRight size={16} className="text-zinc-700 group-hover:text-zinc-400 transition-colors shrink-0 mt-4" />
     </Link>
   );
 }
 
-export default function TendersPage() {
-  const [search, setSearch]           = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [category, setCategory]       = useState("");
-  const [showFilters, setShowFilters] = useState(false);
-  const [sortNewest, setSortNewest]   = useState(true);
+function BidsSidebar({ userId, isVendor }: { userId: number; isVendor: boolean }) {
+  const { data: vendor } = useGetVendorQuery(userId, { skip: !isVendor });
+  const { data: bids = [], isLoading } = useGetBidsByVendorQuery(vendor?.id ?? 0, {
+    skip: !vendor?.id,
+  });
 
-  const user    = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "admin";
+  const recent = bids.slice(0, 5);
+
+  return (
+    <aside className="hidden xl:flex flex-col shrink-0 border-l border-[#1e1c18] bg-[#0f0e0b] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%" }}>
+      <div className="p-4 space-y-4">
+        {/* Header */}
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <IconGavel size={15} className="text-indigo-400" />
+            <p className="text-xs font-semibold text-white">My Bids</p>
+          </div>
+          {bids.length > 0 && (
+            <span className="text-[10px] font-semibold bg-indigo-600/20 text-indigo-400 px-2 py-0.5 rounded-full tabular-nums">
+              {bids.length}
+            </span>
+          )}
+        </div>
+
+        <div className="h-px bg-[#1e1c18]" />
+
+        {/* Bid list */}
+        {!isVendor ? (
+          <div className="px-1 py-4 text-center">
+            <p className="text-xs text-zinc-600">Bids are visible to vendor accounts.</p>
+          </div>
+        ) : isLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="animate-pulse space-y-1.5 px-1">
+                <div className="h-2.5 bg-[#1e1c18] rounded w-3/4" />
+                <div className="h-2 bg-[#1e1c18] rounded w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : recent.length === 0 ? (
+          <div className="px-1 py-4 text-center space-y-2">
+            <div className="w-10 h-10 rounded-full bg-[#1e1c18] flex items-center justify-center mx-auto">
+              <IconGavel size={18} className="text-zinc-600" />
+            </div>
+            <p className="text-xs text-zinc-500">No bids submitted yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {recent.map((bid) => {
+              const colors = BID_STATUS_COLORS[bid.status];
+              return (
+                <div key={bid.id} className="px-3 py-3 rounded-lg bg-[#161410] border border-[#1e1c18] space-y-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] text-zinc-600 font-medium">Tender #{bid.tenderId}</span>
+                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${colors.bg} ${colors.text}`}>
+                      {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
+                    </span>
+                  </div>
+                  <p className="text-sm font-semibold text-white">
+                    ${Number(bid.amount).toLocaleString()}
+                  </p>
+                  <p className="text-[10px] text-zinc-600">
+                    {new Date(bid.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Go to bids page */}
+        <Link
+          href="/bids"
+          className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border border-[#2a2620] text-xs font-medium text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors"
+        >
+          View all bids
+          <IconArrowRight size={13} />
+        </Link>
+      </div>
+    </aside>
+  );
+}
+
+export default function TendersPage() {
+  const [search, setSearch]             = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [category, setCategory]         = useState("");
+  const [showFilters, setShowFilters]   = useState(false);
+  const [sortNewest, setSortNewest]     = useState(true);
+
+  const user     = useSelector((s: RootState) => s.auth.user);
+  const isAdmin  = user?.role === "admin";
+  const isVendor = user?.role === "vendor";
 
   const { data: tenders = [], isLoading, isError } = useGetTendersQuery(
     search ? { title: search } : {}
   );
 
-  // Stable timestamp — initialized once, never triggers impurity rules
   const [now] = useState<number>(() => new Date().getTime());
+
   const filtered = tenders.filter((t) => {
     if (statusFilter === "closing") {
       const days = Math.ceil((new Date(t.closingDate).getTime() - now) / 86_400_000);
@@ -201,18 +278,17 @@ export default function TendersPage() {
       <Navbar />
 
       <div className="flex flex-1 w-full overflow-hidden">
-        {/* ── Left sidebar ── */}
-        <aside className="hidden lg:flex flex-col w-56 xl:w-64 shrink-0 border-r border-[#1e1c18] bg-[#0f0e0b] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
+
+        {/* ── Left sidebar (20%) ── */}
+        <aside className="hidden lg:flex flex-col shrink-0 border-r border-[#1e1c18] bg-[#0f0e0b] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%" }}>
           <div className="p-4 space-y-6">
             {/* Stats */}
             <div className="space-y-1">
-              <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">
-                Overview
-              </p>
+              <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">Overview</p>
               {[
-                { label: "Total tenders",  value: stats.total     },
-                { label: "Active",         value: stats.published  },
-                { label: "Closing soon",   value: stats.closing    },
+                { label: "Total tenders", value: stats.total     },
+                { label: "Active",        value: stats.published  },
+                { label: "Closing soon",  value: stats.closing    },
               ].map((s) => (
                 <div key={s.label} className="flex items-center justify-between px-2 py-1.5">
                   <span className="text-xs text-zinc-500">{s.label}</span>
@@ -225,9 +301,7 @@ export default function TendersPage() {
 
             {/* Categories */}
             <div>
-              <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">
-                Categories
-              </p>
+              <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">Categories</p>
               <nav className="space-y-0.5">
                 {CATEGORIES.map((cat) => (
                   <button
@@ -239,9 +313,7 @@ export default function TendersPage() {
                         : "text-zinc-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    <span className={category === cat.value ? "text-indigo-400" : "text-zinc-600"}>
-                      {cat.icon}
-                    </span>
+                    <span className={category === cat.value ? "text-indigo-400" : "text-zinc-600"}>{cat.icon}</span>
                     {cat.label}
                   </button>
                 ))}
@@ -252,9 +324,7 @@ export default function TendersPage() {
 
             {/* Status filters */}
             <div>
-              <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">
-                Status
-              </p>
+              <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">Status</p>
               <nav className="space-y-0.5">
                 {STATUS_FILTERS.map((f) => (
                   <button
@@ -267,9 +337,7 @@ export default function TendersPage() {
                     }`}
                   >
                     {f.label}
-                    {statusFilter === f.value && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                    )}
+                    {statusFilter === f.value && <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />}
                   </button>
                 ))}
               </nav>
@@ -277,12 +345,11 @@ export default function TendersPage() {
           </div>
         </aside>
 
-        {/* ── Main content ── */}
+        {/* ── Center: tenders (flex-1) ── */}
         <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
           {/* Toolbar */}
           <div className="sticky top-14 z-30 bg-[#0f0e0b] border-b border-[#1e1c18] px-6 py-3 flex items-center gap-3">
-            {/* Search */}
-            <div className="flex items-center flex-1 bg-[#161410] border border-[#2a2620] rounded-lg px-3 py-2 gap-2 max-w-lg">
+            <div className="flex items-center flex-1 bg-[#161410] border border-[#2a2620] rounded-lg px-3 py-2 gap-2">
               <IconSearch size={14} className="text-zinc-500 shrink-0" />
               <input
                 type="text"
@@ -293,7 +360,6 @@ export default function TendersPage() {
               />
             </div>
 
-            {/* Mobile filters toggle */}
             <button
               onClick={() => setShowFilters((v) => !v)}
               className={`lg:hidden flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border transition-colors ${
@@ -306,7 +372,6 @@ export default function TendersPage() {
               Filters
             </button>
 
-            {/* Sort */}
             <select
               value={sortNewest ? "newest" : "oldest"}
               onChange={(e) => setSortNewest(e.target.value === "newest")}
@@ -352,24 +417,12 @@ export default function TendersPage() {
           <div className="px-6 py-4 flex items-center justify-between border-b border-[#1e1c18]">
             <div>
               <h1 className="text-sm font-semibold text-white">
-                {statusFilter
-                  ? STATUS_FILTERS.find((f) => f.value === statusFilter)?.label
-                  : "All Tenders"}
+                {statusFilter ? STATUS_FILTERS.find((f) => f.value === statusFilter)?.label : "All Tenders"}
               </h1>
               <p className="text-xs text-zinc-600 mt-0.5">
                 {isLoading ? "Loading..." : `${sorted.length} result${sorted.length !== 1 ? "s" : ""}`}
               </p>
             </div>
-
-            {isAdmin && (
-              <Link
-                href="/tender/create"
-                className="hidden sm:flex lg:hidden items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
-              >
-                <IconPlus size={14} />
-                New Tender
-              </Link>
-            )}
           </div>
 
           {/* Tender list */}
@@ -417,7 +470,7 @@ export default function TendersPage() {
             )}
           </div>
 
-          {/* Footer count */}
+          {/* Footer */}
           {!isLoading && sorted.length > 0 && (
             <div className="px-6 py-3 border-t border-[#1e1c18] flex items-center justify-between">
               <p className="text-xs text-zinc-600">
@@ -429,6 +482,10 @@ export default function TendersPage() {
             </div>
           )}
         </main>
+
+        {/* ── Right sidebar: Bids ── */}
+        <BidsSidebar userId={user?.id ?? 0} isVendor={isVendor} />
+
       </div>
     </div>
   );

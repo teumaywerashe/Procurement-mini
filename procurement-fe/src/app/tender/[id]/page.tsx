@@ -22,13 +22,29 @@ import {
   IconAlertTriangle,
 } from "@tabler/icons-react";
 import type { TenderStatus } from "@/src/types";
+import { Button } from "@mantine/core";
 
-const STATUS_COLORS: Record<TenderStatus, { bg: string; text: string; dot: string }> = {
-  published: { bg: "bg-green-900/40", text: "text-green-400", dot: "bg-green-400" },
+const STATUS_COLORS: Record<
+  TenderStatus,
+  { bg: string; text: string; dot: string }
+> = {
+  published: {
+    bg: "bg-green-900/40",
+    text: "text-green-400",
+    dot: "bg-green-400",
+  },
   draft: { bg: "bg-gray-800", text: "text-gray-400", dot: "bg-gray-400" },
   closed: { bg: "bg-red-900/40", text: "text-red-400", dot: "bg-red-400" },
-  awarded: { bg: "bg-indigo-900/40", text: "text-indigo-400", dot: "bg-indigo-400" },
-  cancelled: { bg: "bg-orange-900/40", text: "text-orange-400", dot: "bg-orange-400" },
+  awarded: {
+    bg: "bg-indigo-900/40",
+    text: "text-indigo-400",
+    dot: "bg-indigo-400",
+  },
+  cancelled: {
+    bg: "bg-orange-900/40",
+    text: "text-orange-400",
+    dot: "bg-orange-400",
+  },
 };
 
 function daysLeft(dateStr: string) {
@@ -73,7 +89,10 @@ export default function TenderDetailPage() {
         <div className="flex-1 flex flex-col items-center justify-center gap-4 text-sm">
           <IconAlertTriangle size={40} className="text-red-400" />
           <p className="text-red-400">Tender not found or failed to load.</p>
-          <Link href="/tender" className="text-indigo-400 hover:text-indigo-300 transition-colors">
+          <Link
+            href="/tender"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors"
+          >
             ← Back to tenders
           </Link>
         </div>
@@ -109,8 +128,11 @@ export default function TenderDetailPage() {
                   <span
                     className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${status.bg} ${status.text}`}
                   >
-                    <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
-                    {tender.status.charAt(0).toUpperCase() + tender.status.slice(1)}
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${status.dot}`}
+                    />
+                    {tender.status.charAt(0).toUpperCase() +
+                      tender.status.slice(1)}
                   </span>
                   {isUrgent && closing !== "Closed" && (
                     <span className="inline-flex items-center gap-1 text-xs font-medium text-orange-400 bg-orange-900/30 px-2.5 py-1 rounded-full">
@@ -150,23 +172,37 @@ export default function TenderDetailPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 border-b border-[#2a2620]">
             {[
               {
-                icon: <IconCurrencyDollar size={16} className="text-green-400" />,
+                icon: (
+                  <IconCurrencyDollar size={16} className="text-green-400" />
+                ),
                 label: "Estimated Value",
                 value: `$${Number(tender.estimatedValue).toLocaleString()}`,
               },
               {
-                icon: <IconClock size={16} className={isUrgent && closing !== "Closed" ? "text-orange-400" : "text-gray-400"} />,
+                icon: (
+                  <IconClock
+                    size={16}
+                    className={
+                      isUrgent && closing !== "Closed"
+                        ? "text-orange-400"
+                        : "text-gray-400"
+                    }
+                  />
+                ),
                 label: "Closing",
                 value: closing,
               },
               {
                 icon: <IconCalendar size={16} className="text-indigo-400" />,
                 label: "Closing Date",
-                value: new Date(tender.closingDate).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                }),
+                value: new Date(tender.closingDate).toLocaleDateString(
+                  "en-US",
+                  {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  },
+                ),
               },
               {
                 icon: <IconHash size={16} className="text-gray-400" />,
@@ -174,25 +210,34 @@ export default function TenderDetailPage() {
                 value: tender.referenceNumber,
               },
             ].map((item) => (
-              <div key={item.label} className="px-6 py-4 border-r border-[#2a2620] last:border-r-0">
+              <div
+                key={item.label}
+                className="px-6 py-4 border-r border-[#2a2620] last:border-r-0"
+              >
                 <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
                   {item.icon}
                   {item.label}
                 </div>
-                <p className="text-sm font-semibold text-white truncate">{item.value}</p>
+                <p className="text-sm font-semibold text-white truncate">
+                  {item.value}
+                </p>
               </div>
             ))}
           </div>
 
           {/* Description */}
           <div className="px-8 py-6 border-b border-[#2a2620]">
-            <h2 className="text-sm font-semibold text-gray-300 mb-3">Description</h2>
+            <h2 className="text-sm font-semibold text-gray-300 mb-3">
+              Description
+            </h2>
             {tender.description ? (
               <p className="text-sm text-gray-400 leading-relaxed whitespace-pre-wrap">
                 {tender.description}
               </p>
             ) : (
-              <p className="text-sm text-gray-600 italic">No description provided.</p>
+              <p className="text-sm text-gray-600 italic">
+                No description provided.
+              </p>
             )}
           </div>
 
@@ -211,12 +256,11 @@ export default function TenderDetailPage() {
         </div>
 
         {/* Bid section placeholder */}
-        <div className="mt-6 bg-[#1c1a16] border border-[#2a2620] rounded-2xl px-8 py-6">
-          <h2 className="text-sm font-semibold text-white mb-1">Submit a Bid</h2>
-          <p className="text-xs text-gray-500">
-            Bidding functionality coming soon.
-          </p>
-        </div>
+        <Button className="mt-6 bg-[#1c1a16] border border-[#2a2620] rounded-2xl px-8 py-6">
+          <h2 className="text-sm font-semibold text-white mb-1">
+            Submit a Bid
+          </h2>
+        </Button>
       </div>
 
       {/* Delete confirm modal */}
@@ -227,10 +271,14 @@ export default function TenderDetailPage() {
               <div className="w-10 h-10 rounded-full bg-red-900/30 flex items-center justify-center shrink-0">
                 <IconTrash size={18} className="text-red-400" />
               </div>
-              <h3 className="font-semibold text-white text-base">Delete tender?</h3>
+              <h3 className="font-semibold text-white text-base">
+                Delete tender?
+              </h3>
             </div>
             <p className="text-sm text-gray-400 mb-5 leading-relaxed">
-              This will permanently delete <span className="text-white font-medium">{tender.title}</span>. This action cannot be undone.
+              This will permanently delete{" "}
+              <span className="text-white font-medium">{tender.title}</span>.
+              This action cannot be undone.
             </p>
             <div className="flex items-center gap-3">
               <button

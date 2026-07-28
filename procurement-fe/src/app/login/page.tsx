@@ -49,12 +49,18 @@ export default function LoginPage() {
       console.log(result.user);
       router.push("/tender");
     } catch (error: unknown) {
-      console.log("error occurred");
-      setError(
-        (error as { data?: { message?: string } }).data?.message ||
-          "An error occurred",
-      );
-      console.log(error);
+      console.log("error occurred", error);
+      const data = (error as { data?: unknown }).data;
+      const msg  = (data as { message?: unknown } | undefined)?.message;
+      if (Array.isArray(msg)) {
+        setError(msg.join(", "));
+      } else if (typeof msg === "string") {
+        setError(msg);
+      } else if (typeof data === "string") {
+        setError(data);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
     }
   };
 
