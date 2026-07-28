@@ -73,6 +73,10 @@ export class TenderService {
       .where(eq(tender.id, id))
       .returning()
       .execute();
-    return deletedTender;
+    return {
+      deletedTender,
+      success: true,
+      message: 'Tender deleted successfully',
+    };
   }
 }

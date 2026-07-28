@@ -123,6 +123,10 @@ export class VendorService {
       .where(eq(vendor.id, id))
       .returning()
       .execute();
-    return deletedVendor;
+    return {
+      deletedVendor: deletedVendor,
+      success: true,
+      message: 'Vendor deleted successfully',
+    };
   }
 }
