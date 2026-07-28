@@ -4,14 +4,20 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './filters/exception-filters';
+import * as cookieParser from 'cookie-parser';
 dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: process.env.FRONTEND_URL ?? 'http://localhost:3001',
+    credentials: true,
+  });
 
   app.useGlobalFilters(new HttpExceptionFilter());
-  // console.log(process.env.DATABASE_URL);
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const swaggerConfig = new DocumentBuilder()

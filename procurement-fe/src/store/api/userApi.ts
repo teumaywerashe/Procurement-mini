@@ -6,8 +6,12 @@ export const userApi = baseApi.injectEndpoints({
     login: builder.mutation<AuthResponse, { email: string; password: string }>({
       query: (body) => ({ url: "/auth/login", method: "POST", body }),
     }),
-    register: builder.mutation<User, { name: string; email: string; password: string }>({
+    register: builder.mutation<AuthResponse, { name: string; email: string; password: string }>({
       query: (body) => ({ url: "/auth/register", method: "POST", body }),
+    }),
+    logout: builder.mutation<{ message: string }, void>({
+      query: () => ({ url: "/auth/logout", method: "POST" }),
+      invalidatesTags: ["User", "Tender", "Bid", "Vendor"],
     }),
     getMe: builder.query<User, void>({
       query: () => "/user/me",
@@ -20,4 +24,10 @@ export const userApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetMeQuery, useUpdateUserMutation } = userApi;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useLogoutMutation,
+  useGetMeQuery,
+  useUpdateUserMutation,
+} = userApi;

@@ -32,6 +32,11 @@ export class JwtAuthGuard implements CanActivate {
   }
 
   private extractToken(request: Request): string | null {
+    // 1. Try httpOnly cookie first
+    const cookieToken = (request.cookies as Record<string, string>)?.access_token;
+    if (cookieToken) return cookieToken;
+
+    // 2. Fall back to Authorization: Bearer header (e.g. Swagger / API clients)
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : null;
   }

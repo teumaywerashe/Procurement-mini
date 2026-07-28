@@ -1,28 +1,41 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
-import React, { useState } from "react";
+import React from "react";
 import {
-  IconSearch,
   IconBell,
   IconSettings,
   IconChevronDown,
   IconShoppingBag,
 } from "@tabler/icons-react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { useLogoutMutation } from "@/src/store/api/userApi";
+import { logOut } from "@/src/store/auth/authSlice";
+import type { RootState } from "@/src/store/store";
 
-const navLinks = [
-  { label: "Find Tenders", hasDropdown: true },
-  { label: "Submit Bid", hasDropdown: true },
-  { label: "Manage Finances", hasDropdown: true },
-  { label: "Messages", hasDropdown: false },
-];
 
 export default function Navbar() {
-  // TODO: replace with real auth state
-  const {isLoggedIn} = useSelector((state:any) => state.auth);
-  const user = { name: "John D.", role: "Vendor", avatarInitials: "JD" };
+  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const [logoutApi] = useLogoutMutation();
+
+  // Avoid SSR/client mismatch — auth state only exists on the client
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => { setMounted(true); }, []);
+  const authed = mounted && isLoggedIn;
+
+  async function handleLogout() {
+    await logoutApi();
+    dispatch(logOut());
+    router.push("/login");
+  }
+
+  const initials = user?.name
+    ? user.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
+    : "?";
 
   return (
     <nav className="w-full mx-auto  bg-[#14120e] text-white px-6 py-0 flex flex-center items-center gap-4 h-14 shrink-0">
@@ -67,7 +80,7 @@ export default function Navbar() {
 
       {/* Right side */}
       <div className="flex items-center gap-3 ml-auto shrink-0">
-        {isLoggedIn ? (
+        {authed ? (
           <>
             <button className="text-gray-400 hover:text-white transition-colors relative">
               <IconBell size={20} />
@@ -80,13 +93,19 @@ export default function Navbar() {
             </button>
             <div className="flex items-center gap-2 cursor-pointer group">
               <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold">
-                {user.avatarInitials}
+                {initials}
               </div>
               <IconChevronDown
                 size={14}
                 className="text-gray-400 group-hover:text-white transition-colors"
               />
             </div>
+            <button
+              onClick={handleLogout}
+              className="text-xs text-gray-400 hover:text-white border border-[#3a3630] hover:border-gray-400 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              Log out
+            </button>
           </>
         ) : (
           <>

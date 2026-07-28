@@ -1,10 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
-// import React, { useEffect, useState, useCallback } from "react";
-// import Navbar from "../../components/layout/Navbar"
-
 import Link from "next/link";
 import {
   IconSearch,
@@ -19,27 +16,12 @@ import {
   IconStar,
   IconChevronDown,
   IconChevronRight,
+  IconPlus,
 } from "@tabler/icons-react";
-import { Button } from "@mantine/core";
-import { logOut } from "@/src/store/auth/authSlice";
-import { useDispatch } from "react-redux";
-// import { useNavigate } from "react-router-dom";
-import { useRouter } from "next/navigation";
-
-type TenderStatus = "draft" | "published" | "closed" | "awarded" | "cancelled";
-
-interface Tender {
-  id: number;
-  title: string;
-  name: string;
-  description?: string;
-  status: TenderStatus;
-  closingDate: string;
-  referenceNumber: string;
-  estimatedValue: number;
-  createdAt: string;
-  createdBy: number;
-}
+import { useSelector } from "react-redux";
+import { useGetTendersQuery } from "@/src/store/api/tenderApi";
+import type { RootState } from "@/src/store/store";
+import type { Tender, TenderStatus } from "@/src/types";
 
 const STATUS_COLORS: Record<
   TenderStatus,
@@ -306,39 +288,19 @@ const STATUS_FILTERS: { label: string; value: string }[] = [
 ];
 
 export default function TendersPage() {
-  const [tenders, setTenders] = useState<Tender[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState(0);
   const [statusFilter, setStatusFilter] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
-  const dispatch = useDispatch();
-  // const navigate = useNavigate();
-  const router = useRouter();
-  const fetchTenders = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const params = new URLSearchParams();
-      if (search) params.set("title", search);
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/tender/all${params.toString() ? `?${params}` : ""}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Failed to fetch tenders");
-      const data: Tender[] = await res.json();
-      setTenders(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  }, [search]);
+  const user = useSelector((s: RootState) => s.auth.user);
+  const isAdmin = user?.role === "admin";
 
-  useEffect(() => {
-    const timer = setTimeout(fetchTenders, 400);
-    return () => clearTimeout(timer);
-  }, [fetchTenders]);
+  const { data: tenders = [], isLoading: loading, isError } = useGetTendersQuery(
+    search ? { title: search } : {}
+  );
+  console.log(tenders)
+  const error = isError ? "Failed to fetch tenders" : "";
 
   const now = new Date().getTime();
   const filtered = tenders.filter((t) => {
@@ -364,14 +326,6 @@ export default function TendersPage() {
     <div className="min-h-screen bg-[#14120e] text-white flex flex-col">
       <Navbar />
 
-      <Button
-        onClick={() => {
-          dispatch(logOut());
-          router.push("/");
-        }}
-      >
-        logout
-      </Button>
       {/* Banner */}
       <div className="bg-[#1c1a16] border-b border-[#2a2620] px-6 py-8">
         <div className="max-w-5xl mx-auto">
@@ -397,18 +351,31 @@ export default function TendersPage() {
 
       {/* Main layout */}
       <div className="flex-1 max-w-6xl mx-auto w-full px-6 py-6 flex gap-6 items-start">
+        
         {/* Left — tender list */}
+
         <div className="flex-1 min-w-0">
           {/* Search bar */}
-          <div className="flex items-center bg-[#1c1a16] border border-[#2a2620] rounded-xl px-4 py-2.5 gap-3 mb-4">
-            <IconSearch size={18} className="text-gray-500 shrink-0" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search tenders by title or keyword..."
-              className="bg-transparent text-sm text-white placeholder-gray-500 outline-none flex-1"
-            />
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center flex-1 bg-[#1c1a16] border border-[#2a2620] rounded-xl px-4 py-2.5 gap-3">
+              <IconSearch size={18} className="text-gray-500 shrink-0" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search tenders by title or keyword..."
+                className="bg-transparent text-sm text-white placeholder-gray-500 outline-none flex-1"
+              />
+            </div>
+            {isAdmin && (
+              <Link
+                href="/tender/create"
+                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition-colors shrink-0"
+              >
+                <IconPlus size={16} />
+                New Tender
+              </Link>
+            )}
           </div>
 
           {/* Tabs + Filters */}

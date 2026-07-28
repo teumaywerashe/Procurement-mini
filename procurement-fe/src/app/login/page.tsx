@@ -16,6 +16,7 @@ import {
   Box,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 import { IconShoppingBag, IconAlertCircle } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,6 +30,7 @@ export default function LoginPage() {
   const dispatch = useDispatch();
   const [loginUser, { isLoading }] = useLoginMutation();
   const [error, setError] = useState("");
+  // const [loading, setLoading] = useState(false);
 
   const form = useForm({
     initialValues: { email: "", password: "" },
@@ -42,21 +44,23 @@ export default function LoginPage() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       const result: AuthResponse = await loginUser(values).unwrap();
-
+      // .catch((err) => {
+      //   setError(err.data?.message || "An error occurred");
+      // });
       dispatch(logIn(result.user));
-      // console.log(result.user);
+      console.log(result.user);
       router.push("/tender");
     } catch (error: unknown) {
-      const errData = (error as { data?: { message?: unknown } }).data;
-      const msg = errData?.message;
       setError(
-        typeof msg === "string"
-          ? msg
-          : typeof msg === "object" && msg !== null && "message" in msg
-            ? String((msg as { message: unknown }).message)
-            : "An error occurred",
+        (error as { data?: { message?: string } }).data?.message ||
+          "An error occurred",
       );
       console.log(error);
+      // notifications.show({
+      //   title: "Login Failed",
+      //   message: (error as { data?: { message?: string } }).data?.message || "An error occurred",
+      //   color: "red",
+      // });
     }
   };
 

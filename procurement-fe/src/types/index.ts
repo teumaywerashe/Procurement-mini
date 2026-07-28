@@ -49,3 +49,12 @@ export interface AuthState {
   user: User | null;
   isLoggedIn: boolean;
 }
+
+export interface FormState {
+  title: string;
+  name: string;
+  description: string;
+  status: TenderStatus;
+  closingDate: string;
+  estimatedValue: string;
+}

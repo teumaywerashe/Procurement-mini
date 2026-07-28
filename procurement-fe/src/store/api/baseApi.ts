@@ -4,12 +4,8 @@ export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL,
-    prepareHeaders: (headers) => {
-      const token =
-        typeof window !== "undefined" ? localStorage.getItem("token") : null;
-      if (token) headers.set("Authorization", `Bearer ${token}`);
-      return headers;
-    },
+    // Sends the httpOnly cookie automatically on every request
+    credentials: "include",
   }),
   tagTypes: ["Tender", "Bid", "User", "Vendor"],
   endpoints: () => ({}),
