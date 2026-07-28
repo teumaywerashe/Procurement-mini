@@ -7,15 +7,28 @@ export const bidApi = baseApi.injectEndpoints({
       query: (tenderId) => `/bid/tender/${tenderId}`,
       providesTags: ["Bid"],
     }),
+    getBidsByVendor: builder.query<Bid[], number>({
+      query: (vendorId) => `/bid/vendor/${vendorId}`,
+      providesTags: ["Bid"],
+    }),
     createBid: builder.mutation<Bid, Partial<Bid>>({
       query: (body) => ({ url: "/bid", method: "POST", body }),
       invalidatesTags: ["Bid"],
     }),
     updateBid: builder.mutation<Bid, { id: number } & Partial<Bid>>({
-      query: ({ id, ...body }) => ({ url: `/bid/${id}`, method: "PATCH", body }),
+      query: ({ id, ...body }) => ({
+        url: `/bid/${id}`,
+        method: "PATCH",
+        body,
+      }),
       invalidatesTags: ["Bid"],
     }),
   }),
 });
 
-export const { useGetBidsByTenderQuery, useCreateBidMutation, useUpdateBidMutation } = bidApi;
+export const {
+  useGetBidsByTenderQuery,
+  useGetBidsByVendorQuery,
+  useCreateBidMutation,
+  useUpdateBidMutation,
+} = bidApi;

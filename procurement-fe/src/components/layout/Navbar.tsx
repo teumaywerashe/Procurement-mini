@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
@@ -9,6 +10,7 @@ import {
   IconChevronDown,
   IconShoppingBag,
 } from "@tabler/icons-react";
+import { useSelector } from "react-redux";
 
 const navLinks = [
   { label: "Find Tenders", hasDropdown: true },
@@ -18,9 +20,8 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [searchValue, setSearchValue] = useState("");
   // TODO: replace with real auth state
-  const isLoggedIn = true;
+  const {isLoggedIn} = useSelector((state:any) => state.auth);
   const user = { name: "John D.", role: "Vendor", avatarInitials: "JD" };
 
   return (

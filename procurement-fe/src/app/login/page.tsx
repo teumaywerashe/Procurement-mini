@@ -19,11 +19,16 @@ import { useForm } from "@mantine/form";
 import { IconShoppingBag, IconAlertCircle } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLoginMutation } from "@/src/store/api/userApi";
+import { useDispatch } from "react-redux";
+import { logIn } from "@/src/store/auth/authSlice";
+import { AuthResponse } from "@/src/types";
 
 export default function LoginPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const [loginUser, { isLoading }] = useLoginMutation();
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     initialValues: { email: "", password: "" },
@@ -35,23 +40,23 @@ export default function LoginPage() {
   });
 
   const handleSubmit = async (values: typeof form.values) => {
-    setError("");
-    setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed");
-      // TODO: store token and redirect
-      console.log(data);
+      const result: AuthResponse = await loginUser(values).unwrap();
+
+      dispatch(logIn(result.user));
+      // console.log(result.user);
       router.push("/tender");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setLoading(false);
+    } catch (error: unknown) {
+      const errData = (error as { data?: { message?: unknown } }).data;
+      const msg = errData?.message;
+      setError(
+        typeof msg === "string"
+          ? msg
+          : typeof msg === "object" && msg !== null && "message" in msg
+            ? String((msg as { message: unknown }).message)
+            : "An error occurred",
+      );
+      console.log(error);
     }
   };
 
@@ -122,7 +127,7 @@ export default function LoginPage() {
                 Forgot password?
               </Anchor>
 
-              <Button type="submit" fullWidth loading={loading} mt="xs">
+              <Button type="submit" fullWidth loading={isLoading} mt="xs">
                 Sign in
               </Button>
             </Stack>

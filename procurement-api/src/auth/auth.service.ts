@@ -13,8 +13,10 @@ import { eq } from 'drizzle-orm/sql/expressions/conditions';
 import { db } from '../database/db';
 type User = {
   id: number;
+  name: string;
   email: string;
   role: string;
+  createdAt: Date;
 };
 
 @Injectable()
@@ -83,13 +85,16 @@ export class AuthService {
     return {
       accessToken: this.jwtService.sign({
         uid: user.id,
+
         email: user.email,
         role: user.role,
       }),
       user: {
         id: user.id,
+        name: user.name,
         email: user.email,
         role: user.role,
+        createdAt: user.createdAt,
       },
     };
   }

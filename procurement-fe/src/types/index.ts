@@ -18,7 +18,7 @@ export interface User {
   name: string;
   email: string;
   role: "admin" | "vendor";
-  createdAt: string;
+  createdAt: Date;
 }
 
 export interface Vendor {
@@ -42,4 +42,10 @@ export interface Bid {
 export interface AuthResponse {
   access_token: string;
   user: User;
+}
+
+
+export interface AuthState {
+  user: User | null;
+  isLoggedIn: boolean;
 }
