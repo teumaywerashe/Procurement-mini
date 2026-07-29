@@ -19,8 +19,8 @@ import { useTheme } from "@/src/components/ThemeProvider";
 export default function Navbar() {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
   const { user } = useSelector((state: RootState) => state.auth);
-  const isAdmin = user?.role === "admin";
-  const isVendor = user?.role === "vendor";
+  const isAdmin = user?.role === "Admin";
+  const isVendor = user?.role === "Vendor";
   const dispatch = useDispatch();
   const router = useRouter();
   const { theme, toggle } = useTheme();

@@ -24,7 +24,7 @@ import {
 export default function VendorsPage() {
   const router = useRouter();
   const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "Admin";
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "newest" | "oldest">("newest");
 
@@ -36,16 +36,16 @@ export default function VendorsPage() {
 
   const filtered = vendors
     .filter((v) =>
-      search ? v.companyName.toLowerCase().includes(search.toLowerCase()) : true
+      search ? (v.companyName ?? "").toLowerCase().includes(search.toLowerCase()) : true
     )
     .sort((a, b) => {
-      if (sortBy === "name") return a.companyName.localeCompare(b.companyName);
+      if (sortBy === "name") return (a.companyName ?? "").localeCompare(b.companyName ?? "");
       if (sortBy === "newest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     });
 
   // Letter groupings for left sidebar
-  const letters = [...new Set(vendors.map((v) => v.companyName[0]?.toUpperCase()))].sort();
+  const letters = [...new Set(vendors.map((v) => v.companyName?.[0]?.toUpperCase()).filter(Boolean))].sort() as string[];
 
   // Monthly join trend for right sidebar
   const monthMap: Record<string, number> = {};

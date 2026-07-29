@@ -50,10 +50,13 @@ export default function LoginPage() {
     } catch (error: unknown) {
       console.log("error occurred", error);
       const data = (error as { data?: unknown }).data;
-      const msg  = (data as { message?: unknown } | undefined)?.message;
+      const msg = (data as { message?: unknown } | undefined)?.message;
       if (Array.isArray(msg)) {
         setError(msg.join(", "));
-      
+      } else if (typeof msg === "object" && msg !== null && "message" in msg) {
+        setError((msg as { message: string }).message);
+      } else if (typeof msg === "string") {
+        setError(msg);
       } else if (typeof data === "string") {
         setError(data);
       } else {

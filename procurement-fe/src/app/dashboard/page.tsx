@@ -50,9 +50,9 @@ function StatCard({
 }
 
 export default function DashboardPage() {
-  const {user} = useSelector((s: RootState) => s.auth);
-  const isAdmin = user?.role === "admin";
-  const isVendor = user?.role === "vendor";
+  const { user } = useSelector((s: RootState) => s.auth);
+  const isAdmin = user?.role === "Admin";
+  const isVendor = user?.role === "Vendor";
   const now = React.useMemo(() => Date.now(), []);
 
   const { data: tenders = [], isLoading: tendersLoading } = useGetTendersQuery(
@@ -71,7 +71,7 @@ export default function DashboardPage() {
       skip: !vendor?.id,
     },
   );
-
+  console.log({"Tenders": tenders,"Vendors": vendors,"My Bids": myBids });
   const published = tenders.filter((t) => t.status === "published");
   const closingSoon = tenders.filter((t) => {
     const d = Math.ceil((new Date(t.closingDate).getTime() - now) / 86_400_000);
@@ -413,7 +413,9 @@ export default function DashboardPage() {
           <div className="p-4 space-y-4">
             <div className="flex items-center gap-2 px-1">
               <IconTrendingUp size={14} className="text-indigo-400" />
-              <p className="text-xs font-semibold text-[var(--text-primary)]">Tender Overview</p>
+              <p className="text-xs font-semibold text-[var(--text-primary)]">
+                Tender Overview
+              </p>
             </div>
 
             <div className="h-px bg-[var(--border)]" />
@@ -421,44 +423,116 @@ export default function DashboardPage() {
             {tendersLoading ? (
               <div className="space-y-2">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="h-10 bg-[var(--bg-elevated)] rounded animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-10 bg-[var(--bg-elevated)] rounded animate-pulse"
+                  />
                 ))}
               </div>
             ) : (
               <div className="space-y-2">
                 {[
-                  { label: "Total tenders",  value: tenders.length,                                     color: "text-[var(--text-primary)]" },
-                  { label: "Published",      value: published.length,                                    color: "text-emerald-400" },
-                  { label: "Closing soon",   value: closingSoon.length,                                  color: "text-orange-400" },
-                  { label: "Awarded",        value: tenders.filter((t) => t.status === "awarded").length, color: "text-indigo-400" },
-                  { label: "Closed",         value: tenders.filter((t) => t.status === "closed").length,  color: "text-red-400" },
+                  {
+                    label: "Total tenders",
+                    value: tenders.length,
+                    color: "text-[var(--text-primary)]",
+                  },
+                  {
+                    label: "Published",
+                    value: published.length,
+                    color: "text-emerald-400",
+                  },
+                  {
+                    label: "Closing soon",
+                    value: closingSoon.length,
+                    color: "text-orange-400",
+                  },
+                  {
+                    label: "Awarded",
+                    value: tenders.filter((t) => t.status === "awarded").length,
+                    color: "text-indigo-400",
+                  },
+                  {
+                    label: "Closed",
+                    value: tenders.filter((t) => t.status === "closed").length,
+                    color: "text-red-400",
+                  },
                 ].map((stat) => (
-                  <div key={stat.label} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)]">
-                    <span className="text-xs text-[var(--text-subtle)]">{stat.label}</span>
-                    <span className={`text-sm font-bold tabular-nums ${stat.color}`}>{stat.value}</span>
+                  <div
+                    key={stat.label}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)]"
+                  >
+                    <span className="text-xs text-[var(--text-subtle)]">
+                      {stat.label}
+                    </span>
+                    <span
+                      className={`text-sm font-bold tabular-nums ${stat.color}`}
+                    >
+                      {stat.value}
+                    </span>
                   </div>
                 ))}
 
                 {/* Status bar */}
                 {tenders.length > 0 && (
                   <div className="px-3 py-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)]">
-                    <p className="text-[10px] text-[var(--text-faint)] mb-2">Distribution</p>
+                    <p className="text-[10px] text-[var(--text-faint)] mb-2">
+                      Distribution
+                    </p>
                     <div className="flex h-2 rounded-full overflow-hidden gap-0.5">
-                      {published.length > 0 && <div className="bg-emerald-500" style={{ width: `${(published.length / tenders.length) * 100}%` }} />}
-                      {tenders.filter((t) => t.status === "draft").length > 0 && <div className="bg-zinc-500" style={{ width: `${(tenders.filter((t) => t.status === "draft").length / tenders.length) * 100}%` }} />}
-                      {tenders.filter((t) => t.status === "awarded").length > 0 && <div className="bg-indigo-500" style={{ width: `${(tenders.filter((t) => t.status === "awarded").length / tenders.length) * 100}%` }} />}
-                      {tenders.filter((t) => t.status === "closed").length > 0 && <div className="bg-red-500" style={{ width: `${(tenders.filter((t) => t.status === "closed").length / tenders.length) * 100}%` }} />}
+                      {published.length > 0 && (
+                        <div
+                          className="bg-emerald-500"
+                          style={{
+                            width: `${(published.length / tenders.length) * 100}%`,
+                          }}
+                        />
+                      )}
+                      {tenders.filter((t) => t.status === "draft").length >
+                        0 && (
+                        <div
+                          className="bg-zinc-500"
+                          style={{
+                            width: `${(tenders.filter((t) => t.status === "draft").length / tenders.length) * 100}%`,
+                          }}
+                        />
+                      )}
+                      {tenders.filter((t) => t.status === "awarded").length >
+                        0 && (
+                        <div
+                          className="bg-indigo-500"
+                          style={{
+                            width: `${(tenders.filter((t) => t.status === "awarded").length / tenders.length) * 100}%`,
+                          }}
+                        />
+                      )}
+                      {tenders.filter((t) => t.status === "closed").length >
+                        0 && (
+                        <div
+                          className="bg-red-500"
+                          style={{
+                            width: `${(tenders.filter((t) => t.status === "closed").length / tenders.length) * 100}%`,
+                          }}
+                        />
+                      )}
                     </div>
                     <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
                       {[
                         { label: "Published", color: "bg-emerald-500" },
-                        { label: "Draft",     color: "bg-zinc-500" },
-                        { label: "Awarded",   color: "bg-indigo-500" },
-                        { label: "Closed",    color: "bg-red-500" },
+                        { label: "Draft", color: "bg-zinc-500" },
+                        { label: "Awarded", color: "bg-indigo-500" },
+                        { label: "Closed", color: "bg-red-500" },
                       ].map((item) => (
-                        <div key={item.label} className="flex items-center gap-1">
-                          <span className={`w-1.5 h-1.5 rounded-full ${item.color}`} />
-                          <span className="text-[10px] text-[var(--text-faint)]">{item.label}</span>
+                        <div
+                          key={item.label}
+                          className="flex items-center gap-1"
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${item.color}`}
+                          />
+                          <span className="text-[10px] text-[var(--text-faint)]">
+                            {item.label}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -468,16 +542,46 @@ export default function DashboardPage() {
                 {isVendor && (
                   <>
                     <div className="h-px bg-[var(--border)]" />
-                    <p className="text-[10px] font-semibold text-[var(--text-faint)] uppercase tracking-wider px-1">My Bids</p>
+                    <p className="text-[10px] font-semibold text-[var(--text-faint)] uppercase tracking-wider px-1">
+                      My Bids
+                    </p>
                     {[
-                      { label: "Total bids", value: myBids.length,                                     color: "text-[var(--text-primary)]" },
-                      { label: "Pending",    value: myBids.filter((b) => b.status === "pending").length, color: "text-yellow-400" },
-                      { label: "Accepted",   value: myBids.filter((b) => b.status === "accepted").length, color: "text-emerald-400" },
-                      { label: "Rejected",   value: myBids.filter((b) => b.status === "rejected").length, color: "text-red-400" },
+                      {
+                        label: "Total bids",
+                        value: myBids.length,
+                        color: "text-[var(--text-primary)]",
+                      },
+                      {
+                        label: "Pending",
+                        value: myBids.filter((b) => b.status === "pending")
+                          .length,
+                        color: "text-yellow-400",
+                      },
+                      {
+                        label: "Accepted",
+                        value: myBids.filter((b) => b.status === "accepted")
+                          .length,
+                        color: "text-emerald-400",
+                      },
+                      {
+                        label: "Rejected",
+                        value: myBids.filter((b) => b.status === "rejected")
+                          .length,
+                        color: "text-red-400",
+                      },
                     ].map((stat) => (
-                      <div key={stat.label} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)]">
-                        <span className="text-xs text-[var(--text-subtle)]">{stat.label}</span>
-                        <span className={`text-sm font-bold tabular-nums ${stat.color}`}>{stat.value}</span>
+                      <div
+                        key={stat.label}
+                        className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)]"
+                      >
+                        <span className="text-xs text-[var(--text-subtle)]">
+                          {stat.label}
+                        </span>
+                        <span
+                          className={`text-sm font-bold tabular-nums ${stat.color}`}
+                        >
+                          {stat.value}
+                        </span>
                       </div>
                     ))}
                   </>

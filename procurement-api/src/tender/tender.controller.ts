@@ -16,7 +16,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../auth/enum/userRole..enum';
+import { UserRole } from '../user/enum/userRole..enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/decorators/current-user.decorator';
 import { TenderFilterDto } from './dto/tender-filter.dto';

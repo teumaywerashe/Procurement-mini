@@ -26,7 +26,7 @@ import {
 
 export default function ProfilePage() {
   const { user } = useSelector((s: RootState) => s.auth);
-  const isVendor = user?.role === "vendor";
+  const isVendor = user?.role === "Vendor";
   const dispatch = useDispatch();
 
   const { data: vendor } = useGetVendorQuery(user?.id ?? 0, { skip: !isVendor });

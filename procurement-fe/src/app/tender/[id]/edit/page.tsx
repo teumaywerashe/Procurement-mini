@@ -253,7 +253,7 @@ export default function EditTenderPage() {
   const user = useSelector((s: RootState) => s.auth.user);
 
   useEffect(() => {
-    if (user && user.role !== "admin") router.push(`/tender/${id}`);
+    if (user && user.role !== "Admin") router.push(`/tender/${id}`);
   }, [user, id, router]);
 
   const { data: tender, isLoading } = useGetTenderQuery(Number(id));

@@ -45,7 +45,7 @@ const CATEGORIES = [
 export default function MyBidsPage() {
   const router = useRouter();
   const user = useSelector((s: RootState) => s.auth.user);
-  const isVendor = user?.role === "vendor";
+  const isVendor = user?.role === "Vendor";
 
   useEffect(() => {
     if (user && !isVendor) router.push("/dashboard");

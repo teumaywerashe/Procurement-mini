@@ -292,10 +292,10 @@ function BidsSidebar({
 
         {/* Go to bids page */}
         <Link
-          href="/bids"
+          href={isVendor ? "/bids/my" : "/bids"}
           className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border border-[#2a2620] text-xs font-medium text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors"
         >
-          {!isVendor ? "View all bids" : "My Bids"}
+          {isVendor ? "My Bids" : "View all bids"}
           <IconArrowRight size={13} />
         </Link>
       </div>
@@ -311,8 +311,9 @@ export default function TendersPage() {
   const [sortNewest, setSortNewest] = useState(true);
 
   const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "admin";
-  const isVendor = user?.role === "vendor";
+  const isAdmin = user?.role === "Admin";
+  const isVendor = user?.role === "Vendor";
+  console.log(user);
 
   const {
     data: tenders = [],
@@ -323,7 +324,8 @@ export default function TendersPage() {
   const [now] = useState<number>(() => new Date().getTime());
 
   const filtered = tenders.filter((t) => {
-    if (category && t.name?.toLowerCase() !== category.toLowerCase()) return false;
+    if (category && t.name?.toLowerCase() !== category.toLowerCase())
+      return false;
     if (statusFilter === "closing") {
       const days = Math.ceil(
         (new Date(t.closingDate).getTime() - now) / 86_400_000,
@@ -333,8 +335,6 @@ export default function TendersPage() {
     if (statusFilter) return t.status === statusFilter;
     return true;
   });
-
-  
 
   const sorted = [...filtered].sort((a, b) =>
     sortNewest

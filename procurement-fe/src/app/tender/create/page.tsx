@@ -24,7 +24,7 @@ export default function CreateTenderPage() {
   const user = useSelector((s: RootState) => s.auth.user);
 
   useEffect(() => {
-    if (user && user.role !== "admin") router.push("/tender");
+    if (user && user.role !== "Admin") router.push("/tender");
   }, [user, router]);
 
   const [createTender, { isLoading, error }] = useCreateTenderMutation();

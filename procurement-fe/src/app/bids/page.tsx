@@ -43,7 +43,7 @@ const CATEGORIES = [
 export default function AdminBidsPage() {
   const router = useRouter();
   const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "Admin";
 
   useEffect(() => {
     if (user && !isAdmin) router.push("/dashboard");
@@ -140,7 +140,7 @@ export default function AdminBidsPage() {
                         : "text-[var(--text-subtle)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5"
                     }`}
                   >
-                    <span className="capitalize">{s === "" ? "All" : s}</span>
+                    <span className="capitalize"> {s === "" ? "All" : s} </span>
                     {statusFilter === s && <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />}
                   </button>
                 ))}
@@ -251,9 +251,9 @@ export default function AdminBidsPage() {
                           month: "short", day: "numeric", year: "numeric",
                         })}
                       </span>
-                      <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-0.5 rounded-full w-fit ${s.bg} ${s.text}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-                        {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
+                      <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-0.5 rounded-full w-fit ${s?.bg} ${s?.text}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${s?.dot}`} />
+                        {bid.status?.charAt(0).toUpperCase() + bid.status?.slice(1)}
                       </span>
                     </div>
                   );
@@ -305,7 +305,7 @@ export default function AdminBidsPage() {
                         <span className="text-sm font-bold text-emerald-400">
                           ${Number(bid.amount).toLocaleString()}
                         </span>
-                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${s.bg} ${s.text}`}>
+                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${s?.bg} ${s?.text}`}>
                           {bid.status}
                         </span>
                       </div>

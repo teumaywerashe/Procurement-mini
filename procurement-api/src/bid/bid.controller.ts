@@ -16,7 +16,7 @@ import type { JwtPayload } from '../auth/decorators/current-user.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { UserRole } from '../auth/enum/userRole..enum';
+import { UserRole } from '../user/enum/userRole..enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 @ApiTags('Bid')
 @UseGuards(JwtAuthGuard, RolesGuard)

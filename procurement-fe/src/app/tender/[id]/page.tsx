@@ -6,7 +6,7 @@ import Link from "next/link";
 import Navbar from "@/src/components/layout/Navbar";
 import { useGetTenderQuery, useDeleteTenderMutation } from "@/src/store/api/tenderApi";
 import { useGetBidsByVendorQuery, useGetBidsByTenderQuery, useCreateBidMutation } from "@/src/store/api/bidApi";
-import { useGetVendorQuery } from "@/src/store/api/vendorApi";
+import { useGetMyVendorQuery, useCreateVendorMutation } from "@/src/store/api/vendorApi";
 import { useSelector } from "react-redux";
 import { notifications } from "@mantine/notifications";
 import type { RootState } from "@/src/store/store";
@@ -45,17 +45,23 @@ export default function TenderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "admin";
-  const isVendor = user?.role === "vendor";
+  const isAdmin = user?.role === "Admin";
+  const isVendor = user?.role === "Vendor";
 
   const { data: tender, isLoading, isError } = useGetTenderQuery(Number(id));
   const [deleteTender, { isLoading: isDeleting }] = useDeleteTenderMutation();
   const [showConfirm, setShowConfirm] = useState(false);
 
   // Vendor: get own vendor profile and bids for this tender
-  const { data: vendor } = useGetVendorQuery(user?.id ?? 0, { skip: !isVendor });
-  const { data: myBids = [] } = useGetBidsByVendorQuery(vendor?.id ?? 0, { skip: !vendor?.id });
+  const { data: vendor, isLoading: vendorLoading, isError: vendorError } = useGetMyVendorQuery(undefined, { skip: !isVendor });
+  const { data: myBids = [], isLoading: myBidsLoading } = useGetBidsByVendorQuery(vendor?.id ?? 0, { skip: !vendor?.id });
   const hasAlreadyBid = myBids.some((b) => b.tenderId === Number(id));
+  const hasVendorProfile = !!vendor && !vendorError;
+
+  // Vendor creation state
+  const [showVendorForm, setShowVendorForm] = useState(false);
+  const [vendorForm, setVendorForm] = useState({ name: "", registrationNumber: "", email: "", phoneNumber: "" });
+  const [createVendor, { isLoading: isCreatingVendor }] = useCreateVendorMutation();
 
   // Admin: get all bids for this tender
   const { data: tenderBids = [] } = useGetBidsByTenderQuery(Number(id), { skip: !isAdmin });
@@ -82,9 +88,27 @@ export default function TenderDetailPage() {
       await createBid({ tenderId: Number(id), vendorId: vendor.id, amount: Number(bidAmount) }).unwrap();
       notifications.show({ title: "Bid Submitted", message: "Your bid has been submitted successfully.", color: "green" });
       setBidAmount("");
+      console.log("bid submitted");
       setShowBidForm(false);
-    } catch {
+    } catch(error) {
+      console.log(error);
       notifications.show({ title: "Error", message: "Failed to submit bid. Please try again.", color: "red" });
+    }
+  }
+
+  async function handleCreateVendor(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await createVendor({
+        name: vendorForm.name,
+        registrationNumber: vendorForm.registrationNumber,
+        email: vendorForm.email || undefined,
+        phoneNumber: vendorForm.phoneNumber || undefined,
+      }).unwrap();
+      notifications.show({ title: "Vendor Created", message: "Your vendor profile is ready. You can now submit bids.", color: "green" });
+      setShowVendorForm(false);
+    } catch {
+      notifications.show({ title: "Error", message: "Failed to create vendor profile. Please try again.", color: "red" });
     }
   }
 
@@ -227,7 +251,103 @@ export default function TenderDetailPage() {
         {isVendor && (
           <div className="mt-6 bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden">
             <div className="px-8 py-5">
-              {hasAlreadyBid ? (
+              {vendorLoading || myBidsLoading ? (
+                /* Loading */
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[var(--bg-elevated)] animate-pulse" />
+                  <div className="space-y-2">
+                    <div className="h-3 w-32 bg-[var(--bg-elevated)] rounded animate-pulse" />
+                    <div className="h-2.5 w-48 bg-[var(--bg-elevated)] rounded animate-pulse" />
+                  </div>
+                </div>
+              ) : !hasVendorProfile ? (
+                /* No vendor profile — prompt to create one */
+                showVendorForm ? (
+                  <form onSubmit={handleCreateVendor} className="space-y-4">
+                    <div>
+                      <h2 className="text-sm font-semibold text-[var(--text-primary)]">Create Vendor Profile</h2>
+                      <p className="text-xs text-[var(--text-subtle)] mt-0.5">You need a vendor profile before you can submit bids.</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-[var(--text-subtle)] mb-1">Company name <span className="text-red-400">*</span></label>
+                        <input
+                          required
+                          value={vendorForm.name}
+                          onChange={(e) => setVendorForm((f) => ({ ...f, name: e.target.value }))}
+                          placeholder="Acme Corporation"
+                          className="w-full bg-[var(--bg-input)] border border-[var(--border-strong)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-faint)] outline-none focus:border-indigo-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[var(--text-subtle)] mb-1">Registration number <span className="text-red-400">*</span></label>
+                        <input
+                          required
+                          value={vendorForm.registrationNumber}
+                          onChange={(e) => setVendorForm((f) => ({ ...f, registrationNumber: e.target.value }))}
+                          placeholder="REG-123456"
+                          className="w-full bg-[var(--bg-input)] border border-[var(--border-strong)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-faint)] outline-none focus:border-indigo-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[var(--text-subtle)] mb-1">Email <span className="text-[var(--text-faint)]">(optional)</span></label>
+                        <input
+                          type="email"
+                          value={vendorForm.email}
+                          onChange={(e) => setVendorForm((f) => ({ ...f, email: e.target.value }))}
+                          placeholder="vendor@company.com"
+                          className="w-full bg-[var(--bg-input)] border border-[var(--border-strong)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-faint)] outline-none focus:border-indigo-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-[var(--text-subtle)] mb-1">Phone <span className="text-[var(--text-faint)]">(optional)</span></label>
+                        <input
+                          value={vendorForm.phoneNumber}
+                          onChange={(e) => setVendorForm((f) => ({ ...f, phoneNumber: e.target.value }))}
+                          placeholder="+1 234 567 8900"
+                          className="w-full bg-[var(--bg-input)] border border-[var(--border-strong)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-faint)] outline-none focus:border-indigo-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 pt-1">
+                      <button
+                        type="submit"
+                        disabled={isCreatingVendor}
+                        className="px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50"
+                      >
+                        {isCreatingVendor ? "Creating..." : "Create Vendor Profile"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowVendorForm(false)}
+                        className="px-4 py-2.5 rounded-lg border border-[var(--border-strong)] text-sm text-[var(--text-subtle)] hover:text-[var(--text-primary)] transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-orange-950/60 flex items-center justify-center shrink-0">
+                        <IconGavel size={18} className="text-orange-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">Vendor profile required</p>
+                        <p className="text-xs text-[var(--text-subtle)] mt-0.5">
+                          You need a vendor profile to submit bids on tenders.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setShowVendorForm(true)}
+                      className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-sm font-semibold text-white transition-colors shrink-0"
+                    >
+                      Create Vendor Profile
+                    </button>
+                  </div>
+                )
+              ) : hasAlreadyBid ? (
                 // Already submitted
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-emerald-950/60 flex items-center justify-center">
@@ -277,8 +397,9 @@ export default function TenderDetailPage() {
                     </div>
                     <button
                       type="submit"
+                    
                       disabled={isSubmitting || !bidAmount}
-                      className="px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50"
+                      className="px-5 py-2.5 cursor-pointer rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50"
                     >
                       {isSubmitting ? "Submitting..." : "Submit Bid"}
                     </button>
@@ -307,7 +428,7 @@ export default function TenderDetailPage() {
                   </div>
                   <button
                     onClick={() => setShowBidForm(true)}
-                    className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white transition-colors"
+                    className="flex items-center gap-1.5 px-5 py-2.5 cursor-pointer rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white transition-colors"
                   >
                     <IconGavel size={15} />
                     Place Bid

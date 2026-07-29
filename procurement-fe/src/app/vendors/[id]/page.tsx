@@ -21,7 +21,7 @@ export default function VendorDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "Admin";
 
   useEffect(() => {
     if (user && !isAdmin) router.push("/dashboard");

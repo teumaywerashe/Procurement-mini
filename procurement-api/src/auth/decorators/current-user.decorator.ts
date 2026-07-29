@@ -1,6 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
-import { UserRole } from '../enum/userRole..enum';
+import { UserRole } from '../../user/enum/userRole..enum';
+// import { UserRole } from '../enum/userRole..enum';
 
 export interface JwtPayload {
   uid: number;
