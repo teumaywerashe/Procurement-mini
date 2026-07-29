@@ -1,3 +1,4 @@
+import { IconTrendingUp } from '@tabler/icons-react';
 import React from 'react'
 
 function DashboardRightSidebar() {
