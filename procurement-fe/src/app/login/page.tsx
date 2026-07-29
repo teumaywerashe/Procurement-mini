@@ -23,13 +23,12 @@ import { useLoginMutation } from "@/src/store/api/userApi";
 import { useDispatch } from "react-redux";
 import { logIn } from "@/src/store/auth/authSlice";
 import { AuthResponse } from "@/src/types";
+import { getErrorMessage } from "@/src/utilis/getErrorMessage";
 
 export default function LoginPage() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [loginUser, { isLoading }] = useLoginMutation();
-  const [error, setError] = useState("");
-  // const [loading, setLoading] = useState(false);
+  const [loginUser, { error, isLoading }] = useLoginMutation();
 
   const form = useForm({
     initialValues: { email: "", password: "" },
@@ -43,25 +42,10 @@ export default function LoginPage() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       const result: AuthResponse = await loginUser(values).unwrap();
-      // console.log(result);
       dispatch(logIn(result.user));
-      console.log(result.user);
       router.push("/tender");
     } catch (error: unknown) {
       console.log("error occurred", error);
-      const data = (error as { data?: unknown }).data;
-      const msg = (data as { message?: unknown } | undefined)?.message;
-      if (Array.isArray(msg)) {
-        setError(msg.join(", "));
-      } else if (typeof msg === "object" && msg !== null && "message" in msg) {
-        setError((msg as { message: string }).message);
-      } else if (typeof msg === "string") {
-        setError(msg);
-      } else if (typeof data === "string") {
-        setError(data);
-      } else {
-        setError("An error occurred. Please try again.");
-      }
     }
   };
 
@@ -99,7 +83,9 @@ export default function LoginPage() {
               mb="md"
               variant="light"
             >
-              {error}
+              {error
+                ? getErrorMessage(error)
+                : "An error occurred. Please try again."}
             </Alert>
           )}
 

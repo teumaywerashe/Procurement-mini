@@ -17,10 +17,10 @@ const authSlice = createSlice({
 
     logOut: (state) => {
       state.isLoggedIn = false;
+      state.user = null;
     },
   },
 });
-
 
 export const { logIn, logOut } = authSlice.actions;
 export const authReducer = authSlice.reducer;

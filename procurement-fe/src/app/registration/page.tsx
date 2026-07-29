@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   TextInput,
   PasswordInput,
@@ -14,52 +14,45 @@ import {
   Center,
   ThemeIcon,
   Box,
-} from '@mantine/core';
-import { useForm } from '@mantine/form';
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useRegisterMutation } from "@/src/store/api/userApi";
 import {
   IconShoppingBag,
   IconAlertCircle,
   IconCircleCheck,
-} from '@tabler/icons-react';
-import Link from 'next/link';
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { getErrorMessage } from "@/src/utilis/getErrorMessage";
 
 export default function RegistrationPage() {
-  const [error, setError] = useState('');
+  // const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   const form = useForm({
-    initialValues: { name: '', email: '', password: '', confirmPassword: '' },
+    initialValues: { name: "", email: "", password: "", confirmPassword: "" },
     validate: {
-      name: (v) => (v.trim().length > 0 ? null : 'Name is required'),
-      email: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : 'Enter a valid email'),
-      password: (v) => (v.length >= 8 ? null : 'Password must be at least 8 characters'),
+      name: (v) => (v.trim().length > 0 ? null : "Name is required"),
+      email: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : "Enter a valid email"),
+      password: (v) =>
+        v.length >= 8 ? null : "Password must be at least 8 characters",
       confirmPassword: (v, values) =>
-        v === values.password ? null : 'Passwords do not match',
+        v === values.password ? null : "Passwords do not match",
     },
   });
 
+  const [registerUser, { error, isLoading: loading }] = useRegisterMutation();
   const handleSubmit = async (values: typeof form.values) => {
-    setError('');
-    setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          name: values.name,
-          email: values.email,
-          password: values.password,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
+      await registerUser({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      }).unwrap();
       setSuccess(true);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-    } finally {
-      setLoading(false);
+    } catch (error: unknown) {
+      console.log(error);
     }
   };
 
@@ -67,12 +60,12 @@ export default function RegistrationPage() {
     return (
       <Box
         style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'var(--mantine-color-dark-8)',
-          padding: '1rem',
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "var(--mantine-color-dark-8)",
+          padding: "1rem",
         }}
       >
         <Stack align="center" gap="md">
@@ -80,7 +73,9 @@ export default function RegistrationPage() {
             <IconCircleCheck size={36} />
           </ThemeIcon>
           <Title order={2}>Account created</Title>
-          <Text c="dimmed" size="sm">You&apos;re all set. Sign in to get started.</Text>
+          <Text c="dimmed" size="sm">
+            You&apos;re all set. Sign in to get started.
+          </Text>
           <Button component={Link} href="/login" variant="filled" mt="xs">
             Go to login
           </Button>
@@ -92,12 +87,12 @@ export default function RegistrationPage() {
   return (
     <Box
       style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'var(--mantine-color-dark-8)',
-        padding: '1rem',
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "var(--mantine-color-dark-8)",
+        padding: "1rem",
       }}
     >
       <Box w="100%" maw={420}>
@@ -106,8 +101,12 @@ export default function RegistrationPage() {
             <ThemeIcon size={56} radius="xl" variant="filled" color="indigo">
               <IconShoppingBag size={28} />
             </ThemeIcon>
-            <Title order={2} ta="center">ProcureHub</Title>
-            <Text c="dimmed" size="sm">Create your account</Text>
+            <Title order={2} ta="center">
+              ProcureHub
+            </Title>
+            <Text c="dimmed" size="sm">
+              Create your account
+            </Text>
           </Stack>
         </Center>
 
@@ -119,7 +118,9 @@ export default function RegistrationPage() {
               mb="md"
               variant="light"
             >
-              {error}
+              {error
+                ? getErrorMessage(error)
+                : "An error occurred. Please try again."}
             </Alert>
           )}
 
@@ -130,7 +131,7 @@ export default function RegistrationPage() {
                 placeholder="Jane Doe"
                 autoComplete="name"
                 required
-                {...form.getInputProps('name')}
+                {...form.getInputProps("name")}
               />
 
               <TextInput
@@ -139,7 +140,7 @@ export default function RegistrationPage() {
                 type="email"
                 autoComplete="email"
                 required
-                {...form.getInputProps('email')}
+                {...form.getInputProps("email")}
               />
 
               <PasswordInput
@@ -147,7 +148,7 @@ export default function RegistrationPage() {
                 placeholder="Min. 8 characters"
                 autoComplete="new-password"
                 required
-                {...form.getInputProps('password')}
+                {...form.getInputProps("password")}
               />
 
               <PasswordInput
@@ -155,7 +156,7 @@ export default function RegistrationPage() {
                 placeholder="Repeat your password"
                 autoComplete="new-password"
                 required
-                {...form.getInputProps('confirmPassword')}
+                {...form.getInputProps("confirmPassword")}
               />
 
               <Button type="submit" fullWidth loading={loading} mt="xs">
@@ -165,7 +166,7 @@ export default function RegistrationPage() {
           </form>
 
           <Text ta="center" size="sm" mt="lg" c="dimmed">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Anchor component={Link} href="/login" size="sm">
               Sign in
             </Anchor>
