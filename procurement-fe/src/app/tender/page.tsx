@@ -52,7 +52,7 @@ const STATUS_COLORS: Record<
   },
 };
 
-const BID_STATUS_COLORS: Record<Bid["status"], { bg: string; text: string }> = {
+const BID_STATUS_COLORS: Record<Bid["bidStatus"], { bg: string; text: string }> = {
   pending: { bg: "bg-yellow-950/60", text: "text-yellow-400" },
   accepted: { bg: "bg-emerald-950/60", text: "text-emerald-400" },
   rejected: { bg: "bg-red-950/60", text: "text-red-400" },
@@ -258,7 +258,7 @@ function BidsSidebar({
         ) : (
           <div className="space-y-2">
             {recent.map((bid) => {
-              const colors = BID_STATUS_COLORS[bid.status];
+              const colors = BID_STATUS_COLORS[bid.bidStatus];
               return (
                 <div
                   key={bid.id}
@@ -271,14 +271,14 @@ function BidsSidebar({
                     <span
                       className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${colors.bg} ${colors.text}`}
                     >
-                      {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
+                      {bid.bidStatus.charAt(0).toUpperCase() + bid.bidStatus.slice(1)}
                     </span>
                   </div>
                   <p className="text-sm font-semibold text-white">
                     ${Number(bid.amount).toLocaleString()}
                   </p>
                   <p className="text-[10px] text-zinc-600">
-                    {new Date(bid.createdAt).toLocaleDateString("en-US", {
+                    {new Date(bid.submittedAt).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",

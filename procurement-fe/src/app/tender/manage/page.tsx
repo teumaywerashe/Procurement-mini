@@ -124,6 +124,7 @@ function daysLeft(dateStr: string, now: number) {
   if (days === 0) return "Today";
   return `${days}d`;
 }
+const now = Date.now();
 
 export default function ManageTendersPage() {
   const router = useRouter();
@@ -142,8 +143,6 @@ export default function ManageTendersPage() {
     isError,
   } = useGetTendersQuery(search ? { title: search } : {});
   const [deleteTender, { isLoading: isDeleting }] = useDeleteTenderMutation();
-
-  const now = React.useMemo(() => Date.now(), []);
 
   const filtered = tenders.filter((t) =>
     statusFilter ? t.status === statusFilter : true,

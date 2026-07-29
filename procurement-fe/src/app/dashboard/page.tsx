@@ -48,12 +48,12 @@ function StatCard({
     </div>
   );
 }
+const now = Date.now();
 
 export default function DashboardPage() {
   const { user } = useSelector((s: RootState) => s.auth);
   const isAdmin = user?.role === "Admin";
   const isVendor = user?.role === "Vendor";
-  const now = React.useMemo(() => Date.now(), []);
 
   const { data: tenders = [], isLoading: tendersLoading } = useGetTendersQuery(
     {},
@@ -71,7 +71,7 @@ export default function DashboardPage() {
       skip: !vendor?.id,
     },
   );
-  console.log({"Tenders": tenders,"Vendors": vendors,"My Bids": myBids });
+  console.log({ Tenders: tenders, Vendors: vendors, "My Bids": myBids });
   const published = tenders.filter((t) => t.status === "published");
   const closingSoon = tenders.filter((t) => {
     const d = Math.ceil((new Date(t.closingDate).getTime() - now) / 86_400_000);
@@ -84,8 +84,8 @@ export default function DashboardPage() {
     )
     .slice(0, 5);
 
-  const pendingBids = myBids.filter((b) => b.status === "pending");
-  const acceptedBids = myBids.filter((b) => b.status === "accepted");
+  const pendingBids = myBids.filter((b) => b.bidStatus === "pending");
+  const acceptedBids = myBids.filter((b) => b.bidStatus === "accepted");
 
   const quickLinks = [
     {
@@ -387,14 +387,14 @@ export default function DashboardPage() {
                         </div>
                         <span
                           className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                            bid.status === "accepted"
+                            bid.bidStatus === "accepted"
                               ? "bg-emerald-950/60 text-emerald-400"
-                              : bid.status === "rejected"
+                              : bid.bidStatus === "rejected"
                                 ? "bg-red-950/60 text-red-400"
                                 : "bg-yellow-950/60 text-yellow-400"
                           }`}
                         >
-                          {bid.status}
+                          {bid.bidStatus}
                         </span>
                       </div>
                     ))
@@ -553,19 +553,19 @@ export default function DashboardPage() {
                       },
                       {
                         label: "Pending",
-                        value: myBids.filter((b) => b.status === "pending")
+                        value: myBids.filter((b) => b.bidStatus === "pending")
                           .length,
                         color: "text-yellow-400",
                       },
                       {
                         label: "Accepted",
-                        value: myBids.filter((b) => b.status === "accepted")
+                        value: myBids.filter((b) => b.bidStatus === "accepted")
                           .length,
                         color: "text-emerald-400",
                       },
                       {
                         label: "Rejected",
-                        value: myBids.filter((b) => b.status === "rejected")
+                        value: myBids.filter((b) => b.bidStatus === "rejected")
                           .length,
                         color: "text-red-400",
                       },

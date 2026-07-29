@@ -34,7 +34,7 @@ export class AdminOrOwnerGuard implements CanActivate {
     const userId = request.params.id;
 
     // Admin can do everything
-    if (user.role  === UserRole.ADMIN ) {
+    if (user.role === UserRole.ADMIN) {
       return true;
     }
 

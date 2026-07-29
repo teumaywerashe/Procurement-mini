@@ -66,6 +66,18 @@ export class BidController {
     return this.bidService.update(+id, updateBidDto, user);
   }
 
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Update bid status by ID (Admin only)' })
+  @Roles(UserRole.ADMIN)
+  updateBidStatus(@Param('id') id: number, @Body('status') status: string) {
+    const updateBidDto = new UpdateBidDto();
+    updateBidDto.bidStatus = status as 'pending' | 'accepted' | 'rejected';
+    return this.bidService.update(+id, updateBidDto, {
+      uid: 0,
+      email: '',
+      role: UserRole.ADMIN,
+    });
+  }
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a bid by ID (Bid Owner only)' })
   remove(@Param('id') id: number, @CurrentUser() user: JwtPayload) {

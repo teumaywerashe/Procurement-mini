@@ -77,15 +77,15 @@ export class BidService {
     if (!foundBid) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }
-    const [creatingVendor] = await db
+    const [updatingVendor] = await db
       .select()
       .from(vendor)
       .where(eq(vendor.id, foundBid.vendorId))
       .limit(1);
-    if (!creatingVendor) {
+    if (!updatingVendor) {
       throw new UnauthorizedException('Vendor not found');
     }
-    if (creatingVendor.ownerId !== user.uid) {
+    if (updatingVendor.ownerId !== user.uid) {
       throw new UnauthorizedException(
         `Vendor ID mismatch. Cannot update bid with a different vendor ID.`,
       );
@@ -110,15 +110,15 @@ export class BidService {
     if (!foundBid) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }
-    const [creatingVendor] = await db
+    const [foundVendor] = await db
       .select()
       .from(vendor)
       .where(eq(vendor.id, foundBid.vendorId))
       .limit(1);
-    if (!creatingVendor) {
+    if (!foundVendor) {
       throw new UnauthorizedException('Vendor not found');
     }
-    if (creatingVendor.ownerId !== user.uid) {
+    if (foundVendor.ownerId !== user.uid) {
       throw new UnauthorizedException(
         `Vendor ID mismatch. Cannot delete bid with a different vendor ID.`,
       );
