@@ -9,16 +9,7 @@ import { useGetTendersQuery } from "@/src/store/api/tenderApi";
 import { useGetVendorsQuery } from "@/src/store/api/vendorApi";
 import { useGetBidsByVendorQuery } from "@/src/store/api/bidApi";
 import { useGetVendorQuery } from "@/src/store/api/vendorApi";
-import {
-  IconFileText,
-  IconUsers,
-  IconGavel,
-  IconClock,
-  IconChevronRight,
-  IconPlus,
-  IconTrendingUp,
-} from "@tabler/icons-react";
-import StatusCard from "@/src/components/cards/StatusCard";
+
 import DashboardLeftSidebar from "@/src/components/layout/DashboardLeftsidebar";
 import MainDashboardContent from "@/src/components/layout/MainDashboardContent";
 import DashboardRightSidebar from "@/src/components/layout/DashboardRightSidebar";
@@ -63,7 +54,7 @@ export default function DashboardPage() {
   const acceptedBids = myBids.filter((b) => b.bidStatus === "accepted");
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col">
+    <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
 
       <div className="flex flex-1 w-full overflow-hidden">
@@ -101,7 +92,14 @@ export default function DashboardPage() {
         />
 
         {/* ── Right sidebar: Tender stats ── */}
-        <DashboardRightSidebar />
+        <DashboardRightSidebar
+          tenders={tenders}
+          tendersLoading={tendersLoading}
+          published={published}
+          closingSoon={closingSoon}
+          isVendor={isVendor}
+          myBids={myBids}
+        />
       </div>
     </div>
   );

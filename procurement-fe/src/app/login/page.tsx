@@ -16,7 +16,7 @@ import {
   Box,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconShoppingBag, IconAlertCircle } from "@tabler/icons-react";
+import { IconShoppingBag, IconAlertCircle, IconCross, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/src/store/api/userApi";
@@ -61,7 +61,7 @@ export default function LoginPage() {
       }}
     >
       <Box w="100%" maw={420}>
-        <Center mb="xl">
+        <Center className="" mb="xl">
           <Stack align="center" gap="xs">
             <ThemeIcon size={56} radius="xl" variant="filled" color="indigo">
               <IconShoppingBag size={28} />
@@ -73,6 +73,9 @@ export default function LoginPage() {
               Sign in to your account
             </Text>
           </Stack>
+          <Paper>
+            <IconX />
+          </Paper>
         </Center>
 
         <Paper withBorder shadow="md" p="xl" radius="md">

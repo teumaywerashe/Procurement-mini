@@ -1,83 +1,82 @@
 import React from "react";
+import Link from "next/link";
+import {
+  IconFileText,
+  IconGavel,
+  IconShieldCheck,
+  IconArrowRight,
+  IconBuildingSkyscraper,
+  IconDeviceDesktop,
+  IconTruck,
+  IconLeaf,
+} from "@tabler/icons-react";
 
-function Hero() {
-  const categories = [
-    { label: "Construction →" },
-    { label: "IT Services →" },
-    { label: "Consulting →" },
-    { label: "Medical Supplies →" },
-  ];
+const categories = [
+  { label: "Infrastructure", icon: <IconBuildingSkyscraper size={13} /> },
+  { label: "Technology",     icon: <IconDeviceDesktop size={13} /> },
+  { label: "Logistics",      icon: <IconTruck size={13} /> },
+  { label: "Environment",    icon: <IconLeaf size={13} /> },
+];
 
+const features = [
+  { icon: <IconFileText size={18} className="text-indigo-400" />,    title: "Publish tenders",   desc: "Create and manage procurement notices with structured templates." },
+  { icon: <IconGavel size={18} className="text-emerald-400" />,      title: "Submit bids",       desc: "Vendors apply directly through the platform with full audit trails." },
+  { icon: <IconShieldCheck size={18} className="text-orange-400" />, title: "Award transparently", desc: "Track evaluations, decisions, and contracts in one place." },
+];
+
+export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gray-900 text-white">
-      {/* Background overlay image effect */}
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-30"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1568992687947-868a62a9f521?w=1400&q=80')",
-        }}
-      />
-      <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32">
-        <h1 className="text-4xl md:text-6xl font-bold leading-tight max-w-2xl mb-6">
-          Procurement at the speed of trust
-        </h1>
-        <p className="text-lg text-gray-300 max-w-xl mb-10">
-          Connect government agencies and verified vendors on a transparent,
-          end-to-end tendering platform built for accountability.
-        </p>
+    <section className="bg-(--bg-base) border-b border-(--border)">
+      {/* Top hero */}
+      <div className="max-w-6xl mx-auto px-6 py-20 md:py-28">
+        <div className="max-w-3xl">
+         
+         
+          <h1 className="text-4xl md:text-5xl font-bold text-(--text-primary) leading-tight mb-5">
+            Procurement at the<br />
+            <span className="text-indigo-400">speed of trust</span>
+          </h1>
 
-        {/* Toggle tabs */}
-        <div className="flex gap-0 mb-6 w-fit rounded-full border border-white/30 overflow-hidden">
-          <button className="px-6 py-2.5 bg-white text-gray-900 cursor-pointer text-sm font-semibold">
-            I want to tender
-          </button>
-          <button className="px-6 py-2.5 text-white cursor-pointer text-sm font-medium hover:bg-white/10 transition-colors">
-            I want to bid
-          </button>
+          <p className="text-base text-(--text-subtle) max-w-xl mb-8 leading-relaxed">
+            Connect government agencies and verified vendors on a transparent,
+            end-to-end tendering platform built for accountability.
+          </p>
+
+          <div className="flex flex-wrap gap-3 mb-10">
+            <Link href="/registration" className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors">
+              Get started <IconArrowRight size={15} />
+            </Link>
+            <Link href="/tender" className="flex items-center gap-2 border border-(--border-strong) text-(--text-subtle) hover:text-(--text-primary) hover:border-(--text-faint) text-sm font-medium px-6 py-2.5 rounded-lg transition-colors">
+              Browse tenders
+            </Link>
+          </div>
+
+          {/* Category pills */}
+          <div className="flex flex-wrap gap-2">
+            {categories.map((c) => (
+              <Link key={c.label} href="/tender"
+                className="flex items-center gap-1.5 text-xs text-(--text-subtle) hover:text-(--text-primary) border border-(--border) hover:border-(--border-strong) bg-(--bg-surface) px-3 py-1.5 rounded-full transition-colors">
+                {c.icon}{c.label}
+              </Link>
+            ))}
+          </div>
         </div>
+      </div>
 
-        {/* Search bar */}
-        <div className="flex items-center bg-white rounded-full overflow-hidden max-w-xl shadow-lg">
-          <input
-            type="text"
-            placeholder="Search tenders by keyword or category..."
-            className="flex-1 px-5 py-3.5 text-gray-800 text-sm outline-none"
-          />
-          <button className="flex items-center gap-2 bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3.5 text-sm font-semibold transition-colors">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              viewBox="0 0 24 24"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            Search
-          </button>
-        </div>
-
-        {/* Quick category pills */}
-        <div className="flex flex-wrap gap-2 mt-5">
-          {categories.map((c) => (
-            <a
-              key={c.label}
-              href="#"
-              className="text-xs border border-white/40 hover:border-white text-white px-4 py-1.5 rounded-full transition-colors"
-            >
-              {c.label}
-            </a>
+      {/* Feature cards */}
+      <div className="border-t border-(--border)">
+        <div className="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-px bg-(--border)">
+          {features.map((f) => (
+            <div key={f.title} className="bg-(--bg-base) px-8 py-6">
+              <div className="w-9 h-9 rounded-lg bg-(--bg-elevated) flex items-center justify-center mb-4">
+                {f.icon}
+              </div>
+              <h3 className="text-sm font-semibold text-(--text-primary) mb-1">{f.title}</h3>
+              <p className="text-xs text-(--text-subtle) leading-relaxed">{f.desc}</p>
+            </div>
           ))}
         </div>
       </div>
     </section>
   );
 }
-
-export default Hero;
