@@ -1,6 +1,6 @@
 # ProcureHub
 
-**Live:** [https://your-live-url.com](https://procurementHub.vercel.com)
+**Live:** [https://procurementHub.vercel.com](https://procurementHub.vercel.com)
 
 A full-stack procurement management platform. Admins publish tenders, vendors browse and submit bids, and both roles track everything through role-specific dashboards.
 
@@ -8,12 +8,12 @@ A full-stack procurement management platform. Admins publish tenders, vendors br
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | Next.js 16, React 19, Tailwind CSS v4, Mantine v7, Redux Toolkit + RTK Query |
-| Backend | NestJS 11, Drizzle ORM, PostgreSQL 17, Passport JWT |
-| Database | PostgreSQL (via Docker) |
-| Dev Tools | Drizzle Studio, pgAdmin 4, Docker Compose |
+| Layer     | Technology                                                                   |
+| --------- | ---------------------------------------------------------------------------- |
+| Frontend  | Next.js 16, React 19, Tailwind CSS v4, Mantine v7, Redux Toolkit + RTK Query |
+| Backend   | NestJS 11, Drizzle ORM, PostgreSQL 17, Passport JWT                          |
+| Database  | PostgreSQL (via Docker)                                                      |
+| Dev Tools | Drizzle Studio, pgAdmin 4, Docker Compose                                    |
 
 ---
 
@@ -81,13 +81,13 @@ This spins up all services: PostgreSQL, the API, the frontend, Drizzle Studio, a
 docker compose up
 ```
 
-| Service | URL |
-|---|---|
-| Frontend | http://localhost:3001 |
-| Backend API | http://localhost:3000 |
-| pgAdmin | http://localhost:5050 |
+| Service        | URL                   |
+| -------------- | --------------------- |
+| Frontend       | http://localhost:3001 |
+| Backend API    | http://localhost:3000 |
+| pgAdmin        | http://localhost:5050 |
 | Drizzle Studio | http://localhost:4984 |
-| PostgreSQL | localhost:5433 |
+| PostgreSQL     | localhost:5433        |
 
 Migrations run automatically on backend startup.
 
@@ -136,46 +136,46 @@ All protected routes require a JWT cookie set at login.
 
 ### Auth
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/auth/register` | Register a new user |
-| POST | `/auth/login` | Login and receive JWT cookie |
-| POST | `/auth/logout` | Clear session |
+| Method | Endpoint         | Description                  |
+| ------ | ---------------- | ---------------------------- |
+| POST   | `/auth/register` | Register a new user          |
+| POST   | `/auth/login`    | Login and receive JWT cookie |
+| POST   | `/auth/logout`   | Clear session                |
 
 ### Tenders
 
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| GET | `/tender/all` | All | List all tenders (filterable by title) |
-| GET | `/tender/:id` | All | Get single tender |
-| POST | `/tender` | Admin | Create tender |
-| PATCH | `/tender/:id` | Admin | Update tender |
-| DELETE | `/tender/:id` | Admin | Delete tender |
+| Method | Endpoint      | Access | Description                            |
+| ------ | ------------- | ------ | -------------------------------------- |
+| GET    | `/tender/all` | All    | List all tenders (filterable by title) |
+| GET    | `/tender/:id` | All    | Get single tender                      |
+| POST   | `/tender`     | Admin  | Create tender                          |
+| PATCH  | `/tender/:id` | Admin  | Update tender                          |
+| DELETE | `/tender/:id` | Admin  | Delete tender                          |
 
 ### Bids
 
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| GET | `/bid` | Admin | Get all bids |
-| GET | `/bid/tender/:tenderId` | Admin | Bids for a specific tender |
-| GET | `/bid/vendor/:vendorId` | Vendor | Bids by vendor |
-| POST | `/bid` | Vendor | Submit a bid |
-| PATCH | `/bid/:id` | Admin | Update bid status |
+| Method | Endpoint                | Access | Description                |
+| ------ | ----------------------- | ------ | -------------------------- |
+| GET    | `/bid`                  | Admin  | Get all bids               |
+| GET    | `/bid/tender/:tenderId` | Admin  | Bids for a specific tender |
+| GET    | `/bid/vendor/:vendorId` | Vendor | Bids by vendor             |
+| POST   | `/bid`                  | Vendor | Submit a bid               |
+| PATCH  | `/bid/:id`              | Admin  | Update bid status          |
 
 ### Vendors
 
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| GET | `/vendor` | Admin | List all vendors |
-| GET | `/vendor/:id` | Admin | Get vendor by user ID |
-| PATCH | `/vendor/:id` | Admin | Update vendor |
+| Method | Endpoint      | Access | Description           |
+| ------ | ------------- | ------ | --------------------- |
+| GET    | `/vendor`     | Admin  | List all vendors      |
+| GET    | `/vendor/:id` | Admin  | Get vendor by user ID |
+| PATCH  | `/vendor/:id` | Admin  | Update vendor         |
 
 ### Users
 
-| Method | Endpoint | Access | Description |
-|---|---|---|---|
-| GET | `/user/me` | Auth | Get current user |
-| PATCH | `/user/:id` | Auth | Update user profile |
+| Method | Endpoint    | Access | Description         |
+| ------ | ----------- | ------ | ------------------- |
+| GET    | `/user/me`  | Auth   | Get current user    |
+| PATCH  | `/user/:id` | Auth   | Update user profile |
 
 ---
 
@@ -196,22 +196,22 @@ Bid statuses: `pending`, `accepted`, `rejected`
 
 ## Frontend Pages
 
-| Route | Role | Description |
-|---|---|---|
-| `/` | Guest | Landing page |
-| `/login` | Guest | Login form |
-| `/registration` | Guest | Sign up form |
-| `/dashboard` | All | Overview with stats and recent activity |
-| `/tender` | All | Browse and filter tenders by category/status |
-| `/tender/:id` | All | Tender detail — vendors can submit bids here |
-| `/tender/create` | Admin | Create a new tender |
-| `/tender/:id/edit` | Admin | Edit an existing tender |
-| `/tender/manage` | Admin | Manage all tenders with filters and actions |
-| `/bids` | Admin | All submitted bids with category filters |
-| `/bids/my` | Vendor | Vendor's own bids with stats |
-| `/vendors` | Admin | Vendor list with analytics |
-| `/vendors/:id` | Admin | Single vendor profile |
-| `/profile` | All | View and edit your profile |
+| Route              | Role   | Description                                  |
+| ------------------ | ------ | -------------------------------------------- |
+| `/`                | Guest  | Landing page                                 |
+| `/login`           | Guest  | Login form                                   |
+| `/registration`    | Guest  | Sign up form                                 |
+| `/dashboard`       | All    | Overview with stats and recent activity      |
+| `/tender`          | All    | Browse and filter tenders by category/status |
+| `/tender/:id`      | All    | Tender detail — vendors can submit bids here |
+| `/tender/create`   | Admin  | Create a new tender                          |
+| `/tender/:id/edit` | Admin  | Edit an existing tender                      |
+| `/tender/manage`   | Admin  | Manage all tenders with filters and actions  |
+| `/bids`            | Admin  | All submitted bids with category filters     |
+| `/bids/my`         | Vendor | Vendor's own bids with stats                 |
+| `/vendors`         | Admin  | Vendor list with analytics                   |
+| `/vendors/:id`     | Admin  | Single vendor profile                        |
+| `/profile`         | All    | View and edit your profile                   |
 
 ---
 
@@ -252,12 +252,14 @@ npm run docker:build   # Rebuild images
 ## Roles
 
 **Admin**
+
 - Create, edit, delete, and manage tenders
 - View all bids across all tenders
 - Manage vendor accounts
 - Award or reject bids
 
 **Vendor**
+
 - Browse published tenders
 - Submit bids on open tenders
 - Track own bid statuses
