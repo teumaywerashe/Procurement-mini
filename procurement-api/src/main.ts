@@ -19,7 +19,6 @@ async function bootstrap() {
       const allowed = (process.env.FRONTEND_URL ?? 'http://localhost:3001')
         .split(',')
         .map((o) => o.trim());
-      // Allow requests with no origin (server-to-server, curl, Swagger)
       if (!origin || allowed.includes(origin)) {
         callback(null, true);
       } else {
