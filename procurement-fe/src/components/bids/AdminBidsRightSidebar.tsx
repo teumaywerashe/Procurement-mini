@@ -15,14 +15,14 @@ interface BidCardProps {
 function BidCard({ bid, tender, label, color }: BidCardProps) {
   const s = BID_STATUS_STYLES[bid.bidStatus];
   return (
-    <Link href={`/tender/${bid.tenderId}`} className="block px-3 py-3 rounded-lg bg-[var(--bg-surface)] border border-[var(--border)] hover:border-indigo-500/40 transition-colors space-y-1.5">
+    <Link href={`/tender/${bid.tenderId}`} className="block px-3 py-3 rounded-lg bg-(--bg-surface) border border-(--border) hover:border-indigo-500/40 transition-colors space-y-1.5">
       <div className="flex items-center justify-between gap-1">
         <span className={`text-[9px] font-semibold uppercase tracking-wider ${color}`}>{label}</span>
         <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${s?.bg} ${s?.text}`}>{bid.bidStatus}</span>
       </div>
-      <p className="text-xs font-medium text-[var(--text-primary)] line-clamp-1">{tender?.title ?? `Tender #${bid.tenderId}`}</p>
+      <p className="text-xs font-medium text-(--text-primary) line-clamp-1">{tender?.title ?? `Tender #${bid.tenderId}`}</p>
       <p className={`text-sm font-bold ${color}`}>${Number(bid.amount).toLocaleString()}</p>
-      {tender?.name && <p className="text-[10px] text-[var(--text-faint)]">{tender.name}</p>}
+      {tender?.name && <p className="text-[10px] text-(--text-faint)">{tender.name}</p>}
     </Link>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   TextInput,
   PasswordInput,
@@ -16,7 +15,7 @@ import {
   Box,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconShoppingBag, IconAlertCircle, IconCross, IconX } from "@tabler/icons-react";
+import { IconShoppingBag, IconAlertCircle, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/src/store/api/userApi";
@@ -58,10 +57,42 @@ export default function LoginPage() {
         justifyContent: "center",
         background: "var(--mantine-color-dark-8)",
         padding: "1rem",
+        position: "relative",
       }}
     >
+      {/* Close button */}
+      <Link
+        href="/"
+        style={{
+          position: "fixed",
+          top: "1rem",
+          right: "1rem",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "2rem",
+          height: "2rem",
+          borderRadius: "0.5rem",
+          border: "1px solid var(--mantine-color-dark-4)",
+          color: "var(--mantine-color-dimmed)",
+          transition: "all 0.15s",
+          zIndex: 50,
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLElement).style.background = "var(--mantine-color-dark-6)";
+          (e.currentTarget as HTMLElement).style.color = "var(--mantine-color-gray-0)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLElement).style.background = "transparent";
+          (e.currentTarget as HTMLElement).style.color = "var(--mantine-color-dimmed)";
+        }}
+        title="Back to home"
+      >
+        <IconX size={16} />
+      </Link>
+
       <Box w="100%" maw={420}>
-        <Center className="" mb="xl">
+        <Center mb="xl">
           <Stack align="center" gap="xs">
             <ThemeIcon size={56} radius="xl" variant="filled" color="indigo">
               <IconShoppingBag size={28} />
@@ -73,9 +104,6 @@ export default function LoginPage() {
               Sign in to your account
             </Text>
           </Stack>
-          <Paper>
-            <IconX />
-          </Paper>
         </Center>
 
         <Paper withBorder shadow="md" p="xl" radius="md">

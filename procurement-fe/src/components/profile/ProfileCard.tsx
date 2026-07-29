@@ -11,10 +11,10 @@ interface User { id: number; name?: string; email?: string; role?: string; creat
 function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="text-[var(--text-faint)] mt-0.5 shrink-0">{icon}</span>
+      <span className="text-(--text-faint) mt-0.5 shrink-0">{icon}</span>
       <div>
-        <p className="text-[11px] text-[var(--text-faint)] uppercase tracking-wider mb-0.5">{label}</p>
-        <p className="text-sm text-[var(--text-primary)]">{value}</p>
+        <p className="text-[11px] text-(--text-faint) uppercase tracking-wider mb-0.5">{label}</p>
+        <p className="text-sm text-(--text-primary)">{value}</p>
       </div>
     </div>
   );
@@ -40,21 +40,21 @@ export default function ProfileCard({ user }: { user: User }) {
   }
 
   return (
-    <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl overflow-hidden mb-4">
-      <div className="px-8 py-6 border-b border-[var(--border)] flex items-center gap-5">
+    <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden mb-4">
+      <div className="px-8 py-6 border-b border-(--border) flex items-center gap-5">
         <div className="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center text-xl font-bold text-white shrink-0">{initials}</div>
         <div className="flex-1 min-w-0">
           {editing ? (
             <div className="flex items-center gap-2">
               <input value={name} onChange={(e) => setName(e.target.value)} autoFocus
-                className="flex-1 bg-[var(--bg-input)] border border-[var(--border-strong)] rounded-lg px-3 py-1.5 text-sm text-[var(--text-primary)] outline-none focus:border-indigo-500" />
+                className="flex-1 bg-(--bg-input) border border-(--border-strong) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) outline-none focus:border-indigo-500" />
               <button onClick={handleSave} disabled={isLoading} className="p-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:opacity-50"><IconCheck size={15} /></button>
-              <button onClick={() => { setEditing(false); setName(user.name ?? ""); }} className="p-1.5 rounded-md border border-[var(--border)] text-[var(--text-subtle)] hover:text-[var(--text-primary)] transition-colors"><IconX size={15} /></button>
+              <button onClick={() => { setEditing(false); setName(user.name ?? ""); }} className="p-1.5 rounded-md border border-(--border) text-(--text-subtle) hover:text-(--text-primary) transition-colors"><IconX size={15} /></button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold text-[var(--text-primary)]">{user.name}</h1>
-              <button onClick={() => setEditing(true)} className="p-1 rounded text-[var(--text-faint)] hover:text-[var(--text-primary)] transition-colors" title="Edit name"><IconEdit size={14} /></button>
+              <h1 className="text-lg font-bold text-(--text-primary)">{user.name}</h1>
+              <button onClick={() => setEditing(true)} className="p-1 rounded text-(--text-faint) hover:text-(--text-primary) transition-colors" title="Edit name"><IconEdit size={14} /></button>
             </div>
           )}
           <span className="inline-flex items-center gap-1 mt-1 text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-950/60 text-indigo-400 capitalize">
