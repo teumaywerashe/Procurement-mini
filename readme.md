@@ -1,1 +1,0 @@
-and for the create tender and update tender make the input types and fields match from the backend what it is supposed to require like if the frontend is needing the name title description and other details make the frontend to send them properly

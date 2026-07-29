@@ -3,6 +3,10 @@ import type { Bid } from "@/src/types";
 
 export const bidApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getAllBids: builder.query<Bid[], void>({
+      query: () => "/bid",
+      providesTags: ["Bid"],
+    }),
     getBidsByTender: builder.query<Bid[], number>({
       query: (tenderId) => `/bid/tender/${tenderId}`,
       providesTags: ["Bid"],
@@ -27,6 +31,7 @@ export const bidApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetAllBidsQuery,
   useGetBidsByTenderQuery,
   useGetBidsByVendorQuery,
   useCreateBidMutation,
