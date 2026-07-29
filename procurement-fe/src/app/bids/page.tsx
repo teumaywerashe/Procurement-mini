@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/src/components/layout/Navbar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/src/store/store";
-import { useGetAllBidsQuery } from "@/src/store/api/bidApi";
+import { useGetAllBidsQuery, useUpdateBidMutation } from "@/src/store/api/bidApi";
 import { useGetTendersQuery } from "@/src/store/api/tenderApi";
 import type { Bid } from "@/src/types";
+import { notifications } from "@mantine/notifications";
 import {
   IconGavel,
   IconCurrencyDollar,
@@ -22,10 +23,14 @@ import {
   IconSchool,
   IconLeaf,
   IconTrendingUp,
+  IconTrendingDown,
+  IconCheck,
+  IconX,
+  IconEdit,
 } from "@tabler/icons-react";
 
-const BID_STATUS: Record<Bid["status"], { bg: string; text: string; dot: string }> = {
-  pending:  { bg: "bg-yellow-950/60",  text: "text-yellow-400",  dot: "bg-yellow-400"  },
+const BID_STATUS: Record<Bid["bidStatus"], { bg: string; text: string; dot: string }> = {
+  pending:  { bg: "b0/60",  text: "text-yellow-400",  dot: "bg-yellow-400"  },
   accepted: { bg: "bg-emerald-950/60", text: "text-emerald-400", dot: "bg-emerald-400" },
   rejected: { bg: "bg-red-950/60",     text: "text-red-400",     dot: "bg-red-400"     },
 };
@@ -35,7 +40,7 @@ const CATEGORIES = [
   { label: "Infrastructure", value: "infrastructure", icon: <IconBuildingSkyscraper size={14} /> },
   { label: "Logistics",      value: "logistics",      icon: <IconTruck size={14} /> },
   { label: "Technology",     value: "technology",     icon: <IconDeviceDesktop size={14} /> },
-  { label: "Healthcare",     value: "healthcare",     icon: <IconMedicalCross size={14} /> },
+  { label: "Healthcare",     value: "healalCross size={14} /> },
   { label: "Education",      value: "education",      icon: <IconSchool size={14} /> },
   { label: "Environment",    value: "environment",    icon: <IconLeaf size={14} /> },
 ];
@@ -50,62 +55,57 @@ export default function AdminBidsPage() {
   }, [user, isAdmin, router]);
 
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState<Bid["status"] | "">("");
+  const [statusFilter, setStatusFilter] = useState<Bid["bidStatus"] | "">("");
+  // editingId: which bid's status is being edited inline
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingStatus, setEditingStatus] = useState<Bid["bidStatus"]>("pending");
 
   const { data: bids = [], isLoading, isError } = useGetAllBidsQuery();
   const { data: tenders = [] } = useGetTendersQuery({});
+  const [updateBid, { isLoading: isUpdating }] = useUpdateBidMutation();
 
-  // Map tenderId -> tender for category lookup
   const tenderMap = React.useMemo(() => {
     const m: Record<number, (typeof tenders)[0]> = {};
     tenders.forEach((t) => { m[t.id] = t; });
     return m;
   }, [tenders]);
 
-  const filtered = bids.filter((b) => {
+b) => {
     const tender = tenderMap[b.tenderId];
     const matchCategory = categoryFilter
       ? tender?.name?.toLowerCase() === categoryFilter.toLowerCase()
       : true;
-    const matchStatus = statusFilter ? b.status === statusFilter : true;
+    const matchStatus = statusFilter ? b.bidStatus === statusFilter : true;
     return matchCategory && matchStatus;
   });
 
-  // Highest bid per tender for the right sidebar
-  const highestBidPerTender = React.useMemo(() => {
-    const map: Record<number, Bid> = {};
-    bids.forEach((b) => {
-      if (!map[b.tenderId] || Number(b.amount) > Number(map[b.tenderId].amount)) {
-        map[b.tenderId] = b;
-      }
+  // Highest & lowest bid per tender for the right sidebar
+  const { highest, lowest } = React.useMemo(() => {
+    const highMap: Record<number, Bid> = {};
+    const lowMap: Record<number, Bid> = {};
+(b) => {
+      if (!highMap[b.tenderId] || Number(b.amount) > Number(highMap[b.tenderId].amount)) highMap[b.tenderId] = b;
+      if (!lowMap[b.tenderId]  || Number(b.amount) < Number(lowMap[b.tenderId].amount))  lowMap[b.tenderId] = b;
     });
-    return Object.values(map)
-      .sort((a, b) => Number(b.amount) - Number(a.amount))
-      .slice(0, 8);
+    return {
+      highest: Object.values(highMap).sort((a, b) => Number(b.amount) - Number(a.amount)).slice(0, 6),
+      lowest:  Object.values(lowMap).sort((a, b) => Number(a.amount) - Number(b.amount)).slice(0, 6),
+    };
   }, [bids]);
 
-  const pending  = filtered.filter((b) => b.status === "pending").length;
-  const accepted = filtered.filter((b) => b.status === "accepted").length;
-  const rejected = filtered.filter((b) => b.status === "rejected").length;
+  const pending  = filtered.filter((b) => b.bidStatus === "pending").length;
+  const accepted = filtered.filter((b) => b.bidStatus === "accepted").length;
+  const rejected = filtered.filter((b) => b.bidStatus === "rejected").length;
 
-  return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col">
-      <Navbar />
+  function startEdit(bid: Bid) {
+    setEditingId(bid.id);
+    setEditingStatus(bid.bidStatus);
+  }
 
-      <div className="flex flex-1 w-full overflow-hidden">
-        {/* ── Left sidebar: Category filter ── */}
-        <aside
-          className="hidden lg:flex flex-col shrink-0 border-r border-[var(--border)] bg-[var(--bg-base)] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto"
-          style={{ width: "18%" }}
-        >
-          <div className="p-4 space-y-5">
-            <div>
-              <p className="text-[10px] font-semibold text-[var(--text-faint)] uppercase tracking-wider px-2 mb-2">
-                Category
-              </p>
-              <nav className="space-y-0.5">
-                {CATEGORIES.map((cat) => (
-                  <button
+  async function confirmEdit(bidId: number) {
+    try {
+      await updateBid({ id: bidId, bidStatus: editingStatus }).unwrap();
+      notifications.show({ title: "Status updated", message: `Bid #${bidId} marke
                     key={cat.value}
                     onClick={() => setCategoryFilter(cat.value)}
                     className={`w-full flex cursor-pointer items-center gap-2.5 px-2 py-2 rounded-md text-xs transition-colors text-left ${
@@ -226,7 +226,7 @@ export default function AdminBidsPage() {
                 </div>
               ) : (
                 filtered.map((bid) => {
-                  const s = BID_STATUS[bid.status];
+                  const s = BID_STATUS[bid.bidStatus];
                   const tender = tenderMap[bid.tenderId];
                   return (
                     <div
@@ -247,13 +247,13 @@ export default function AdminBidsPage() {
                       </span>
                       <span className="flex items-center gap-1 text-xs text-[var(--text-subtle)]">
                         <IconClock size={12} className="text-[var(--text-faint)]" />
-                        {new Date(bid.createdAt).toLocaleDateString("en-US", {
+                        {new Date(bid.submittedAt).toLocaleDateString("en-US", {
                           month: "short", day: "numeric", year: "numeric",
                         })}
                       </span>
                       <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-0.5 rounded-full w-fit ${s?.bg} ${s?.text}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${s?.dot}`} />
-                        {bid.status?.charAt(0).toUpperCase() + bid.status?.slice(1)}
+                        {bid?.bidStatus?.charAt(0).toUpperCase() + bid?.bidStatus?.slice(1)}
                       </span>
                     </div>
                   );
@@ -306,7 +306,7 @@ export default function AdminBidsPage() {
                           ${Number(bid.amount).toLocaleString()}
                         </span>
                         <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${s?.bg} ${s?.text}`}>
-                          {bid.status}
+                          {bid?.bidStatus?.charAt(0).toUpperCase() + bid?.bidStatus?.slice(1)}
                         </span>
                       </div>
                       {tender?.name && (

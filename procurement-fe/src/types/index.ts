@@ -35,8 +35,9 @@ export interface Bid {
   tenderId: number;
   vendorId: number;
   amount: number;
-  status: "pending" | "accepted" | "rejected";
-  createdAt: string;
+  bidStatus: "pending" | "accepted" | "rejected";
+  submittedAt: string;
+  referenceNumber: string;
 }
 
 export interface AuthResponse {

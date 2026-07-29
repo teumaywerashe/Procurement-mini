@@ -1,4 +1,12 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateBidDto } from './create-bid.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsIn } from 'class-validator';
 
-export class UpdateBidDto extends PartialType(CreateBidDto) {}
+export class UpdateBidDto {
+  @ApiProperty({
+    example: 'accepted',
+    description: 'Bid status',
+    enum: ['pending', 'accepted', 'rejected'],
+  })
+  @IsIn(['pending', 'accepted', 'rejected'])
+  bidStatus!: 'pending' | 'accepted' | 'rejected';
+}

@@ -468,16 +468,16 @@ export default function TenderDetailPage() {
                             ${Number(bid.amount).toLocaleString()}
                           </p>
                           <p className="text-[11px] text-[var(--text-faint)]">
-                            Vendor #{bid.vendorId} · {new Date(bid.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                            Vendor #{bid.vendorId} · {new Date(bid.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                           </p>
                         </div>
                       </div>
                       <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full ${
-                        bid.status === "accepted" ? "bg-emerald-950/60 text-emerald-400"
-                        : bid.status === "rejected" ? "bg-red-950/60 text-red-400"
+                        bid?.bidStatus === "accepted" ? "bg-emerald-950/60 text-emerald-400"
+                        : bid?.bidStatus === "rejected" ? "bg-red-950/60 text-red-400"
                         : "bg-yellow-950/60 text-yellow-400"
                       }`}>
-                        {bid.status.charAt(0).toUpperCase() + bid.status.slice(1)}
+                        {bid?.bidStatus?.charAt(0).toUpperCase() + bid?.bidStatus?.slice(1)}
                       </span>
                     </div>
                   ))}
