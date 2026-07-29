@@ -323,6 +323,7 @@ export default function TendersPage() {
   const [now] = useState<number>(() => new Date().getTime());
 
   const filtered = tenders.filter((t) => {
+    if (category && t.name?.toLowerCase() !== category.toLowerCase()) return false;
     if (statusFilter === "closing") {
       const days = Math.ceil(
         (new Date(t.closingDate).getTime() - now) / 86_400_000,
