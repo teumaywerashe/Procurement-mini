@@ -1,6 +1,6 @@
 # ProcureHub
 
-**Live:** [https://your-live-url.com](https://your-live-url.com)
+**Live:** [https://your-live-url.com](https://procurementHub.vercel.com)
 
 A full-stack procurement management platform. Admins publish tenders, vendors browse and submit bids, and both roles track everything through role-specific dashboards.
 
