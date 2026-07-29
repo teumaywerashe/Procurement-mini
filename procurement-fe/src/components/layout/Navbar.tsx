@@ -18,7 +18,7 @@ import { useTheme } from "@/src/components/ThemeProvider";
 
 export default function Navbar() {
   const { isLoggedIn } = useSelector((state: RootState) => state.auth);
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { user } = useSelector((state: RootState) => state.auth);
   const isAdmin = user?.role === "admin";
   const isVendor = user?.role === "vendor";
   const dispatch = useDispatch();
@@ -59,7 +59,7 @@ export default function Navbar() {
       <div className="w-full px-6 h-14 flex items-center gap-6">
         {/* Logo */}
         <Link
-          href={isLoggedIn ? "/dashboard" : "/"}
+          href={isLoggedIn ? "/tender" : "/"}
           className="flex items-center gap-2 shrink-0"
         >
           <IconShoppingBag size={22} className="text-[#9fef00]" />
@@ -109,9 +109,17 @@ export default function Navbar() {
               <button
                 onClick={toggle}
                 className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors"
-                title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                title={
+                  theme === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+                }
               >
-                {theme === "dark" ? <IconSun size={18} /> : <IconMoon size={18} />}
+                {theme === "dark" ? (
+                  <IconSun size={18} />
+                ) : (
+                  <IconMoon size={18} />
+                )}
               </button>
 
               <button className="relative p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
@@ -137,7 +145,7 @@ export default function Navbar() {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="text-xs text-gray-500 hover:text-white border border-[#2a2620] hover:border-[#3a3630] px-3 py-1.5 rounded-md transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border border-gray-600 cursor-pointer text-white-400 hover:bg-red-900/20 hover:border-red-600 transition-colors"
                 >
                   Logout
                 </button>
@@ -148,9 +156,17 @@ export default function Navbar() {
               <button
                 onClick={toggle}
                 className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors"
-                title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                title={
+                  theme === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+                }
               >
-                {theme === "dark" ? <IconSun size={18} /> : <IconMoon size={18} />}
+                {theme === "dark" ? (
+                  <IconSun size={18} />
+                ) : (
+                  <IconMoon size={18} />
+                )}
               </button>
               <Link
                 href="/login"

@@ -4,7 +4,7 @@ import Hero from "../components/home/Hero";
 import Testimony from "../components/home/Testimony";
 import About from "../components/home/About";
 
-const stats = [
+const stats = [                
   { value: "2,400+", label: "Active tenders" },
   { value: "18,000+", label: "Registered vendors" },
   { value: "$4.2B+", label: "Contract value managed" },

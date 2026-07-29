@@ -21,11 +21,7 @@ type User = {
 
 @Injectable()
 export class AuthService {
-  constructor(
-    // private readonly userService: UserService,
-    private readonly jwtService: JwtService,
-    // private readonly vendorService: VendorService,
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
   async register(registerDto: RegisterDto) {
     const [existingUser] = await db

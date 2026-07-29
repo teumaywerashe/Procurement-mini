@@ -204,14 +204,14 @@ export default function ManageTendersPage() {
                     </Link>
                     <Link
                       href={`/tender/${t.id}/edit`}
-                      className="p-1.5 text-zinc-600 hover:text-indigo-400 rounded hover:bg-indigo-950/30 transition-colors"
+                      className="p-1.5 text-zinc-600 cursor-pointer hover:text-indigo-400 rounded hover:bg-indigo-950/30 transition-colors"
                       title="Edit"
                     >
                       <IconEdit size={15} />
                     </Link>
                     <button
                       onClick={() => setToDelete(t)}
-                      className="p-1.5 text-zinc-600 hover:text-red-400 rounded hover:bg-red-950/30 transition-colors"
+                      className="p-1.5 text-zinc-600 cursor-pointer hover:text-red-400 rounded hover:bg-red-950/30 transition-colors"
                       title="Delete"
                     >
                       <IconTrash size={15} />

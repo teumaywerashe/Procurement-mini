@@ -29,10 +29,10 @@ function Hero() {
 
         {/* Toggle tabs */}
         <div className="flex gap-0 mb-6 w-fit rounded-full border border-white/30 overflow-hidden">
-          <button className="px-6 py-2.5 bg-white text-gray-900 text-sm font-semibold">
+          <button className="px-6 py-2.5 bg-white text-gray-900 cursor-pointer text-sm font-semibold">
             I want to tender
           </button>
-          <button className="px-6 py-2.5 text-white text-sm font-medium hover:bg-white/10 transition-colors">
+          <button className="px-6 py-2.5 text-white cursor-pointer text-sm font-medium hover:bg-white/10 transition-colors">
             I want to bid
           </button>
         </div>
@@ -44,7 +44,7 @@ function Hero() {
             placeholder="Search tenders by keyword or category..."
             className="flex-1 px-5 py-3.5 text-gray-800 text-sm outline-none"
           />
-          <button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3.5 text-sm font-semibold transition-colors">
+          <button className="flex items-center gap-2 bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3.5 text-sm font-semibold transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"

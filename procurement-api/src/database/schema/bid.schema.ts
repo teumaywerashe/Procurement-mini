@@ -13,6 +13,7 @@ export const bid = pgTable('bid', {
   vendorId: integer('vendor_id')
     .notNull()
     .references(() => vendor.id, { onDelete: 'cascade' }),
+  bidStatus: varchar().default('pending'),
   amount: integer('amount').notNull(),
   tenderId: integer('tender_id')
     .notNull()

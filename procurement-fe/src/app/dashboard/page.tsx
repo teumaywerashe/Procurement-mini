@@ -36,7 +36,9 @@ function StatCard({
   return (
     <div className="bg-[#1c1a16] border border-[#2a2620] rounded-xl p-5">
       <div className="flex items-start justify-between mb-3">
-        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${color}`}>
+        <div
+          className={`w-9 h-9 rounded-lg flex items-center justify-center ${color}`}
+        >
           {icon}
         </div>
       </div>
@@ -48,17 +50,27 @@ function StatCard({
 }
 
 export default function DashboardPage() {
-  const user = useSelector((s: RootState) => s.auth.user);
+  const {user} = useSelector((s: RootState) => s.auth);
   const isAdmin = user?.role === "admin";
   const isVendor = user?.role === "vendor";
   const now = React.useMemo(() => Date.now(), []);
 
-  const { data: tenders = [], isLoading: tendersLoading } = useGetTendersQuery({});
-  const { data: vendors = [], isLoading: vendorsLoading } = useGetVendorsQuery(undefined, { skip: !isAdmin });
-  const { data: vendor } = useGetVendorQuery(user?.id ?? 0, { skip: !isVendor });
-  const { data: myBids = [], isLoading: bidsLoading } = useGetBidsByVendorQuery(vendor?.id ?? 0, {
-    skip: !vendor?.id,
+  const { data: tenders = [], isLoading: tendersLoading } = useGetTendersQuery(
+    {},
+  );
+  const { data: vendors = [], isLoading: vendorsLoading } = useGetVendorsQuery(
+    undefined,
+    { skip: !isAdmin },
+  );
+  const { data: vendor } = useGetVendorQuery(user?.id ?? 0, {
+    skip: !isVendor,
   });
+  const { data: myBids = [], isLoading: bidsLoading } = useGetBidsByVendorQuery(
+    vendor?.id ?? 0,
+    {
+      skip: !vendor?.id,
+    },
+  );
 
   const published = tenders.filter((t) => t.status === "published");
   const closingSoon = tenders.filter((t) => {
@@ -66,43 +78,113 @@ export default function DashboardPage() {
     return d >= 0 && d <= 7 && t.status === "published";
   });
   const recentTenders = [...tenders]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
     .slice(0, 5);
 
   const pendingBids = myBids.filter((b) => b.status === "pending");
   const acceptedBids = myBids.filter((b) => b.status === "accepted");
 
   const quickLinks = [
-    { href: "/tender", icon: <IconFileText size={15} />, label: "Browse tenders", color: "text-indigo-400", always: true },
-    { href: "/bids/my", icon: <IconGavel size={15} />, label: "My bids", color: "text-yellow-400", always: false, vendorOnly: true },
-    { href: "/tender/create", icon: <IconPlus size={15} />, label: "Create tender", color: "text-emerald-400", always: false, adminOnly: true },
-    { href: "/tender/manage", icon: <IconFileText size={15} />, label: "Manage tenders", color: "text-orange-400", always: false, adminOnly: true },
-    { href: "/vendors", icon: <IconUsers size={15} />, label: "Manage vendors", color: "text-purple-400", always: false, adminOnly: true },
-  ].filter((l) => l.always || (l.adminOnly && isAdmin) || (l.vendorOnly && isVendor));
+    {
+      href: "/tender",
+      icon: <IconFileText size={15} />,
+      label: "Browse tenders",
+      color: "text-indigo-400",
+      always: true,
+    },
+    {
+      href: "/bids/my",
+      icon: <IconGavel size={15} />,
+      label: "My bids",
+      color: "text-yellow-400",
+      always: false,
+      vendorOnly: true,
+    },
+    {
+      href: "/tender/create",
+      icon: <IconPlus size={15} />,
+      label: "Create tender",
+      color: "text-emerald-400",
+      always: false,
+      adminOnly: true,
+    },
+    {
+      href: "/tender/manage",
+      icon: <IconFileText size={15} />,
+      label: "Manage tenders",
+      color: "text-orange-400",
+      always: false,
+      adminOnly: true,
+    },
+    {
+      href: "/vendors",
+      icon: <IconUsers size={15} />,
+      label: "Manage vendors",
+      color: "text-purple-400",
+      always: false,
+      adminOnly: true,
+    },
+  ].filter(
+    (l) => l.always || (l.adminOnly && isAdmin) || (l.vendorOnly && isVendor),
+  );
 
   return (
     <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
       <Navbar />
 
       <div className="flex flex-1 w-full overflow-hidden">
-
         {/* ── Left sidebar ── */}
-        <aside className="hidden lg:flex flex-col shrink-0 border-r border-[#1e1c18] bg-[#0f0e0b] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%" }}>
+        <aside
+          className="hidden lg:flex flex-col shrink-0 border-r border-[#1e1c18] bg-[#0f0e0b] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto"
+          style={{ width: "20%" }}
+        >
           <div className="p-4 space-y-6">
-
             {/* Overview stats */}
             <div className="space-y-1">
-              <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">Overview</p>
+              <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">
+                Overview
+              </p>
               {[
-                { label: "Total tenders", value: tendersLoading ? "—" : tenders.length },
-                { label: "Active",        value: tendersLoading ? "—" : published.length },
-                { label: "Closing soon",  value: tendersLoading ? "—" : closingSoon.length },
-                ...(isAdmin ? [{ label: "Vendors", value: vendorsLoading ? "—" : vendors.length }] : []),
-                ...(isVendor ? [{ label: "My bids", value: bidsLoading ? "—" : myBids.length }] : []),
+                {
+                  label: "Total tenders",
+                  value: tendersLoading ? "—" : tenders.length,
+                },
+                {
+                  label: "Active",
+                  value: tendersLoading ? "—" : published.length,
+                },
+                {
+                  label: "Closing soon",
+                  value: tendersLoading ? "—" : closingSoon.length,
+                },
+                ...(isAdmin
+                  ? [
+                      {
+                        label: "Vendors",
+                        value: vendorsLoading ? "—" : vendors.length,
+                      },
+                    ]
+                  : []),
+                ...(isVendor
+                  ? [
+                      {
+                        label: "My bids",
+                        value: bidsLoading ? "—" : myBids.length,
+                      },
+                    ]
+                  : []),
               ].map((s) => (
-                <div key={s.label} className="flex items-center justify-between px-2 py-1.5">
+                <div
+                  key={s.label}
+                  className="flex items-center justify-between px-2 py-1.5"
+                >
                   <span className="text-xs text-zinc-500">{s.label}</span>
-                  <span className="text-xs font-semibold text-white tabular-nums">{s.value}</span>
+                  <span className="text-xs font-semibold text-white tabular-nums">
+                    {s.value}
+                  </span>
                 </div>
               ))}
             </div>
@@ -113,7 +195,9 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center gap-2 px-2 mb-2">
                 <IconLayoutDashboard size={12} className="text-zinc-600" />
-                <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">Quick Actions</p>
+                <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
+                  Quick Actions
+                </p>
               </div>
               <nav className="space-y-0.5">
                 {quickLinks.map((l) => (
@@ -128,20 +212,20 @@ export default function DashboardPage() {
                 ))}
               </nav>
             </div>
-
           </div>
         </aside>
 
         {/* ── Main content ── */}
         <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
           <div className="max-w-4xl w-full mx-auto px-6 py-8 flex-1">
-
             {/* Page header */}
             <div className="mb-8">
               <h1 className="text-xl font-bold text-white">
                 Welcome back, {user?.name?.split(" ")[0] ?? "User"}
               </h1>
-              <p className="text-sm text-zinc-500 mt-1 capitalize">{user?.role} account</p>
+              <p className="text-sm text-zinc-500 mt-1 capitalize">
+                {user?.role} account
+              </p>
             </div>
 
             {/* Stats grid */}
@@ -191,8 +275,13 @@ export default function DashboardPage() {
             {/* Recent tenders */}
             <div className="bg-[#1c1a16] border border-[#2a2620] rounded-xl overflow-hidden mb-6">
               <div className="px-5 py-4 border-b border-[#2a2620] flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-white">Recent Tenders</h2>
-                <Link href="/tender" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+                <h2 className="text-sm font-semibold text-white">
+                  Recent Tenders
+                </h2>
+                <Link
+                  href="/tender"
+                  className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                >
                   View all <IconChevronRight size={13} />
                 </Link>
               </div>
@@ -200,11 +289,16 @@ export default function DashboardPage() {
                 {tendersLoading ? (
                   <div className="p-5 space-y-3">
                     {Array.from({ length: 4 }).map((_, i) => (
-                      <div key={i} className="h-10 bg-[#14120e] rounded animate-pulse" />
+                      <div
+                        key={i}
+                        className="h-10 bg-[#14120e] rounded animate-pulse"
+                      />
                     ))}
                   </div>
                 ) : recentTenders.length === 0 ? (
-                  <div className="px-5 py-10 text-center text-sm text-zinc-600">No tenders yet.</div>
+                  <div className="px-5 py-10 text-center text-sm text-zinc-600">
+                    No tenders yet.
+                  </div>
                 ) : (
                   recentTenders.map((t) => (
                     <Link
@@ -216,14 +310,21 @@ export default function DashboardPage() {
                         <p className="text-sm font-medium text-white group-hover:text-indigo-300 transition-colors truncate">
                           {t.title}
                         </p>
-                        <p className="text-xs text-zinc-600 mt-0.5">{t.referenceNumber}</p>
+                        <p className="text-xs text-zinc-600 mt-0.5">
+                          {t.referenceNumber}
+                        </p>
                       </div>
-                      <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 ml-3 ${
-                        t.status === "published" ? "bg-emerald-950/60 text-emerald-400"
-                        : t.status === "awarded"  ? "bg-indigo-950/60 text-indigo-400"
-                        : t.status === "closed"   ? "bg-red-950/60 text-red-400"
-                        : "bg-zinc-800 text-zinc-400"
-                      }`}>
+                      <span
+                        className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 ml-3 ${
+                          t.status === "published"
+                            ? "bg-emerald-950/60 text-emerald-400"
+                            : t.status === "awarded"
+                              ? "bg-indigo-950/60 text-indigo-400"
+                              : t.status === "closed"
+                                ? "bg-red-950/60 text-red-400"
+                                : "bg-zinc-800 text-zinc-400"
+                        }`}
+                      >
                         {t.status}
                       </span>
                     </Link>
@@ -246,8 +347,13 @@ export default function DashboardPage() {
             {isVendor && (
               <div className="bg-[#1c1a16] border border-[#2a2620] rounded-xl overflow-hidden">
                 <div className="px-5 py-4 border-b border-[#2a2620] flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-white">My Recent Bids</h2>
-                  <Link href="/bids/my" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+                  <h2 className="text-sm font-semibold text-white">
+                    My Recent Bids
+                  </h2>
+                  <Link
+                    href="/bids/my"
+                    className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                  >
                     View all <IconChevronRight size={13} />
                   </Link>
                 </div>
@@ -255,23 +361,39 @@ export default function DashboardPage() {
                   {bidsLoading ? (
                     <div className="p-4 space-y-2">
                       {Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="h-8 bg-[#14120e] rounded animate-pulse" />
+                        <div
+                          key={i}
+                          className="h-8 bg-[#14120e] rounded animate-pulse"
+                        />
                       ))}
                     </div>
                   ) : myBids.length === 0 ? (
-                    <div className="px-5 py-6 text-center text-xs text-zinc-600">No bids submitted yet.</div>
+                    <div className="px-5 py-6 text-center text-xs text-zinc-600">
+                      No bids submitted yet.
+                    </div>
                   ) : (
                     myBids.slice(0, 3).map((bid) => (
-                      <div key={bid.id} className="flex items-center justify-between px-5 py-3 border-b border-[#1e1c18]">
+                      <div
+                        key={bid.id}
+                        className="flex items-center justify-between px-5 py-3 border-b border-[#1e1c18]"
+                      >
                         <div>
-                          <p className="text-xs font-medium text-white">Tender #{bid.tenderId}</p>
-                          <p className="text-[11px] text-zinc-600">${Number(bid.amount).toLocaleString()}</p>
+                          <p className="text-xs font-medium text-white">
+                            Tender #{bid.tenderId}
+                          </p>
+                          <p className="text-[11px] text-zinc-600">
+                            ${Number(bid.amount).toLocaleString()}
+                          </p>
                         </div>
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                          bid.status === "accepted" ? "bg-emerald-950/60 text-emerald-400"
-                          : bid.status === "rejected" ? "bg-red-950/60 text-red-400"
-                          : "bg-yellow-950/60 text-yellow-400"
-                        }`}>
+                        <span
+                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                            bid.status === "accepted"
+                              ? "bg-emerald-950/60 text-emerald-400"
+                              : bid.status === "rejected"
+                                ? "bg-red-950/60 text-red-400"
+                                : "bg-yellow-950/60 text-yellow-400"
+                          }`}
+                        >
                           {bid.status}
                         </span>
                       </div>
@@ -280,10 +402,8 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
-
           </div>
         </main>
-
       </div>
     </div>
   );

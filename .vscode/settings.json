@@ -2,5 +2,6 @@
   "js/ts.experimental.useTsgo": false,
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "files.autoSave": "afterDelay"
+  "files.autoSave": "afterDelay",
+  "typescript.autoClosingTags": false
 }

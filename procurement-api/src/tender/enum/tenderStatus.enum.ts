@@ -5,4 +5,3 @@ export enum tenderStatus {
   AWARDED = 'awarded',
   CANCELLED = 'cancelled',
 }
-// draft → published → closed → awarded)

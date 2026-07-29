@@ -16,7 +16,6 @@ import {
   Box,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import { IconShoppingBag, IconAlertCircle } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -47,15 +46,14 @@ export default function LoginPage() {
       // console.log(result);
       dispatch(logIn(result.user));
       console.log(result.user);
-      router.push("/dashboard");
+      router.push("/tender");
     } catch (error: unknown) {
       console.log("error occurred", error);
       const data = (error as { data?: unknown }).data;
       const msg  = (data as { message?: unknown } | undefined)?.message;
       if (Array.isArray(msg)) {
         setError(msg.join(", "));
-      } else if (typeof msg === "string") {
-        setError(msg);
+      
       } else if (typeof data === "string") {
         setError(data);
       } else {

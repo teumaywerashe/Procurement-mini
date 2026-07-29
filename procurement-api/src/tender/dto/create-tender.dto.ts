@@ -27,7 +27,7 @@ export class CreateTenderDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: 'open' })
+  @ApiProperty({ example: 'published' })
   @IsString()
   @IsNotEmpty()
   status!: tenderStatus;

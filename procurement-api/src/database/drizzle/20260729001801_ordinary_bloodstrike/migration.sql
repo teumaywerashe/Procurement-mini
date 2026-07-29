@@ -1,0 +1,1 @@
+ALTER TABLE "bid" ADD COLUMN "bidStatus" varchar DEFAULT 'pending';

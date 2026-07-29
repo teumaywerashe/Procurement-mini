@@ -8,7 +8,8 @@ import { useCreateTenderMutation } from "@/src/store/api/tenderApi";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/src/store/store";
 import { IconArrowLeft } from "@tabler/icons-react";
-import type { TenderStatus,FormState } from "@/src/types";
+import type { TenderStatus, FormState } from "@/src/types";
+import { notifications } from "@mantine/notifications";
 
 const STATUS_OPTIONS: { label: string; value: TenderStatus }[] = [
   { label: "Draft", value: "draft" },
@@ -17,8 +18,6 @@ const STATUS_OPTIONS: { label: string; value: TenderStatus }[] = [
   { label: "Awarded", value: "awarded" },
   { label: "Cancelled", value: "cancelled" },
 ];
-
-
 
 export default function CreateTenderPage() {
   const router = useRouter();
@@ -40,7 +39,9 @@ export default function CreateTenderPage() {
   });
 
   function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
@@ -56,6 +57,11 @@ export default function CreateTenderPage() {
       estimatedValue: Number(form.estimatedValue),
     });
     if ("data" in result && result.data) {
+      notifications.show({
+        title: "Tender Created",
+        message: `Tender has been created successfully.`,
+        color: "green",
+      });
       router.push(`/tender/${result.data.id}`);
     }
   }
@@ -101,18 +107,55 @@ export default function CreateTenderPage() {
             {/* Name */}
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1.5">
-                Name <span className="text-xs text-gray-600 ml-1 font-normal">(category / short label)</span>
+                Name{" "}
+                <span className="text-xs text-gray-600 ml-1 font-normal">
+                  (category / short label)
+                </span>
                 <span className="text-red-400"> *</span>
               </label>
-              <input
-                type="text"
+              <select  onChange={handleChange} 
+                className="w-full bg-[#14120e] border border-[#3a3630] rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 transition-colors"
                 name="name"
                 value={form.name}
-                onChange={handleChange}
-                required
-                placeholder="e.g. Infrastructure"
-                className="w-full bg-[#14120e] border border-[#3a3630] rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 transition-colors"
-              />
+                id=""
+              >
+                <option
+                  className="w-full bg-[#14120e] border border-[#3a3630] rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 transition-colors"
+                  value="Infrastructure"
+                >
+                  Infrastructure
+                </option>
+                <option
+                  className="w-full bg-[#14120e] border border-[#3a3630] rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 transition-colors"
+                  value="Logistic"
+                >
+                  Logistic
+                </option>
+                <option
+                  className="w-full bg-[#14120e] border border-[#3a3630] rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 transition-colors"
+                  value="Education"
+                >
+                  Education
+                </option>
+                <option
+                  className="w-full bg-[#14120e] border border-[#3a3630] rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 transition-colors"
+                  value="HealthCare"
+                >
+                  HealthCare
+                </option>
+                <option
+                  className="w-full bg-[#14120e] border border-[#3a3630] rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 transition-colors"
+                  value="Technology"
+                >
+                  Technology
+                </option>
+                <option
+                  className="w-full bg-[#14120e] border border-[#3a3630] rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 transition-colors"
+                  value="Environment"
+                >
+                  Environment
+                </option>
+              </select>
             </div>
 
             {/* Description */}
@@ -192,7 +235,11 @@ export default function CreateTenderPage() {
                     message?: string | string[];
                   } | null;
                   const raw = data?.message;
-                  const messages = Array.isArray(raw) ? raw : raw ? [raw] : ["Failed to create tender. Please try again."];
+                  const messages = Array.isArray(raw)
+                    ? raw
+                    : raw
+                      ? [raw]
+                      : ["Failed to create tender. Please try again."];
                   return messages.map((m, i) => <p key={i}>{m}</p>);
                 })()}
               </div>

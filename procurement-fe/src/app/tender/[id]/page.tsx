@@ -9,6 +9,7 @@ import {
   useDeleteTenderMutation,
 } from "@/src/store/api/tenderApi";
 import { useSelector } from "react-redux";
+import { notifications } from "@mantine/notifications";
 import type { RootState } from "@/src/store/store";
 import {
   IconArrowLeft,
@@ -23,6 +24,7 @@ import {
 } from "@tabler/icons-react";
 import type { TenderStatus } from "@/src/types";
 import { Button } from "@mantine/core";
+// import { Button, Notification } from "@mantine/core";
 
 const STATUS_COLORS: Record<
   TenderStatus,
@@ -67,10 +69,23 @@ export default function TenderDetailPage() {
   const [showConfirm, setShowConfirm] = React.useState(false);
 
   async function handleDelete() {
-    await deleteTender(Number(id));
-    router.push("/tender");
+    try {
+      const data = await deleteTender(Number(id)).unwrap();
+      notifications.show({
+       title: "Tender Deleted",
+        message: `Tender has been deleted successfully.`,
+        color: "green",
+      });
+      router.push("/tender");
+    } catch (error) {
+      console.log(error);
+      notifications.show({
+        title: "Error",
+        message: "Failed to delete tender. Please try again.",
+        color: "red",
+      });
+    }
   }
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#14120e] text-white flex flex-col">
@@ -158,7 +173,7 @@ export default function TenderDetailPage() {
                   </Link>
                   <button
                     onClick={() => setShowConfirm(true)}
-                    className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border border-red-800/60 text-red-400 hover:bg-red-900/20 hover:border-red-600 transition-colors"
+                    className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border border-red-800/60 cursor-pointer text-red-400 hover:bg-red-900/20 hover:border-red-600 transition-colors"
                   >
                     <IconTrash size={15} />
                     Delete
@@ -212,7 +227,7 @@ export default function TenderDetailPage() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="px-6 py-4 border-r border-[#2a2620] last:border-r-0"
+                className="px-6 py-4 cursor-pointer border-r border-[#2a2620] last:border-r-0"
               >
                 <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-1">
                   {item.icon}
