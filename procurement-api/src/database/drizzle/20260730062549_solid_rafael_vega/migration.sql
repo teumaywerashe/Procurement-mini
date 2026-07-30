@@ -1,0 +1,1 @@
+ALTER TABLE "tender" ALTER COLUMN "description" SET DATA TYPE varchar USING "description"::varchar;

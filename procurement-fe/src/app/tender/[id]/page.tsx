@@ -38,13 +38,13 @@ export default function TenderDetailPage() {
   }
 
   if (isLoading) return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col">
-      <Navbar /><div className="flex-1 flex items-center justify-center text-[var(--text-subtle)] text-sm">Loading tender...</div>
+    <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
+      <Navbar /><div className="flex-1 flex items-center justify-center text-(--text-subtle) text-sm">Loading tender...</div>
     </div>
   );
 
   if (isError || !tender) return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col">
+    <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
       <div className="flex-1 flex flex-col items-center justify-center gap-4 text-sm">
         <IconAlertTriangle size={40} className="text-red-400" />
@@ -57,16 +57,16 @@ export default function TenderDetailPage() {
   const closing = daysLeft(tender.closingDate);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col">
+    <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
       <div className="max-w-4xl mx-auto w-full px-6 py-8 flex-1">
-        <Link href="/tender" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-subtle)] hover:text-[var(--text-primary)] transition-colors mb-6">
+        <Link href="/tender" className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors mb-6">
           <IconArrowLeft size={16} /> Back to tenders
         </Link>
 
         <TenderDetailHeader tender={tender} closing={closing} isAdmin={isAdmin} onDelete={() => setShowConfirm(true)} />
 
-        <div className="px-8 py-4 bg-[var(--bg-surface)] border border-[var(--border)] rounded-b-2xl -mt-px flex items-center gap-2 text-xs text-[var(--text-faint)]">
+        <div className="px-8 py-4 bg-(--bg-surface) border border-(--border) rounded-b-2xl -mt-px flex items-center gap-2 text-xs text-(--text-faint)">
           <IconUser size={13} />
           Created {new Date(tender.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
         </div>
@@ -77,16 +77,16 @@ export default function TenderDetailPage() {
 
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-          <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-6 max-w-sm w-full">
+          <div className="bg-(--bg-surface) border border-(--border) rounded-2xl p-6 max-w-sm w-full">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-full bg-red-900/30 flex items-center justify-center shrink-0"><IconTrash size={18} className="text-red-400" /></div>
-              <h3 className="font-semibold text-[var(--text-primary)] text-base">Delete tender?</h3>
+              <h3 className="font-semibold text-(--text-primary) text-base">Delete tender?</h3>
             </div>
-            <p className="text-sm text-[var(--text-subtle)] mb-5 leading-relaxed">
-              This will permanently delete <span className="text-[var(--text-primary)] font-medium">{tender.title}</span>. This action cannot be undone.
+            <p className="text-sm text-(--text-subtle) mb-5 leading-relaxed">
+              This will permanently delete <span className="text-[var(--text-primary) font-medium">{tender.title}</span>. This action cannot be undone.
             </p>
             <div className="flex items-center gap-3">
-              <button onClick={() => setShowConfirm(false)} disabled={isDeleting} className="flex-1 py-2.5 rounded-lg border border-[var(--border-strong)] text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">Cancel</button>
+              <button onClick={() => setShowConfirm(false)} disabled={isDeleting} className="flex-1 py-2.5 rounded-lg border border-[var(--border-strong) text-sm text-[var(--text-muted) hover:text-[var(--text-primary) transition-colors">Cancel</button>
               <button onClick={handleDelete} disabled={isDeleting} className="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-sm font-medium text-white transition-colors disabled:opacity-50">
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>

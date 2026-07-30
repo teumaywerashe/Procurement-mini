@@ -21,7 +21,7 @@ interface Props {
 
 export default function TenderLeftSidebar({ stats, category, statusFilter, onCategoryChange, onStatusChange }: Props) {
   return (
-    <aside className="hidden lg:flex flex-col shrink-0 border-r border-[#1e1c18] bg-[#0f0e0b] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%" }}>
+    <aside className="hidden fixed left-0  lg:flex flex-col shrink-0 border-r border-[#1e1c18] bg-[#0f0e0b] top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%" }}>
       <div className="p-4 space-y-6">
         <div className="space-y-1">
           <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">Overview</p>

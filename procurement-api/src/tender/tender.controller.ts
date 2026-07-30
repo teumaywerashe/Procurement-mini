@@ -18,8 +18,9 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../user/enum/userRole..enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import type { JwtPayload } from '../auth/decorators/current-user.decorator';
 import { TenderFilterDto } from './dto/tender-filter.dto';
+import { Public } from '../auth/decorators/public.decorator';
+import type { JwtPayload } from '../auth/decorators/types';
 @Controller('tender')
 @ApiTags('Tenders')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -36,14 +37,17 @@ export class TenderController {
   }
 
   @Get()
+  @Public()
   async findAll() {
     return await this.tenderService.findAll();
   }
   @Get('all')
+  @Public()
   findAllByFilter(@Query() filter: TenderFilterDto) {
     return this.tenderService.findAllByFilter(filter);
   }
   @Get(':id')
+  @Public()
   async findOne(@Param('id') id: string) {
     return await this.tenderService.findOne(+id);
   }

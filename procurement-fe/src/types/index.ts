@@ -24,9 +24,9 @@ export interface User {
 export interface Vendor {
   id: number;
   userId: number;
-  companyName: string;
-  contactPhone?: string;
-  address?: string;
+  name: string;
+  phoneNumber?: string;
+  email?: string;
   createdAt: string;
 }
 
@@ -56,6 +56,6 @@ export interface FormState {
   name: string;
   description: string;
   status: TenderStatus;
-  closingDate: string;
+  closingDate: Date;
   estimatedValue: string;
 }

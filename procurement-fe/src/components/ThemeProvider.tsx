@@ -42,7 +42,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         defaultColorScheme="dark"
         forceColorScheme={theme}
       >
-        <Notifications />
+        <Notifications position="top-right" />
         {children}
       </MantineProvider>
     </ThemeContext.Provider>

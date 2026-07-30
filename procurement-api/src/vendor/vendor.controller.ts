@@ -12,7 +12,7 @@ import { VendorService } from './vendor.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { ApiOperation } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import type { JwtPayload } from '../auth/decorators/current-user.decorator';
+import type { JwtPayload } from '../auth/decorators/types';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../user/enum/userRole..enum';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';

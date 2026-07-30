@@ -3,7 +3,14 @@
 import { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
 import Link from "next/link";
-import { IconSearch, IconAdjustments, IconFileText, IconPlus, IconFilter, IconArrowRight } from "@tabler/icons-react";
+import {
+  IconSearch,
+  IconAdjustments,
+  IconFileText,
+  IconPlus,
+  IconFilter,
+  IconArrowRight,
+} from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import { useGetTendersQuery } from "@/src/store/api/tenderApi";
 import type { RootState } from "@/src/store/store";
@@ -12,28 +19,39 @@ import TenderLeftSidebar from "@/src/components/tender/TenderLeftSidebar";
 import TenderBidsSidebar from "@/src/components/tender/TenderBidsSidebar";
 
 const STATUS_FILTER_LABELS: Record<string, string> = {
-  "": "All Tenders", published: "Published", closing: "Closing Soon",
-  awarded: "Awarded", draft: "Draft", cancelled: "Cancelled",
+  "": "All Tenders",
+  published: "Published",
+  closing: "Closing Soon",
+  awarded: "Awarded",
+  draft: "Draft",
+  cancelled: "Cancelled",
 };
 
 export default function TendersPage() {
-  const [search, setSearch]           = useState("");
+  const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [category, setCategory]       = useState("");
+  const [category, setCategory] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [sortNewest, setSortNewest]   = useState(true);
-  const [now]                         = useState(() => Date.now());
+  const [sortNewest, setSortNewest] = useState(true);
+  const [now] = useState(() => Date.now());
 
-  const user     = useSelector((s: RootState) => s.auth.user);
-  const isAdmin  = user?.role === "Admin";
-  const isVendor = user?.role === "Vendor";
+  const user = useSelector((s: RootState) => s.auth.user);
+  const isAdmin = user?.role == "Admin";
+  const isVendor = user?.role == "Vendor";
 
-  const { data: tenders = [], isLoading, isError } = useGetTendersQuery(search ? { title: search } : {});
+  const {
+    data: tenders = [],
+    isLoading,
+    isError,
+  } = useGetTendersQuery(search ? { title: search } : {});
 
   const filtered = tenders.filter((t) => {
-    if (category && t.name?.toLowerCase() !== category.toLowerCase()) return false;
+    if (category && t.name?.toLowerCase() !== category.toLowerCase())
+      return false;
     if (statusFilter === "closing") {
-      const days = Math.ceil((new Date(t.closingDate).getTime() - now) / 86_400_000);
+      const days = Math.ceil(
+        (new Date(t.closingDate).getTime() - now) / 86_400_000,
+      );
       return days >= 0 && days <= 7;
     }
     if (statusFilter) return t.status === statusFilter;
@@ -43,40 +61,64 @@ export default function TendersPage() {
   const sorted = [...filtered].sort((a, b) =>
     sortNewest
       ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
   );
 
   const stats = {
-    total:     tenders.length,
+    total: tenders.length,
     published: tenders.filter((t) => t.status === "published").length,
-    closing:   tenders.filter((t) => { const d = Math.ceil((new Date(t.closingDate).getTime() - now) / 86_400_000); return d >= 0 && d <= 7; }).length,
+    closing: tenders.filter((t) => {
+      const d = Math.ceil(
+        (new Date(t.closingDate).getTime() - now) / 86_400_000,
+      );
+      return d >= 0 && d <= 7;
+    }).length,
   };
 
   return (
     <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
       <Navbar />
-      <div className="flex flex-1 w-full overflow-hidden">
-        <TenderLeftSidebar stats={stats} category={category} statusFilter={statusFilter} onCategoryChange={setCategory} onStatusChange={setStatusFilter} />
+      <div className="flex  ml-100 mr-100 flex-1 w-full overflow-hidden">
+        <TenderLeftSidebar
+          stats={stats}
+          category={category}
+          statusFilter={statusFilter}
+          onCategoryChange={setCategory}
+          onStatusChange={setStatusFilter}
+        />
 
         <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
           <div className="sticky top-14 z-30 bg-[#0f0e0b] border-b border-[#1e1c18] px-6 py-3 flex items-center gap-3">
             <div className="flex items-center flex-1 bg-[#161410] border border-[#2a2620] rounded-lg px-3 py-2 gap-2">
               <IconSearch size={14} className="text-zinc-500 shrink-0" />
-              <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tenders..."
-                className="bg-transparent text-sm text-white placeholder-zinc-600 outline-none flex-1" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search tenders..."
+                className="bg-transparent text-sm text-white placeholder-zinc-600 outline-none flex-1"
+              />
             </div>
-            <button onClick={() => setShowFilters((v) => !v)}
-              className={`lg:hidden flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border transition-colors ${showFilters ? "border-indigo-500 text-indigo-400 bg-indigo-950/40" : "border-[#2a2620] text-zinc-400 hover:text-white"}`}>
+            <button
+              onClick={() => setShowFilters((v) => !v)}
+              className={`lg:hidden flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border transition-colors ${showFilters ? "border-indigo-500 text-indigo-400 bg-indigo-950/40" : "border-[#2a2620] text-zinc-400 hover:text-white"}`}
+            >
               <IconFilter size={14} /> Filters
             </button>
-            <select value={sortNewest ? "newest" : "oldest"} onChange={(e) => setSortNewest(e.target.value === "newest")}
-              className="bg-[#161410] border border-[#2a2620] text-xs text-zinc-300 rounded-lg px-3 py-2 outline-none cursor-pointer">
+            <select
+              value={sortNewest ? "newest" : "oldest"}
+              onChange={(e) => setSortNewest(e.target.value === "newest")}
+              className="bg-[#161410] border border-[#2a2620] text-xs text-zinc-300 rounded-lg px-3 py-2 outline-none cursor-pointer"
+            >
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
             </select>
             <div className="flex-1" />
             {isAdmin && (
-              <Link href="/tender/create" className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0">
+              <Link
+                href="/tender/create"
+                className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0"
+              >
                 <IconPlus size={14} /> New Tender
               </Link>
             )}
@@ -84,32 +126,75 @@ export default function TendersPage() {
 
           <div className="px-6 py-4 flex items-center border-b border-[#1e1c18]">
             <div>
-              <h1 className="text-sm font-semibold text-white">{STATUS_FILTER_LABELS[statusFilter] ?? "All Tenders"}</h1>
-              <p className="text-xs text-zinc-600 mt-0.5">{isLoading ? "Loading..." : `${sorted.length} result${sorted.length !== 1 ? "s" : ""}`}</p>
+              <h1 className="text-sm font-semibold text-white">
+                {STATUS_FILTER_LABELS[statusFilter] ?? "All Tenders"}
+              </h1>
+              <p className="text-xs text-zinc-600 mt-0.5">
+                {isLoading
+                  ? "Loading..."
+                  : `${sorted.length} result${sorted.length !== 1 ? "s" : ""}`}
+              </p>
             </div>
           </div>
 
           <div className="flex-1">
             {isLoading ? (
-              <div>{Array.from({ length: 6 }).map((_, i) => <div key={i} className="px-6 py-5 border-b border-[#1e1c18] flex items-start gap-4 animate-pulse"><div className="w-10 h-10 rounded-lg bg-[#1e1c18] shrink-0" /><div className="flex-1 space-y-2"><div className="h-3 bg-[#1e1c18] rounded w-1/4" /><div className="h-4 bg-[#1e1c18] rounded w-2/3" /></div></div>)}</div>
+              <div>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="px-6 py-5 border-b border-[#1e1c18] flex items-start gap-4 animate-pulse"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-[#1e1c18] shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3 bg-[#1e1c18] rounded w-1/4" />
+                      <div className="h-4 bg-[#1e1c18] rounded w-2/3" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             ) : isError ? (
               <div className="flex flex-col items-center justify-center py-24 text-center px-6">
-                <div className="w-12 h-12 rounded-full bg-red-950/40 flex items-center justify-center mb-4"><IconAdjustments size={20} className="text-red-400" /></div>
-                <p className="text-sm font-medium text-white mb-1">Failed to load tenders</p>
+                <div className="w-12 h-12 rounded-full bg-red-950/40 flex items-center justify-center mb-4">
+                  <IconAdjustments size={20} className="text-red-400" />
+                </div>
+                <p className="text-sm font-medium text-white mb-1">
+                  Failed to load tenders
+                </p>
               </div>
             ) : sorted.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 text-center px-6">
-                <div className="w-12 h-12 rounded-full bg-[#1e1c18] flex items-center justify-center mb-4"><IconFileText size={20} className="text-zinc-600" /></div>
-                <p className="text-sm font-medium text-white mb-1">No tenders found</p>
-                {isAdmin && <Link href="/tender/create" className="mt-4 flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"><IconPlus size={14} /> Create first tender</Link>}
+                <div className="w-12 h-12 rounded-full bg-[#1e1c18] flex items-center justify-center mb-4">
+                  <IconFileText size={20} className="text-zinc-600" />
+                </div>
+                <p className="text-sm font-medium text-white mb-1">
+                  No tenders found
+                </p>
+                {isAdmin && (
+                  <Link
+                    href="/tender/create"
+                    className="mt-4 flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+                  >
+                    <IconPlus size={14} /> Create first tender
+                  </Link>
+                )}
               </div>
-            ) : sorted.map((t) => <TenderRow key={t.id} tender={t} now={now} />)}
+            ) : (
+              sorted.map((t) => <TenderRow key={t.id} tender={t} now={now} />)
+            )}
           </div>
 
           {!isLoading && sorted.length > 0 && (
             <div className="px-6 py-3 border-t border-[#1e1c18] flex items-center justify-between">
-              <p className="text-xs text-zinc-600">Showing {sorted.length} of {tenders.length} tenders</p>
-              <Link href="#" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">View all <IconArrowRight size={12} /></Link>
+              <p className="text-xs text-zinc-600">
+                Showing {sorted.length} of {tenders.length} tenders
+              </p>
+              <Link
+                href="#"
+                className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors"
+              >
+                View all <IconArrowRight size={12} />
+              </Link>
             </div>
           )}
         </main>

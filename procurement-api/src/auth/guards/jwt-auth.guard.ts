@@ -6,13 +6,27 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { JwtPayload } from '../decorators/current-user.decorator';
+
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { Reflector } from '@nestjs/core/services/reflector.service';
+import { JwtPayload } from '../decorators/types';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private reflector: Reflector,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic) {
+      return true;
+    }
     const request = context
       .switchToHttp()
       .getRequest<Request & { user: JwtPayload }>();
@@ -32,11 +46,10 @@ export class JwtAuthGuard implements CanActivate {
   }
 
   private extractToken(request: Request): string | null {
-    // 1. Try httpOnly cookie first
-    const cookieToken = (request.cookies as Record<string, string>)?.access_token;
+    const cookieToken = (request.cookies as Record<string, string>)
+      ?.access_token;
     if (cookieToken) return cookieToken;
 
-    // 2. Fall back to Authorization: Bearer header (e.g. Swagger / API clients)
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : null;
   }

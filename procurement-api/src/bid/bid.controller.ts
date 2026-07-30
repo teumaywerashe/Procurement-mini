@@ -12,7 +12,7 @@ import { BidService } from './bid.service';
 import { CreateBidDto } from './dto/create-bid.dto';
 import { UpdateBidDto } from './dto/update-bid.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import type { JwtPayload } from '../auth/decorators/current-user.decorator';
+import type { JwtPayload } from '../auth/decorators/types';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -58,12 +58,8 @@ export class BidController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a bid by ID (Bid Owner only)' })
-  update(
-    @Param('id') id: number,
-    @Body() updateBidDto: UpdateBidDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
-    return this.bidService.update(+id, updateBidDto, user);
+  update(@Param('id') id: number, @Body() updateBidDto: UpdateBidDto) {
+    return this.bidService.update(+id, updateBidDto);
   }
 
   @Patch(':id/status')
@@ -72,11 +68,7 @@ export class BidController {
   updateBidStatus(@Param('id') id: number, @Body('status') status: string) {
     const updateBidDto = new UpdateBidDto();
     updateBidDto.bidStatus = status as 'pending' | 'accepted' | 'rejected';
-    return this.bidService.update(+id, updateBidDto, {
-      uid: 0,
-      email: '',
-      role: UserRole.ADMIN,
-    });
+    return this.bidService.update(+id, updateBidDto);
   }
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a bid by ID (Bid Owner only)' })

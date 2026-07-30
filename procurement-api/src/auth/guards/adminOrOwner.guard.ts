@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { JwtPayload } from '../decorators/current-user.decorator';
+import { JwtPayload } from '../decorators/types';
 import { UserRole } from '../../user/enum/userRole..enum';
 // import { UserRole } from '../enum/userRole..enum';
 

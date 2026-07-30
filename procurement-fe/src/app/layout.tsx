@@ -4,6 +4,7 @@ import "@mantine/notifications/styles.css";
 import "./globals.css";
 import StoreProvider from "../store/StoreProvider";
 import { ThemeProvider } from "../components/ThemeProvider";
+import { Notifications } from "@mantine/notifications";
 
 export const metadata: Metadata = {
   title: "ProcureHub",
@@ -26,6 +27,7 @@ export default function RootLayout({
       </head>
       <body>
         <StoreProvider>
+           
           <ThemeProvider>{children}</ThemeProvider>
         </StoreProvider>
       </body>

@@ -8,7 +8,7 @@ import { CreateVendorDto } from './dto/create-vendor.dto';
 import { eq } from 'drizzle-orm/sql/expressions/conditions';
 import { db } from '../database/db';
 import { vendor } from '../database/schema/vendor.schema';
-import { JwtPayload } from '../auth/decorators/current-user.decorator';
+import { JwtPayload } from '../auth/decorators/types';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 
 @Injectable()
@@ -61,7 +61,7 @@ export class VendorService {
     if (!id) {
       throw new BadRequestException('Vendor ID is required');
     }
-    const existingVendor = await db
+    const [existingVendor] = await db
       .select()
       .from(vendor)
       .where(eq(vendor.id, id))

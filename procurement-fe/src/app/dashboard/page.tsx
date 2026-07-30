@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import Navbar from "@/src/components/layout/Navbar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/src/store/store";
@@ -32,7 +31,7 @@ export default function DashboardPage() {
     skip: !isVendor,
   });
   const { data: myBids = [], isLoading: bidsLoading } = useGetBidsByVendorQuery(
-    vendor?.id ?? 0,
+    undefined,
     {
       skip: !vendor?.id,
     },
@@ -48,7 +47,7 @@ export default function DashboardPage() {
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
-    .slice(0, 5);
+    .slice(0, 7);
 
   const pendingBids = myBids.filter((b) => b.bidStatus === "pending");
   const acceptedBids = myBids.filter((b) => b.bidStatus === "accepted");

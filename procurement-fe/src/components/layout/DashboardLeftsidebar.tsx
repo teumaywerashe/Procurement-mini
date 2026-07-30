@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
 import {
   IconFileText,
   IconGavel,
@@ -7,7 +8,6 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import React from "react";
 
 function DashboardLeftSidebar({
   tendersLoading,
@@ -77,7 +77,7 @@ function DashboardLeftSidebar({
   );
   return (
     <aside
-      className="hidden lg:flex flex-col shrink-0 border-r border-[var(--border)] bg-[var(--bg-base)] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto"
+      className="hidden lg:flex flex-col shrink-0 border-r border-(--border) bg-(--bg-base) sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto"
       style={{ width: "20%" }}
     >
       <div className="p-4 space-y-6">

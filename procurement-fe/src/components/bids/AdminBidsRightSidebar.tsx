@@ -48,28 +48,28 @@ export default function AdminBidsRightSidebar({ bids, tenderMap, isLoading }: Pr
   }, [bids]);
 
   const skeleton = Array.from({ length: 3 }).map((_, i) => (
-    <div key={i} className="h-16 bg-[var(--bg-elevated)] rounded animate-pulse" />
+    <div key={i} className="h-16 bg-(--bg-elevated) rounded animate-pulse" />
   ));
 
   return (
-    <aside className="hidden xl:flex flex-col shrink-0 border-l border-[var(--border)] bg-[var(--bg-base)] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%" }}>
+    <aside className="hidden xl:flex flex-col shrink-0 border-l border-(--border) bg-(--bg-base) sticky top-14 h-[calc(100vh-3.5rem) overflow-y-auto" style={{ width: "20%" }}>
       <div className="p-4 space-y-4">
         <div className="flex items-center gap-2 px-1">
           <IconTrendingUp size={14} className="text-emerald-400" />
-          <p className="text-xs font-semibold text-[var(--text-primary)]">Highest Bids</p>
+          <p className="text-xs font-semibold text-(--text-primary)]">Highest Bids</p>
         </div>
-        <div className="h-px bg-[var(--border)]" />
+        <div className="h-px bg-(--border)]" />
         {isLoading ? <div className="space-y-2">{skeleton}</div>
-          : highest.length === 0 ? <p className="text-xs text-[var(--text-subtle)] text-center py-4">No bids yet.</p>
+          : highest.length === 0 ? <p className="text-xs text-(--text-subtle) text-center py-4">No bids yet.</p>
           : <div className="space-y-2">{highest.map((b) => <BidCard key={`h-${b.id}`} bid={b} tender={tenderMap[b.tenderId]} label="Highest" color="text-emerald-400" />)}</div>}
 
-        <div className="h-px bg-[var(--border)]" />
+        <div className="h-px bg-(--border)]" />
         <div className="flex items-center gap-2 px-1">
           <IconTrendingDown size={14} className="text-orange-400" />
-          <p className="text-xs font-semibold text-[var(--text-primary)]">Lowest Bids</p>
+          <p className="text-xs font-semibold text-(--text-primary)]">Lowest Bids</p>
         </div>
         {isLoading ? <div className="space-y-2">{skeleton}</div>
-          : lowest.length === 0 ? <p className="text-xs text-[var(--text-subtle)] text-center py-4">No bids yet.</p>
+          : lowest.length === 0 ? <p className="text-xs text-(--text-subtle) text-center py-4">No bids yet.</p>
           : <div className="space-y-2">{lowest.map((b) => <BidCard key={`l-${b.id}`} bid={b} tender={tenderMap[b.tenderId]} label="Lowest" color="text-orange-400" />)}</div>}
       </div>
     </aside>

@@ -11,8 +11,8 @@ export const bidApi = baseApi.injectEndpoints({
       query: (tenderId) => `/bid/tender/${tenderId}`,
       providesTags: ["Bid"],
     }),
-    getBidsByVendor: builder.query<Bid[], number>({
-      query: (vendorId) => `/bid/vendor/${vendorId}`,
+    getBidsByVendor: builder.query<Bid[], void>({
+      query: () => `/bid/me`,
       providesTags: ["Bid"],
     }),
     createBid: builder.mutation<Bid, Partial<Bid>>({

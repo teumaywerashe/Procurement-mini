@@ -27,13 +27,15 @@ export default function VendorDetailPage() {
     if (user && !isAdmin) router.push("/dashboard");
   }, [user, isAdmin, router]);
 
-  const { data: vendor, isLoading, isError } = useGetVendorQuery(Number(id));
-
+  const { data: vendor , isLoading, isError } = useGetVendorQuery(Number(id));
+  console.log("vendor", vendor);
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center text-zinc-500 text-sm">Loading...</div>
+        <div className="flex-1 flex items-center justify-center text-zinc-500 text-sm">
+          Loading...
+        </div>
       </div>
     );
   }
@@ -45,7 +47,10 @@ export default function VendorDetailPage() {
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <IconAlertTriangle size={36} className="text-red-400" />
           <p className="text-sm text-red-400">Vendor not found.</p>
-          <Link href="/vendors" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+          <Link
+            href="/vendors"
+            className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+          >
             ← Back to vendors
           </Link>
         </div>
@@ -54,15 +59,33 @@ export default function VendorDetailPage() {
   }
 
   const details = [
-    { icon: <IconHash size={15} className="text-zinc-500" />,     label: "Vendor ID",     value: `#${vendor.id}` },
-    { icon: <IconBuilding size={15} className="text-zinc-500" />,  label: "Company",       value: vendor.companyName },
-    { icon: <IconPhone size={15} className="text-zinc-500" />,     label: "Phone",         value: vendor.contactPhone ?? "—" },
-    { icon: <IconMapPin size={15} className="text-zinc-500" />,    label: "Address",       value: vendor.address ?? "—" },
+    {
+      icon: <IconHash size={15} className="text-zinc-500" />,
+      label: "Vendor ID",
+      value: `#${vendor.id}`,
+    },
+    {
+      icon: <IconBuilding size={15} className="text-zinc-500" />,
+      label: "Company",
+      value: vendor.name,
+    },
+    {
+      icon: <IconPhone size={15} className="text-zinc-500" />,
+      label: "Phone",
+      value: vendor.phoneNumber ?? "—",
+    },
+    {
+      icon: <IconMapPin size={15} className="text-zinc-500" />,
+      label: "Address",
+      value: vendor.email ?? "—",
+    },
     {
       icon: <IconCalendar size={15} className="text-zinc-500" />,
       label: "Registered",
       value: new Date(vendor.createdAt).toLocaleDateString("en-US", {
-        month: "long", day: "numeric", year: "numeric",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
       }),
     },
   ];
@@ -87,7 +110,7 @@ export default function VendorDetailPage() {
               <IconBuilding size={26} className="text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">{vendor.companyName}</h1>
+              <h1 className="text-xl font-bold text-white">{vendor.name}</h1>
               <p className="text-xs text-zinc-500 mt-0.5">Vendor profile</p>
             </div>
           </div>
@@ -97,7 +120,9 @@ export default function VendorDetailPage() {
             {details.map((d) => (
               <div key={d.label} className="flex items-center gap-4 px-8 py-4">
                 {d.icon}
-                <span className="text-xs text-zinc-600 w-24 shrink-0">{d.label}</span>
+                <span className="text-xs text-zinc-600 w-24 shrink-0">
+                  {d.label}
+                </span>
                 <span className="text-sm text-zinc-300">{d.value}</span>
               </div>
             ))}

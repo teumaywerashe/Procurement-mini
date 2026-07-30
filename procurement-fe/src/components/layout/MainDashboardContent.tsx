@@ -84,7 +84,7 @@ function MainDashboardContent({
           ) : (
             <StatusCard
               icon={<IconGavel size={18} className="text-yellow-400" />}
-              label="My Bids"
+              label={`${isAdmin ? "Bids" : "My Bids"}`}
               value={bidsLoading ? "—" : myBids.length}
               sub={`${pendingBids.length} pending`}
               color="bg-yellow-950/60"
@@ -210,7 +210,7 @@ function MainDashboardContent({
                         Tender #{bid.tenderId}
                       </p>
                       <p className="text-[11px] text-zinc-600">
-                        ${Number(bid.amount).toLocaleString()}
+                        ${Number(bid.amount)}
                       </p>
                     </div>
                     <span

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTenderDto } from './dto/create-tender.dto';
 import { UpdateTenderDto } from './dto/update-tender.dto';
-import { JwtPayload } from '../auth/decorators/current-user.decorator';
+import { JwtPayload } from '../auth/decorators/types';
 import { db } from '../database/db';
 import { tender } from '../database/schema/tender.schema';
 import { eq } from 'drizzle-orm/sql/expressions/conditions';

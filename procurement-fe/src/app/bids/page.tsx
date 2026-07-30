@@ -19,6 +19,7 @@ import AdminBidTableRow from "@/src/components/bids/AdminBidTableRow";
 import AdminBidsRightSidebar from "@/src/components/bids/AdminBidsRightSidebar";
 
 export default function AdminBidsPage() {
+ 
   const router = useRouter();
   const user = useSelector((s: RootState) => s.auth.user);
   const isAdmin = user?.role === "Admin";
@@ -136,9 +137,7 @@ export default function AdminBidsPage() {
                   <div className="w-12 h-12 rounded-full bg-(--bg-elevated) flex items-center justify-center">
                     <IconGavel size={22} className="text-(--text-faint)" />
                   </div>
-                  <p className="text-sm text-(--text-subtle)">
-                    No bids found.
-                  </p>
+                  <p className="text-sm text-(--text-subtle)">No bids found.</p>
                 </div>
               ) : (
                 filtered.map((bid) => (
@@ -152,6 +151,7 @@ export default function AdminBidsPage() {
                     onEdit={(b) => {
                       setEditingId(b.id);
                       setEditingStatus(b.bidStatus);
+                      updateBidStatus({ id: b.id, status: editingStatus });
                     }}
                     onConfirm={confirmEdit}
                     onCancel={() => setEditingId(null)}

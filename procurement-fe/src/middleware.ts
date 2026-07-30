@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Decode JWT payload without verifying signature (good enough for routing)
-function decodeJwtPayload(token: string): { uid?: number; role?: string } | null {
+function decodeJwtPayload(
+  token: string,
+): { uid?: number; role?: string } | null {
   try {
     const base64 = token.split(".")[1];
     const json = Buffer.from(base64, "base64url").toString("utf-8");
@@ -11,41 +12,58 @@ function decodeJwtPayload(token: string): { uid?: number; role?: string } | null
   }
 }
 
-// Routes that require any authenticated user
-const AUTH_ROUTES = [
-  "/dashboard",
-  "/tender/manage",
-  "/tender/create",
-  "/bids/my",
-  "/profile",
-];
+const AUTH_ROUTES = ["/dashboard"];
 
-// Routes that require Admin role
-const ADMIN_ROUTES = [
-  "/vendors",
-  "/bids",
-];
+const ADMIN_ROUTES = ["/tender/manage", "/tender/create", "/vendors"];
+
+const VENDOR_ROUTES = ["/profile", "/bids/my"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   const token = req.cookies.get("access_token")?.value;
   const payload = token ? decodeJwtPayload(token) : null;
-  const isLoggedIn = !!payload?.uid;
-  const isAdmin = payload?.role === "Admin";
 
-  // Check admin-only routes
-  const isAdminRoute = ADMIN_ROUTES.some((r) => pathname.startsWith(r));
+  const isLoggedIn = !!payload?.uid;
+  const role = payload?.role;
+
+  const isAdmin = role === "Admin";
+  const isVendor = role === "Vendor";
+
+  const isAdminRoute =
+    ADMIN_ROUTES.some((route) => pathname.startsWith(route)) ||
+    pathname === "/bids" ||
+    /^\/tender\/[^/]+\/edit$/.test(pathname);
+
   if (isAdminRoute) {
-    if (!isLoggedIn) return NextResponse.redirect(new URL("/login", req.url));
-    if (!isAdmin)    return NextResponse.redirect(new URL("/dashboard", req.url));
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
     return NextResponse.next();
   }
 
-  // Check auth-required routes (also catches /tender/[id]/edit)
-  const isProtected =
-    AUTH_ROUTES.some((r) => pathname.startsWith(r)) ||
-    /^\/tender\/[^/]+\/edit/.test(pathname);
+  const isVendorRoute = VENDOR_ROUTES.some((route) =>
+    pathname.startsWith(route),
+  );
+
+  if (isVendorRoute) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+
+    if (!isVendor) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    return NextResponse.next();
+  }
+
+  const isProtected = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL("/login", req.url);
@@ -53,11 +71,9 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect already-logged-in users away from login/register
   if (isLoggedIn && (pathname === "/login" || pathname === "/registration")) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
-
   return NextResponse.next();
 }
 

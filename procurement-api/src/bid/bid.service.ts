@@ -8,7 +8,7 @@ import { CreateBidDto } from './dto/create-bid.dto';
 import { UpdateBidDto } from './dto/update-bid.dto';
 import { bid } from '../database/schema/bid.schema';
 import { db } from '../database/db';
-import type { JwtPayload } from '../auth/decorators/current-user.decorator';
+import type { JwtPayload } from '../auth/decorators/types';
 import { eq } from 'drizzle-orm';
 import { vendor } from '../database/schema/vendor.schema';
 @Injectable()
@@ -65,7 +65,7 @@ export class BidService {
     return bidById;
   }
 
-  async update(id: number, updateBidDto: UpdateBidDto, user: JwtPayload) {
+  async update(id: number, updateBidDto: UpdateBidDto) {
     if (!id) {
       throw new BadRequestException('Bid ID is required for update');
     }
@@ -85,11 +85,7 @@ export class BidService {
     if (!updatingVendor) {
       throw new UnauthorizedException('Vendor not found');
     }
-    if (updatingVendor.ownerId !== user.uid) {
-      throw new UnauthorizedException(
-        `Vendor ID mismatch. Cannot update bid with a different vendor ID.`,
-      );
-    }
+
     const [updatedBid] = await db
       .update(bid)
       .set(updateBidDto)
