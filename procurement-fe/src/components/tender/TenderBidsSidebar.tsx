@@ -8,6 +8,7 @@ import {
   useGetBidsByVendorQuery,
 } from "@/src/store/api/bidApi";
 import { BID_STATUS_STYLES } from "@/src/components/shared/constants";
+import { useRouter } from "next/navigation";
 
 interface Props {
   userId: number;
@@ -20,6 +21,7 @@ export default function TenderBidsSidebar({ userId, isVendor }: Props) {
   const { data: bids = [], isLoading: isVendorLoading } =
     useGetBidsByVendorQuery(undefined, { skip: !isVendor || !vendor?.id });
 
+    const route=useRouter()
   const { data: allBids = [], isLoading: isAllBidsLoading } =
     useGetAllBidsQuery(undefined, { skip: isVendor });
 
@@ -71,9 +73,10 @@ export default function TenderBidsSidebar({ userId, isVendor }: Props) {
             {displayBids.map((bid) => {
               const colors = BID_STATUS_STYLES[bid.bidStatus];
               return (
-                <div
+                <div onClick={()=>{route.push(`/bids/${bid.id}`)}} 
+
                   key={bid.id}
-                  className="px-3 py-3 rounded-lg bg-(--bg-elevated) border border-(--border) space-y-1.5"
+                  className="px-3 py-3 cursor-pointer rounded-lg bg-(--bg-elevated) border border-(--border) space-y-1.5"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-[10px] text-(--text-faint) font-medium">

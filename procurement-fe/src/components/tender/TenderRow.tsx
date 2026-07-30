@@ -11,7 +11,7 @@ export default function TenderRow({ tender, now }: { tender: Tender; now: number
   const isUrgent = closing !== "Closed" && parseInt(closing) <= 3;
 
   return (
-    <Link href={`/tender/${tender.id}`} className="group flex items-start gap-3 sm:gap-5 px-4 sm:px-8 py-4 sm:py-6 border-b border-(--border) hover:bg-(--bg-elevated) transition-colors">
+    <Link href={`/tender/${tender.id}`} className="group flex items-start gap-3 sm:gap-5 px-4 sm:px-8 py-4  sm:py-6 border rounded-2xl border-(--border) hover:bg-(--bg-elevated) hover:border-blue-950 transition-colors">
       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-(--bg-elevated) border border-(--border) flex items-center justify-center shrink-0 mt-0.5">
         <IconFileText size={20} className="text-indigo-400" />
       </div>

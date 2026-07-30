@@ -17,7 +17,7 @@ export default function BidTableRow({ bid, tender }: Props) {
       {/* Mobile layout */}
       <div className="sm:hidden flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <Link href={`/tender/${bid.tenderId}`} className="group">
+          <Link href={`/bids/${bid.id}`} className="group">
             <p className="text-sm font-medium text-(--text-primary) group-hover:text-indigo-400 transition-colors truncate">
               {tender?.title ?? `Tender #${bid.tenderId}`}
             </p>
@@ -42,7 +42,7 @@ export default function BidTableRow({ bid, tender }: Props) {
 
       {/* Desktop layout */}
       <div className="hidden sm:grid grid-cols-[1fr_130px_160px_120px] gap-4 items-center">
-        <Link href={`/tender/${bid.tenderId}`} className="group min-w-0">
+        <Link href={`/bids/${bid.id}`} className="group min-w-0">
           <p className="text-sm font-medium text-(--text-primary) group-hover:text-indigo-400 transition-colors truncate">
             {tender?.title ?? `Tender #${bid.tenderId}`}
           </p>

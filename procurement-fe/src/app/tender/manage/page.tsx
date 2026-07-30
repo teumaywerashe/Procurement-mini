@@ -1,11 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import Navbar from "@/src/components/layout/Navbar";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/src/store/store";
 import { useGetTendersQuery, useDeleteTenderMutation } from "@/src/store/api/tenderApi";
 import type { Tender, TenderStatus } from "@/src/types";
 import { IconPlus, IconSearch, IconFileText, IconAlertTriangle } from "@tabler/icons-react";
@@ -17,15 +14,11 @@ import DeleteModal from "@/src/components/tender/DeleteModal";
 const now = Date.now();
 
 export default function ManageTendersPage() {
-  const router = useRouter();
-  const user   = useSelector((s: RootState) => s.auth.user);
   const [search, setSearch]           = useState("");
   const [statusFilter, setStatusFilter] = useState<TenderStatus | "">("");
   const [toDelete, setToDelete]       = useState<Tender | null>(null);
 
-  useEffect(() => {
-    if (user && user.role !== "Admin") router.push("/tender");
-  }, [user, router]);
+ 
 
   const { data: tenders = [], isLoading, isError } = useGetTendersQuery(search ? { title: search } : {});
   const [deleteTender, { isLoading: isDeleting }]  = useDeleteTenderMutation();
@@ -55,7 +48,7 @@ export default function ManageTendersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col">
+    <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
       <div className="flex flex-1 w-full overflow-hidden">
         <ManageLeftSidebar tenders={tenders} statusFilter={statusFilter} onStatusChange={setStatusFilter} />
@@ -64,14 +57,14 @@ export default function ManageTendersPage() {
           <div className="px-4 sm:px-6 py-6">
             <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
               <div>
-                <h1 className="text-lg font-bold text-[var(--text-primary)]">Manage Tenders</h1>
-                <p className="text-xs text-[var(--text-subtle)] mt-0.5">{isLoading ? "Loading..." : `${filtered.length} tender${filtered.length !== 1 ? "s" : ""}`}</p>
+                <h1 className="text-lg font-bold text-(--text-primary)]">Manage Tenders</h1>
+                <p className="text-xs text-(--text-subtle) mt-0.5">{isLoading ? "Loading..." : `${filtered.length} tender${filtered.length !== 1 ? "s" : ""}`}</p>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg px-3 py-2 gap-2">
-                  <IconSearch size={14} className="text-[var(--text-faint)] shrink-0" />
+                <div className="flex items-center bg-(--bg-elevated) border border-(--border) rounded-lg px-3 py-2 gap-2">
+                  <IconSearch size={14} className="text-(--text-faint) shrink-0" />
                   <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..."
-                    className="bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-faint)] outline-none w-28 sm:w-36" />
+                    className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none w-28 sm:w-36" />
                 </div>
                 <Link href="/tender/create" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0">
                   <IconPlus size={14} /> <span className="hidden sm:inline">New</span>
@@ -79,16 +72,16 @@ export default function ManageTendersPage() {
               </div>
             </div>
 
-            <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl overflow-hidden">
-              <div className="hidden sm:grid grid-cols-[1fr_130px_120px_130px_110px] gap-3 px-5 py-3 border-b border-[var(--border)] text-[11px] font-semibold text-[var(--text-faint)] uppercase tracking-wider">
+            <div className="bg-(--bg-surface) border border-(--border) rounded-xl overflow-hidden">
+              <div className="hidden sm:grid grid-cols-[1fr_130px_120px_130px_110px] gap-3 px-5 py-3 border-b border-(--border) text-[11px] font-semibold text-(--text-faint) uppercase tracking-wider">
                 <span>Tender</span><span>Status</span><span>Value</span><span>Closing</span><span className="text-center">Actions</span>
               </div>
               {isLoading ? (
-                <div className="p-6 space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 bg-[var(--bg-elevated)] rounded animate-pulse" />)}</div>
+                <div className="p-6 space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 bg-(--bg-elevated) rounded animate-pulse" />)}</div>
               ) : isError ? (
                 <div className="flex flex-col items-center py-16 gap-3"><IconAlertTriangle size={28} className="text-red-400" /><p className="text-sm text-red-400">Failed to load tenders.</p></div>
               ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center py-16 gap-3"><IconFileText size={28} className="text-[var(--text-faint)]" /><p className="text-sm text-[var(--text-subtle)]">No tenders found.</p></div>
+                <div className="flex flex-col items-center py-16 gap-3"><IconFileText size={28} className="text-(--text-faint)]" /><p className="text-sm text-(--text-subtle)]">No tenders found.</p></div>
               ) : filtered.map((t) => <ManageTenderRow key={t.id} tender={t} now={now} onDelete={setToDelete} />)}
             </div>
           </div>

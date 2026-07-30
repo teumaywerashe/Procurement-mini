@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+// import { useRouter } from "next/navigation";
 import Navbar from "@/src/components/layout/Navbar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/src/store/store";
@@ -20,13 +20,6 @@ import AdminBidsRightSidebar from "@/src/components/bids/AdminBidsRightSidebar";
 
 export default function AdminBidsPage() {
  
-  const router = useRouter();
-  const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "Admin";
-
-  useEffect(() => {
-    if (user && !isAdmin) router.push("/dashboard");
-  }, [user, isAdmin, router]);
 
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<Bid["bidStatus"] | "">("");
@@ -111,8 +104,8 @@ export default function AdminBidsPage() {
               />
             )}
 
-            <div className="bg-(--bg-surface) border border-(--border) rounded-xl overflow-hidden">
-              <div className="hidden sm:grid grid-cols-[1fr_120px_150px_1fr] gap-4 px-5 py-3 border-b border-(--border) text-[11px] font-semibold text-(--text-faint) uppercase tracking-wider">
+            <div className="bg-(--bg-surface)  border border-(--border) rounded-xl overflow-hidden">
+              <div className="hidden sm:grid grid-cols-[0.8fr_120px_150px_100px] gap-4 px-5 py-3 border-b border-(--border) text-[11px] font-semibold text-(--text-faint) uppercase tracking-wider">
                 <span>Tender</span>
                 <span>Amount</span>
                 <span>Submitted</span>
@@ -141,6 +134,7 @@ export default function AdminBidsPage() {
                 </div>
               ) : (
                 filtered.map((bid) => (
+                  
                   <AdminBidTableRow
                     key={bid.id}
                     bid={bid}
@@ -157,6 +151,7 @@ export default function AdminBidsPage() {
                     onCancel={() => setEditingId(null)}
                     onStatusChange={setEditingStatus}
                   />
+                 
                 ))
               )}
             </div>

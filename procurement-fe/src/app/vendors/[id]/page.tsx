@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import React from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/src/components/layout/Navbar";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/src/store/store";
 import { useGetVendorQuery } from "@/src/store/api/vendorApi";
 import {
   IconArrowLeft,
@@ -19,15 +17,8 @@ import {
 
 export default function VendorDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
-  const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "Admin";
 
-  useEffect(() => {
-    if (user && !isAdmin) router.push("/dashboard");
-  }, [user, isAdmin, router]);
-
-  const { data: vendor , isLoading, isError } = useGetVendorQuery(Number(id));
+  const { data: vendor, isLoading, isError } = useGetVendorQuery(Number(id));
   console.log("vendor", vendor);
   if (isLoading) {
     return (

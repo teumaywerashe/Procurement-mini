@@ -12,11 +12,11 @@ function decodeJwtPayload(
   }
 }
 
-const AUTH_ROUTES = ["/dashboard","/profile"];
+const AUTH_ROUTES = ["/dashboard", "/profile"];
 
 const ADMIN_ROUTES = ["/tender/manage", "/tender/create", "/vendors"];
 
-const VENDOR_ROUTES = [ "/bids/my"];
+const VENDOR_ROUTES = ["/bids/my"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -71,7 +71,10 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isLoggedIn && (pathname === "/login" || pathname === "/registration")) {
+  if (
+    isLoggedIn &&
+    (pathname === "/" || pathname === "/login" || pathname === "/registration")
+  ) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
   return NextResponse.next();
@@ -79,14 +82,15 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
     "/tender/manage/:path*",
     "/tender/create/:path*",
     "/tender/:path*/edit",
-    "/bids/:path*",
+    "/dashboard/:path*",
     "/vendors/:path*",
     "/profile/:path*",
-    "/login",
     "/registration",
+    "/bids/:path*",
+    "/login",
+    "/",
   ],
 };

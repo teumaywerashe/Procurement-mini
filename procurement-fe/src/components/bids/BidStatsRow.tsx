@@ -10,7 +10,7 @@ interface Props {
 
 export default function BidStatsRow({ total, pending, accepted, rejected }: Props) {
   return (
-    <div className="flex items-center gap-3 mb-5 flex-wrap">
+    <div className="flex  items-center gap-3 mb-5 flex-wrap">
       <div className="flex items-center gap-2 px-3 py-1.5 bg-(--bg-surface) border border-(--border) rounded-lg">
         <span className="text-xs text-(--text-subtle)">Total</span>
         <span className="text-xs font-bold text-(--text-primary) tabular-nums">{total}</span>

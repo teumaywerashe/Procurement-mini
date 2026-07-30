@@ -1,25 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, {  useState } from "react";
 import Navbar from "@/src/components/layout/Navbar";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/src/store/store";
 import { useGetVendorsQuery } from "@/src/store/api/vendorApi";
 import { IconSearch, IconUsers, IconAlertTriangle } from "@tabler/icons-react";
 import VendorCard from "@/src/components/vendors/VendorCard";
 import { VendorLeftSidebar, VendorRightSidebar } from "@/src/components/vendors/VendorSidebars";
 
 export default function VendorsPage() {
-  const router  = useRouter();
-  const user    = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "Admin";
   const [search, setSearch]   = useState("");
   const [sortBy, setSortBy]   = useState<"name" | "newest" | "oldest">("newest");
 
-  useEffect(() => {
-    if (user && !isAdmin) router.push("/dashboard");
-  }, [user, isAdmin, router]);
+  
 
   const { data: vendors = [], isLoading, isError } = useGetVendorsQuery();
   console.log("vendors", vendors);

@@ -21,7 +21,7 @@ export default function AdminBidTableRow({ bid, tender, isEditing, editingStatus
   const s = BID_STATUS_STYLES[bid.bidStatus];
 
   const statusCell = isEditing ? (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-1.5   ">
       <select value={editingStatus} onChange={(e) => onStatusChange(e.target.value as Bid["bidStatus"])}
         className="flex-1 bg-(--bg-input) border border-(--border-strong) rounded-md px-2 py-1 text-xs text-(--text-primary) outline-none focus:border-indigo-500 cursor-pointer" autoFocus>
         <option value="pending">Pending</option>
@@ -55,7 +55,7 @@ export default function AdminBidTableRow({ bid, tender, isEditing, editingStatus
       {/* Mobile layout */}
       <div className="sm:hidden flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <Link href={`/tender/${bid.tenderId}`} className="group">
+          <Link href={`/bids/${bid.id}`} className="group">
             <p className="text-sm font-medium text-(--text-primary) group-hover:text-indigo-400 transition-colors truncate">
               {tender?.title ?? `Tender #${bid.tenderId}`}
             </p>
@@ -76,8 +76,8 @@ export default function AdminBidTableRow({ bid, tender, isEditing, editingStatus
       </div>
 
       {/* Desktop layout */}
-      <div className="hidden sm:grid grid-cols-[1fr_120px_150px_1fr] gap-4 items-center">
-        <Link href={`/tender/${bid.tenderId}`} className="group min-w-0">
+      <div className="hidden sm:grid grid-cols-[0.8fr_120px_150px_100px] gap-4 items-center">
+        <Link href={`/bids/${bid.id}`} className="group min-w-0">
           <p className="text-sm font-medium text-(--text-primary) group-hover:text-indigo-400 transition-colors truncate">
             {tender?.title ?? `Tender #${bid.tenderId}`}
           </p>

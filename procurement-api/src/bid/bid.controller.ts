@@ -41,20 +41,19 @@ export class BidController {
   @Get('/me')
   @ApiOperation({ summary: 'Get bids for the logged-in vendor' })
   findByVendor(@CurrentUser() user: JwtPayload) {
-    return this.bidService.findByVendorId(user.uid);
+    return this.bidService.findByVendorId(+user.uid);
   }
-  @Get(':id')
-  @ApiOperation({ summary: 'Get a bid by ID' })
-  @AdminOrOwner()
-  findOne(@Param(':id') id: number) {
-    return this.bidService.findOne(id);
-  }
-
   @Get('tender/:tenderId')
   @ApiOperation({ summary: 'Get bids by tender ID (admin only)' })
   @Roles(UserRole.ADMIN)
   findByTenderId(@Param('tenderId') tenderId: number) {
-    return this.bidService.findByTenderId(tenderId);
+    return this.bidService.findByTenderId(+tenderId);
+  }
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a bid by ID' })
+  @AdminOrOwner()
+  findOne(@Param('id') id: number) {
+    return this.bidService.findOne(+id);
   }
 
   @Patch(':id')
@@ -73,7 +72,7 @@ export class BidController {
   }
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a bid by ID (Bid Owner only)' })
-  remove(@Param(':id') id: number, @CurrentUser() user: JwtPayload) {
+  remove(@Param('id') id: number, @CurrentUser() user: JwtPayload) {
     return this.bidService.remove(+id, user);
   }
 }

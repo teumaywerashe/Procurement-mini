@@ -62,6 +62,7 @@ export class BidService {
     if (!bidById) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }
+    console.log(bidById);
     return bidById;
   }
 

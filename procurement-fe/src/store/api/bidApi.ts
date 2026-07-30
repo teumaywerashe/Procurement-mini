@@ -7,6 +7,10 @@ export const bidApi = baseApi.injectEndpoints({
       query: () => "/bid",
       providesTags: ["Bid"],
     }),
+    getBidById: builder.query<Bid, number>({
+      query: (id) => `/bid/${id}`,
+      providesTags: ["Bid"],
+    }),
     getBidsByTender: builder.query<Bid[], number>({
       query: (tenderId) => `/bid/tender/${tenderId}`,
       providesTags: ["Bid"],
@@ -27,13 +31,19 @@ export const bidApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Bid"],
     }),
+    deleteBid: builder.mutation<{ success: boolean }, number>({
+      query: (id) => ({ url: `/bid/${id}`, method: "DELETE" }),
+      invalidatesTags: ["Bid"],
+    }),
   }),
 });
 
 export const {
   useGetAllBidsQuery,
+  useGetBidByIdQuery,
   useGetBidsByTenderQuery,
   useGetBidsByVendorQuery,
   useCreateBidMutation,
   useUpdateBidStatusMutation,
+  useDeleteBidMutation,
 } = bidApi;
