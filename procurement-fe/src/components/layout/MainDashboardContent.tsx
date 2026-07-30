@@ -50,10 +50,10 @@ function MainDashboardContent({
       <div className="max-w-4xl w-full mx-auto px-6 py-8 flex-1">
         {/* Page header */}
         <div className="mb-8">
-          <h1 className="text-xl font-bold text-white">
+          <h1 className="text-xl font-bold text-(--text-primary)">
             Welcome back, {user?.name?.split(" ")[0] ?? "User"}
           </h1>
-          <p className="text-sm text-zinc-500 mt-1 capitalize">
+          <p className="text-sm text-(--text-subtle) mt-1 capitalize">
             {user?.role} account
           </p>
         </div>
@@ -103,9 +103,9 @@ function MainDashboardContent({
         </div>
 
         {/* Recent tenders */}
-        <div className="bg-[#1c1a16] border border-[#2a2620] rounded-xl overflow-hidden mb-6">
-          <div className="px-5 py-4 border-b border-[#2a2620] flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-white">Recent Tenders</h2>
+        <div className="bg-(--bg-surface) border border-(--border) rounded-xl overflow-hidden mb-6">
+          <div className="px-5 py-4 border-b border-(--border) flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-(--text-primary)">Recent Tenders</h2>
             <Link
               href="/tender"
               className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
@@ -124,7 +124,7 @@ function MainDashboardContent({
                 ))}
               </div>
             ) : recentTenders.length === 0 ? (
-              <div className="px-5 py-10 text-center text-sm text-zinc-600">
+              <div className="px-5 py-10 text-center text-sm text-(--text-subtle)">
                 No tenders yet.
               </div>
             ) : (
@@ -132,13 +132,13 @@ function MainDashboardContent({
                 <Link
                   key={t.id}
                   href={`/tender/${t.id}`}
-                  className="flex items-center justify-between px-5 py-3.5 border-b border-[#1e1c18] hover:bg-[#161410] transition-colors group"
+                  className="flex items-center justify-between px-5 py-3.5 border-b border-(--border-subtle) hover:bg-(--bg-elevated) transition-colors group"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white group-hover:text-indigo-300 transition-colors truncate">
+                    <p className="text-sm font-medium text-(--text-primary) group-hover:text-indigo-400 transition-colors truncate">
                       {t.title}
                     </p>
-                    <p className="text-xs text-zinc-600 mt-0.5">
+                    <p className="text-xs text-(--text-faint) mt-0.5">
                       {t.referenceNumber}
                     </p>
                   </div>
@@ -160,7 +160,7 @@ function MainDashboardContent({
             )}
           </div>
           {isAdmin && (
-            <div className="px-5 py-3 border-t border-[#2a2620]">
+            <div className="px-5 py-3 border-t border-(--border)">
               <Link
                 href="/tender/create"
                 className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
@@ -173,9 +173,9 @@ function MainDashboardContent({
 
         {/* Vendor: recent bids */}
         {isVendor && (
-          <div className="bg-[#1c1a16] border border-[#2a2620] rounded-xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-[#2a2620] flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-white">
+          <div className="bg-(--bg-surface) border border-(--border) rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-(--border) flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-(--text-primary)">
                 My Recent Bids
               </h2>
               <Link
@@ -191,25 +191,25 @@ function MainDashboardContent({
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div
                       key={i}
-                      className="h-8 bg-[#14120e] rounded animate-pulse"
+                      className="h-8 bg-(--bg-elevated) rounded animate-pulse"
                     />
                   ))}
                 </div>
               ) : myBids.length === 0 ? (
-                <div className="px-5 py-6 text-center text-xs text-zinc-600">
+                <div className="px-5 py-6 text-center text-xs text-(--text-subtle)">
                   No bids submitted yet.
                 </div>
               ) : (
                 myBids.slice(0, 3).map((bid) => (
                   <div
                     key={bid.id}
-                    className="flex items-center justify-between px-5 py-3 border-b border-[#1e1c18]"
+                    className="flex items-center justify-between px-5 py-3 border-b border-(--border-subtle)"
                   >
                     <div>
-                      <p className="text-xs font-medium text-white">
+                      <p className="text-xs font-medium text-(--text-primary)">
                         Tender #{bid.tenderId}
                       </p>
-                      <p className="text-[11px] text-zinc-600">
+                      <p className="text-[11px] text-(--text-faint)">
                         ${Number(bid.amount)}
                       </p>
                     </div>

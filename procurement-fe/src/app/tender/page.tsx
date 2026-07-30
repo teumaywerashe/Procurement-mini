@@ -76,9 +76,9 @@ export default function TendersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
+    <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
-      <div className="flex  ml-100 mr-100 flex-1 w-full overflow-hidden">
+      <div className="flex flex-1 w-full overflow-hidden mt-14">
         <TenderLeftSidebar
           stats={stats}
           category={category}
@@ -88,15 +88,15 @@ export default function TendersPage() {
         />
 
         <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-          <div className="sticky top-14 z-30 bg-[#0f0e0b] border-b border-[#1e1c18] px-6 py-3 flex items-center gap-3">
-            <div className="flex items-center flex-1 bg-[#161410] border border-[#2a2620] rounded-lg px-3 py-2 gap-2">
-              <IconSearch size={14} className="text-zinc-500 shrink-0" />
+          <div className="sticky top-14 z-30 bg-(--bg-base) border-b border-(--border) px-6 py-3 flex items-center gap-3">
+            <div className="flex items-center flex-1 bg-(--bg-elevated) border border-(--border) rounded-lg px-3 py-2 gap-2">
+              <IconSearch size={14} className="text-(--text-faint) shrink-0" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search tenders..."
-                className="bg-transparent text-sm text-white placeholder-zinc-600 outline-none flex-1"
+                className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none flex-1"
               />
             </div>
             <button
@@ -108,7 +108,7 @@ export default function TendersPage() {
             <select
               value={sortNewest ? "newest" : "oldest"}
               onChange={(e) => setSortNewest(e.target.value === "newest")}
-              className="bg-[#161410] border border-[#2a2620] text-xs text-zinc-300 rounded-lg px-3 py-2 outline-none cursor-pointer"
+              className="bg-(--bg-elevated) border border-(--border) text-xs text-(--text-primary) rounded-lg px-3 py-2 outline-none cursor-pointer"
             >
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
@@ -124,12 +124,12 @@ export default function TendersPage() {
             )}
           </div>
 
-          <div className="px-6 py-4 flex items-center border-b border-[#1e1c18]">
+          <div className="px-6 py-4 flex items-center border-b border-(--border)">
             <div>
-              <h1 className="text-sm font-semibold text-white">
+              <h1 className="text-sm font-semibold text-(--text-primary)">
                 {STATUS_FILTER_LABELS[statusFilter] ?? "All Tenders"}
               </h1>
-              <p className="text-xs text-zinc-600 mt-0.5">
+              <p className="text-xs text-(--text-faint) mt-0.5">
                 {isLoading
                   ? "Loading..."
                   : `${sorted.length} result${sorted.length !== 1 ? "s" : ""}`}
@@ -143,12 +143,12 @@ export default function TendersPage() {
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="px-6 py-5 border-b border-[#1e1c18] flex items-start gap-4 animate-pulse"
+                    className="px-6 py-5 border-b border-(--border) flex items-start gap-4 animate-pulse"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-[#1e1c18] shrink-0" />
+                    <div className="w-10 h-10 rounded-lg bg-(--bg-elevated) shrink-0" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-3 bg-[#1e1c18] rounded w-1/4" />
-                      <div className="h-4 bg-[#1e1c18] rounded w-2/3" />
+                      <div className="h-3 bg-(--bg-elevated) rounded w-1/4" />
+                      <div className="h-4 bg-(--bg-elevated) rounded w-2/3" />
                     </div>
                   </div>
                 ))}
@@ -158,16 +158,16 @@ export default function TendersPage() {
                 <div className="w-12 h-12 rounded-full bg-red-950/40 flex items-center justify-center mb-4">
                   <IconAdjustments size={20} className="text-red-400" />
                 </div>
-                <p className="text-sm font-medium text-white mb-1">
+                <p className="text-sm font-medium text-(--text-primary) mb-1">
                   Failed to load tenders
                 </p>
               </div>
             ) : sorted.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 text-center px-6">
-                <div className="w-12 h-12 rounded-full bg-[#1e1c18] flex items-center justify-center mb-4">
-                  <IconFileText size={20} className="text-zinc-600" />
+                <div className="w-12 h-12 rounded-full bg-(--bg-elevated) flex items-center justify-center mb-4">
+                  <IconFileText size={20} className="text-(--text-faint)" />
                 </div>
-                <p className="text-sm font-medium text-white mb-1">
+                <p className="text-sm font-medium text-(--text-primary) mb-1">
                   No tenders found
                 </p>
                 {isAdmin && (
@@ -185,8 +185,8 @@ export default function TendersPage() {
           </div>
 
           {!isLoading && sorted.length > 0 && (
-            <div className="px-6 py-3 border-t border-[#1e1c18] flex items-center justify-between">
-              <p className="text-xs text-zinc-600">
+            <div className="px-6 py-3 border-t border-(--border) flex items-center justify-between">
+              <p className="text-xs text-(--text-faint)">
                 Showing {sorted.length} of {tenders.length} tenders
               </p>
               <Link

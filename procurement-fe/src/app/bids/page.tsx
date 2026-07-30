@@ -81,7 +81,7 @@ export default function AdminBidsPage() {
   return (
     <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
-      <div className="flex flex-1 w-full overflow-hidden">
+      <div className="flex flex-1 w-full overflow-hidden mt-14">
         <SidebarCategoryFilter
           categoryFilter={categoryFilter}
           statusFilter={statusFilter}

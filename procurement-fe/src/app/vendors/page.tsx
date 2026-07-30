@@ -35,7 +35,7 @@ export default function VendorsPage() {
   return (
     <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
-      <div className="flex flex-1 w-full overflow-hidden">
+      <div className="flex flex-1 w-full overflow-hidden mt-14">
         <VendorLeftSidebar vendors={vendors} sortBy={sortBy} search={search} onSortChange={setSortBy} onSearchChange={setSearch} />
 
         <main className="flex-1 min-w-0 overflow-y-auto">

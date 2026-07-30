@@ -83,7 +83,7 @@ function DashboardLeftSidebar({
       <div className="p-4 space-y-6">
         {/* Overview stats */}
         <div className="space-y-1">
-          <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-2 mb-2">
+          <p className="text-[10px] font-semibold text-(--text-faint) uppercase tracking-wider px-2 mb-2">
             Overview
           </p>
           {[
@@ -120,21 +120,21 @@ function DashboardLeftSidebar({
               key={s.label}
               className="flex items-center justify-between px-2 py-1.5"
             >
-              <span className="text-xs text-zinc-500">{s.label}</span>
-              <span className="text-xs font-semibold text-white tabular-nums">
+              <span className="text-xs text-(--text-subtle)">{s.label}</span>
+              <span className="text-xs font-semibold text-(--text-primary) tabular-nums">
                 {s.value}
               </span>
             </div>
           ))}
         </div>
 
-        <div className="h-px bg-[#1e1c18]" />
+        <div className="h-px bg-(--border)" />
 
         {/* Quick Actions nav */}
         <div>
           <div className="flex items-center gap-2 px-2 mb-2">
-            <IconLayoutDashboard size={12} className="text-zinc-600" />
-            <p className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
+            <IconLayoutDashboard size={12} className="text-(--text-faint)" />
+            <p className="text-[10px] font-semibold text-(--text-faint) uppercase tracking-wider">
               Quick Actions
             </p>
           </div>
@@ -143,7 +143,7 @@ function DashboardLeftSidebar({
               <Link
                 key={l.href}
                 href={l.href}
-                className="w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-xs text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+                className="w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-xs text-(--text-subtle) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               >
                 <span className={l.color}>{l.icon}</span>
                 {l.label}

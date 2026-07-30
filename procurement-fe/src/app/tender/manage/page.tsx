@@ -57,7 +57,7 @@ export default function ManageTendersPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col">
       <Navbar />
-      <div className="flex flex-1 w-full overflow-hidden">
+      <div className="flex flex-1 w-full overflow-hidden mt-14">
         <ManageLeftSidebar tenders={tenders} statusFilter={statusFilter} onStatusChange={setStatusFilter} />
 
         <main className="flex-1 min-w-0 overflow-y-auto">

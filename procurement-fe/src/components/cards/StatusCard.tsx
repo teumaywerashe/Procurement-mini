@@ -14,7 +14,7 @@ function StatusCard({
   color: string;
 }) {
   return (
-    <div className="bg-[#1c1a16] border border-[#2a2620] rounded-xl p-5">
+    <div className="bg-(--bg-surface) border border-(--border) rounded-xl p-5">
       <div className="flex items-start justify-between mb-3">
         <div
           className={`w-9 h-9 rounded-lg flex items-center justify-center ${color}`}
@@ -22,9 +22,9 @@ function StatusCard({
           {icon}
         </div>
       </div>
-      <p className="text-2xl font-bold text-white tabular-nums">{value}</p>
-      <p className="text-xs text-zinc-500 mt-0.5">{label}</p>
-      {sub && <p className="text-[11px] text-zinc-600 mt-1">{sub}</p>}
+      <p className="text-2xl font-bold text-(--text-primary) tabular-nums">{value}</p>
+      <p className="text-xs text-(--text-muted) mt-0.5">{label}</p>
+      {sub && <p className="text-[11px] text-(--text-subtle) mt-1">{sub}</p>}
     </div>
   );
 }
