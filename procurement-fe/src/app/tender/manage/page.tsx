@@ -57,12 +57,12 @@ export default function ManageTendersPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col">
       <Navbar />
-      <div className="flex flex-1 w-full overflow-hidden mt-14">
+      <div className="flex flex-1 w-full overflow-hidden">
         <ManageLeftSidebar tenders={tenders} statusFilter={statusFilter} onStatusChange={setStatusFilter} />
 
         <main className="flex-1 min-w-0 overflow-y-auto">
-          <div className="px-6 py-6">
-            <div className="flex items-center justify-between mb-5">
+          <div className="px-4 sm:px-6 py-6">
+            <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
               <div>
                 <h1 className="text-lg font-bold text-[var(--text-primary)]">Manage Tenders</h1>
                 <p className="text-xs text-[var(--text-subtle)] mt-0.5">{isLoading ? "Loading..." : `${filtered.length} tender${filtered.length !== 1 ? "s" : ""}`}</p>
@@ -71,16 +71,16 @@ export default function ManageTendersPage() {
                 <div className="flex items-center bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg px-3 py-2 gap-2">
                   <IconSearch size={14} className="text-[var(--text-faint)] shrink-0" />
                   <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..."
-                    className="bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-faint)] outline-none w-36" />
+                    className="bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-faint)] outline-none w-28 sm:w-36" />
                 </div>
-                <Link href="/tender/create" className="hidden lg:flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0">
-                  <IconPlus size={14} /> New
+                <Link href="/tender/create" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0">
+                  <IconPlus size={14} /> <span className="hidden sm:inline">New</span>
                 </Link>
               </div>
             </div>
 
             <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl overflow-hidden">
-              <div className="grid grid-cols-[1fr_130px_120px_130px_110px] gap-3 px-5 py-3 border-b border-[var(--border)] text-[11px] font-semibold text-[var(--text-faint)] uppercase tracking-wider">
+              <div className="hidden sm:grid grid-cols-[1fr_130px_120px_130px_110px] gap-3 px-5 py-3 border-b border-[var(--border)] text-[11px] font-semibold text-[var(--text-faint)] uppercase tracking-wider">
                 <span>Tender</span><span>Status</span><span>Value</span><span>Closing</span><span className="text-center">Actions</span>
               </div>
               {isLoading ? (

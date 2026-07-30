@@ -60,7 +60,7 @@ export default function MyBidsPage() {
   return (
     <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
-      <div className="flex flex-1 w-full overflow-hidden">
+      <div className="flex flex-1 w-full overflow-hidden mt-14">
         <SidebarCategoryFilter
           categoryFilter={categoryFilter}
           statusFilter={statusFilter}
@@ -69,7 +69,7 @@ export default function MyBidsPage() {
         />
 
         <main className="flex-1 min-w-0 overflow-y-auto">
-          <div className="px-6 py-6">
+          <div className="px-4 sm:px-6 py-6">
             <div className="mb-5">
               <h1 className="text-lg font-bold text-(--text-primary)]">
                 {isVendor ? "My Bids" : "Bids"}
@@ -89,7 +89,7 @@ export default function MyBidsPage() {
             )}
 
             <div className="bg-(--bg-surface) border border-(--border) rounded-xl overflow-hidden">
-              <div className="grid grid-cols-[1fr_130px_160px_120px] gap-4 px-5 py-3 border-b border-(--border) text-[11px] font-semibold text-(--text-faint) uppercase tracking-wider">
+              <div className="hidden sm:grid grid-cols-[1fr_130px_160px_120px] gap-4 px-5 py-3 border-b border-(--border) text-[11px] font-semibold text-(--text-faint) uppercase tracking-wider">
                 <span>Tender</span>
                 <span>Amount</span>
                 <span>Submitted</span>

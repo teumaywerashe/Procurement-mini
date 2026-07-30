@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UserRole } from '../user/enum/userRole..enum';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { AdminOrOwner } from '../auth/decorators/adminOrOwner.decorator';
 @ApiTags('Bid')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('bid')
@@ -44,8 +45,8 @@ export class BidController {
   }
   @Get(':id')
   @ApiOperation({ summary: 'Get a bid by ID' })
-  @Roles(UserRole.ADMIN)
-  findOne(@Param('id') id: number) {
+  @AdminOrOwner()
+  findOne(@Param(':id') id: number) {
     return this.bidService.findOne(id);
   }
 
@@ -72,7 +73,7 @@ export class BidController {
   }
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a bid by ID (Bid Owner only)' })
-  remove(@Param('id') id: number, @CurrentUser() user: JwtPayload) {
+  remove(@Param(':id') id: number, @CurrentUser() user: JwtPayload) {
     return this.bidService.remove(+id, user);
   }
 }

@@ -18,7 +18,7 @@ export default function SidebarCategoryFilter({
 }: Props) {
   return (
     <aside
-      className="hidden lg:flex flex-col shrink-0 border-r border-(--border) bg-(--bg-base) sticky top-14 h-[calc(100vh-3.5rem) overflow-y-auto"
+      className="hidden lg:flex flex-col shrink-0 border-r border-(--border) bg-(--bg-base) sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto"
       style={{ width: "18%" }}
     >
       <div className="p-4 space-y-5">

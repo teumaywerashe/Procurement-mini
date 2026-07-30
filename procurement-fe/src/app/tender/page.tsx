@@ -10,6 +10,7 @@ import {
   IconPlus,
   IconFilter,
   IconArrowRight,
+  IconX,
 } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import { useGetTendersQuery } from "@/src/store/api/tenderApi";
@@ -39,19 +40,12 @@ export default function TendersPage() {
   const isAdmin = user?.role == "Admin";
   const isVendor = user?.role == "Vendor";
 
-  const {
-    data: tenders = [],
-    isLoading,
-    isError,
-  } = useGetTendersQuery(search ? { title: search } : {});
+  const { data: tenders = [], isLoading, isError } = useGetTendersQuery(search ? { title: search } : {});
 
   const filtered = tenders.filter((t) => {
-    if (category && t.name?.toLowerCase() !== category.toLowerCase())
-      return false;
+    if (category && t.name?.toLowerCase() !== category.toLowerCase()) return false;
     if (statusFilter === "closing") {
-      const days = Math.ceil(
-        (new Date(t.closingDate).getTime() - now) / 86_400_000,
-      );
+      const days = Math.ceil((new Date(t.closingDate).getTime() - now) / 86_400_000);
       return days >= 0 && days <= 7;
     }
     if (statusFilter) return t.status === statusFilter;
@@ -68,9 +62,7 @@ export default function TendersPage() {
     total: tenders.length,
     published: tenders.filter((t) => t.status === "published").length,
     closing: tenders.filter((t) => {
-      const d = Math.ceil(
-        (new Date(t.closingDate).getTime() - now) / 86_400_000,
-      );
+      const d = Math.ceil((new Date(t.closingDate).getTime() - now) / 86_400_000);
       return d >= 0 && d <= 7;
     }).length,
   };
@@ -88,7 +80,8 @@ export default function TendersPage() {
         />
 
         <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-          <div className="sticky top-14 z-30 bg-(--bg-base) border-b border-(--border) px-6 py-3 flex items-center gap-3">
+          {/* Search / toolbar */}
+          <div className="sticky top-0 z-30 bg-(--bg-base) border-b border-(--border) px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-3">
             <div className="flex items-center flex-1 bg-(--bg-elevated) border border-(--border) rounded-lg px-3 py-2 gap-2">
               <IconSearch size={14} className="text-(--text-faint) shrink-0" />
               <input
@@ -96,43 +89,60 @@ export default function TendersPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search tenders..."
-                className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none flex-1"
+                className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none flex-1 min-w-0"
               />
             </div>
+            {/* Mobile filter toggle */}
             <button
               onClick={() => setShowFilters((v) => !v)}
-              className={`lg:hidden flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border transition-colors ${showFilters ? "border-indigo-500 text-indigo-400 bg-indigo-950/40" : "border-[#2a2620] text-zinc-400 hover:text-white"}`}
+              className={`lg:hidden flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border transition-colors shrink-0 ${showFilters ? "border-indigo-500 text-indigo-400 bg-indigo-950/40" : "border-(--border) text-(--text-subtle) hover:text-(--text-primary)"}`}
             >
-              <IconFilter size={14} /> Filters
+              {showFilters ? <IconX size={14} /> : <IconFilter size={14} />}
+              <span className="hidden xs:inline">Filters</span>
             </button>
             <select
               value={sortNewest ? "newest" : "oldest"}
               onChange={(e) => setSortNewest(e.target.value === "newest")}
-              className="bg-(--bg-elevated) border border-(--border) text-xs text-(--text-primary) rounded-lg px-3 py-2 outline-none cursor-pointer"
+              className="bg-(--bg-elevated) border border-(--border) text-xs text-(--text-primary) rounded-lg px-2 sm:px-3 py-2 outline-none cursor-pointer shrink-0"
             >
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
             </select>
-            <div className="flex-1" />
             {isAdmin && (
               <Link
                 href="/tender/create"
-                className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0"
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 sm:px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0"
               >
-                <IconPlus size={14} /> New Tender
+                <IconPlus size={14} />
+                <span className="hidden sm:inline">New Tender</span>
               </Link>
             )}
           </div>
 
-          <div className="px-6 py-4 flex items-center border-b border-(--border)">
+          {/* Mobile filter drawer */}
+          {showFilters && (
+            <div className="lg:hidden border-b border-(--border) bg-(--bg-base) px-4 py-4 space-y-4">
+              <div>
+                <p className="text-[10px] font-semibold text-(--text-faint) uppercase tracking-wider mb-2">Status</p>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(STATUS_FILTER_LABELS).map(([val, label]) => (
+                    <button key={val} onClick={() => { setStatusFilter(val); setShowFilters(false); }}
+                      className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${statusFilter === val ? "border-indigo-500 bg-indigo-600/20 text-indigo-300" : "border-(--border) text-(--text-subtle) hover:text-(--text-primary)"}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="px-4 sm:px-6 py-3 flex items-center border-b border-(--border)">
             <div>
               <h1 className="text-sm font-semibold text-(--text-primary)">
                 {STATUS_FILTER_LABELS[statusFilter] ?? "All Tenders"}
               </h1>
               <p className="text-xs text-(--text-faint) mt-0.5">
-                {isLoading
-                  ? "Loading..."
-                  : `${sorted.length} result${sorted.length !== 1 ? "s" : ""}`}
+                {isLoading ? "Loading..." : `${sorted.length} result${sorted.length !== 1 ? "s" : ""}`}
               </p>
             </div>
           </div>
@@ -141,10 +151,7 @@ export default function TendersPage() {
             {isLoading ? (
               <div>
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="px-6 py-5 border-b border-(--border) flex items-start gap-4 animate-pulse"
-                  >
+                  <div key={i} className="px-4 sm:px-6 py-5 border-b border-(--border) flex items-start gap-4 animate-pulse">
                     <div className="w-10 h-10 rounded-lg bg-(--bg-elevated) shrink-0" />
                     <div className="flex-1 space-y-2">
                       <div className="h-3 bg-(--bg-elevated) rounded w-1/4" />
@@ -158,23 +165,16 @@ export default function TendersPage() {
                 <div className="w-12 h-12 rounded-full bg-red-950/40 flex items-center justify-center mb-4">
                   <IconAdjustments size={20} className="text-red-400" />
                 </div>
-                <p className="text-sm font-medium text-(--text-primary) mb-1">
-                  Failed to load tenders
-                </p>
+                <p className="text-sm font-medium text-(--text-primary) mb-1">Failed to load tenders</p>
               </div>
             ) : sorted.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 text-center px-6">
                 <div className="w-12 h-12 rounded-full bg-(--bg-elevated) flex items-center justify-center mb-4">
                   <IconFileText size={20} className="text-(--text-faint)" />
                 </div>
-                <p className="text-sm font-medium text-(--text-primary) mb-1">
-                  No tenders found
-                </p>
+                <p className="text-sm font-medium text-(--text-primary) mb-1">No tenders found</p>
                 {isAdmin && (
-                  <Link
-                    href="/tender/create"
-                    className="mt-4 flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
-                  >
+                  <Link href="/tender/create" className="mt-4 flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors">
                     <IconPlus size={14} /> Create first tender
                   </Link>
                 )}
@@ -185,14 +185,11 @@ export default function TendersPage() {
           </div>
 
           {!isLoading && sorted.length > 0 && (
-            <div className="px-6 py-3 border-t border-(--border) flex items-center justify-between">
+            <div className="px-4 sm:px-6 py-3 border-t border-(--border) flex items-center justify-between">
               <p className="text-xs text-(--text-faint)">
                 Showing {sorted.length} of {tenders.length} tenders
               </p>
-              <Link
-                href="#"
-                className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors"
-              >
+              <Link href="#" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
                 View all <IconArrowRight size={12} />
               </Link>
             </div>

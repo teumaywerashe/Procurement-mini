@@ -33,7 +33,7 @@ export const TENDER_STATUS_COLORS: Record<
 export const CATEGORIES = [
   { label: "All Categories", value: "",              icon: React.createElement(IconFileText, { size: 14 }) },
   { label: "Infrastructure", value: "infrastructure", icon: React.createElement(IconBuildingSkyscraper, { size: 14 }) },
-  { label: "Logistics",      value: "logistics",      icon: React.createElement(IconTruck, { size: 14 }) },
+  { label: "Logistics",      value: "logistic",      icon: React.createElement(IconTruck, { size: 14 }) },
   { label: "Technology",     value: "technology",     icon: React.createElement(IconDeviceDesktop, { size: 14 }) },
   { label: "Healthcare",     value: "healthcare",     icon: React.createElement(IconMedicalCross, { size: 14 }) },
   { label: "Education",      value: "education",      icon: React.createElement(IconSchool, { size: 14 }) },

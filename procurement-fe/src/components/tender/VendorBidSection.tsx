@@ -88,12 +88,12 @@ export default function VendorBidSection({ tender, closing }: Props) {
               </div>
             </form>
           ) : (
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row gap-5 items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-orange-950/60 flex items-center justify-center shrink-0"><IconGavel size={18} className="text-orange-400" /></div>
                 <div><p className="text-sm font-semibold text-(--text-primary)">Vendor profile required</p><p className="text-xs text-(--text-subtle) mt-0.5">You need a vendor profile to submit bids.</p></div>
               </div>
-              <button onClick={() => setShowVendorForm(true)} className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-sm font-semibold text-white transition-colors">Create Vendor Profile</button>
+              <button onClick={() => setShowVendorForm(true)} className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-sm font-semibold cursor-pointer text-white transition-colors">Create Vendor Profile</button>
             </div>
           )
         ) : hasAlreadyBid ? (

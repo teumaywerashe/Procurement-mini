@@ -81,50 +81,55 @@ export function VendorRightSidebar({ vendors, isLoading }: RightProps) {
   const maxMonthCount = Math.max(...months.map(([, c]) => c), 1);
 
   return (
-    <aside className="hidden xl:flex flex-col shrink-0 border-l border-(--border) bg-(--bg-base) sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%"}}>
-    <aside className="hidden xl:flex flex-col shrink-0 border-l border-(--border)] bg-(--bg-base)] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "100%" }}>
+    <aside className="hidden xl:flex flex-col shrink-0 border-l border-(--border) bg-(--bg-base) sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%" }}>
       <div className="p-4 space-y-4">
-        <div className="flex items-center gap-2 px-1"><IconChartBar size={14} className="text-indigo-400" /><p className="text-xs font-semibold text-(--text-primary)]">Vendor Analytics</p></div>
-        <div className="h-px bg-(--border)]" />
+        <div className="flex items-center gap-2 px-1">
+          <IconChartBar size={14} className="text-indigo-400" />
+          <p className="text-xs font-semibold text-(--text-primary)">Vendor Analytics</p>
+        </div>
+        <div className="h-px bg-(--border)" />
         {isLoading ? (
-          <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-14 bg-(--bg-elevated)] rounded animate-pulse" />)}</div>
+          <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-14 bg-(--bg-elevated) rounded animate-pulse" />)}</div>
         ) : (
           <div className="space-y-3">
-            <div className="px-3 py-3 rounded-lg bg-(--bg-surface)] border border-(--border)] text-center">
+            <div className="px-3 py-3 rounded-lg bg-(--bg-surface) border border-(--border) text-center">
               <p className="text-3xl font-bold text-indigo-400 tabular-nums">{vendors.length}</p>
-              <p className="text-[10px] text-(--text-faint)] mt-1">Total Vendors</p>
+              <p className="text-[10px] text-(--text-faint) mt-1">Total Vendors</p>
             </div>
-            <div className="px-3 py-3 rounded-lg bg-(--bg-surface)] border border-(--border)]">
-              <p className="text-[10px] text-(--text-faint)] mb-2">Profile completeness</p>
+            <div className="px-3 py-3 rounded-lg bg-(--bg-surface) border border-(--border)">
+              <p className="text-[10px] text-(--text-faint) mb-2">Profile completeness</p>
               {[{ label: "With phone", count: withPhone, color: "bg-indigo-500" }, { label: "With email", count: withEmail, color: "bg-emerald-500" }].map((item) => (
                 <div key={item.label} className="mb-2 last:mb-0">
-                  <div className="flex justify-between text-[10px] text-(--text-faint)] mb-1"><span>{item.label}</span><span>{vendors.length > 0 ? Math.round((item.count / vendors.length) * 100) : 0}%</span></div>
-                  <div className="h-1.5 bg-(--bg-elevated)] rounded-full overflow-hidden"><div className={`h-full ${item.color} rounded-full`} style={{ width: `${vendors.length > 0 ? (item.count / vendors.length) * 100 : 0}%` }} /></div>
+                  <div className="flex justify-between text-[10px] text-(--text-faint) mb-1"><span>{item.label}</span><span>{vendors.length > 0 ? Math.round((item.count / vendors.length) * 100) : 0}%</span></div>
+                  <div className="h-1.5 bg-(--bg-elevated) rounded-full overflow-hidden"><div className={`h-full ${item.color} rounded-full`} style={{ width: `${vendors.length > 0 ? (item.count / vendors.length) * 100 : 0}%` }} /></div>
                 </div>
               ))}
             </div>
             {months.length > 0 && (
-              <div className="px-3 py-3 rounded-lg bg-(--bg-surface)] border border-(--border)]">
-                <p className="text-[10px] text-(--text-faint)] mb-3">Recent registrations</p>
+              <div className="px-3 py-3 rounded-lg bg-(--bg-surface) border border-(--border)">
+                <p className="text-[10px] text-(--text-faint) mb-3">Recent registrations</p>
                 <div className="flex items-end gap-1 h-16">
                   {months.map(([month, count]) => (
                     <div key={month} className="flex-1 flex flex-col items-center gap-1">
-                      <span className="text-[9px] text-(--text-faint)] tabular-nums">{count}</span>
+                      <span className="text-[9px] text-(--text-faint) tabular-nums">{count}</span>
                       <div className="w-full bg-indigo-500/60 rounded-sm" style={{ height: `${(count / maxMonthCount) * 48}px` }} />
-                      <span className="text-[9px] text-(--text-faint)] truncate w-full text-center">{month.split(" ")[0]}</span>
+                      <span className="text-[9px] text-(--text-faint) truncate w-full text-center">{month.split(" ")[0]}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
             {vendors.length > 0 && (
-              <div className="px-3 py-3 rounded-lg bg-(--bg-surface)] border border-(--border)]">
-                <p className="text-[10px] text-(--text-faint)] mb-2">Recently joined</p>
+              <div className="px-3 py-3 rounded-lg bg-(--bg-surface) border border-(--border)">
+                <p className="text-[10px] text-(--text-faint) mb-2">Recently joined</p>
                 <div className="space-y-2">
                   {[...vendors].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 3).map((v) => (
                     <Link key={v.id} href={`/vendors/${v.id}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                       <div className="w-6 h-6 rounded-full bg-indigo-950/60 flex items-center justify-center shrink-0"><IconBuilding size={11} className="text-indigo-400" /></div>
-                      <div className="min-w-0"><p className="text-xs font-medium text-(--text-primary)] truncate">{v.name}</p><p className="text-[10px] text-(--text-faint)]">{new Date(v.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p></div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-(--text-primary) truncate">{v.name}</p>
+                        <p className="text-[10px] text-(--text-faint)">{new Date(v.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p>
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -133,7 +138,6 @@ export function VendorRightSidebar({ vendors, isLoading }: RightProps) {
           </div>
         )}
       </div>
-    </aside>
     </aside>
   );
 }

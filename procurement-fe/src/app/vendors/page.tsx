@@ -35,12 +35,12 @@ export default function VendorsPage() {
   return (
     <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
-      <div className="flex flex-1 w-full overflow-hidden mt-14">
+      <div className="flex flex-1 w-full overflow-hidden">
         <VendorLeftSidebar vendors={vendors} sortBy={sortBy} search={search} onSortChange={setSortBy} onSearchChange={setSearch} />
 
         <main className="flex-1 min-w-0 overflow-y-auto">
-          <div className="px-6 py-6">
-            <div className="flex items-center justify-between mb-5">
+          <div className="px-4 sm:px-6 py-6">
+            <div className="flex items-center justify-between gap-3 mb-5 flex-wrap">
               <div>
                 <h1 className="text-lg font-bold text-(--text-primary)">Vendors</h1>
                 <p className="text-xs text-(--text-subtle) mt-0.5">
@@ -50,7 +50,7 @@ export default function VendorsPage() {
               <div className="flex items-center bg-(--bg-elevated) border border-(--border) rounded-lg px-3 py-2 gap-2">
                 <IconSearch size={14} className="text-(--text-faint) shrink-0" />
                 <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by company..."
-                  className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none w-44" />
+                  className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none w-36 sm:w-44" />
               </div>
             </div>
 

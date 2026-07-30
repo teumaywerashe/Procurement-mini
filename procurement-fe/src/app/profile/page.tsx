@@ -49,7 +49,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
-      <div className="max-w-2xl mx-auto w-full px-6 py-8 flex-1">
+      <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 py-8 mt-14 flex-1">
         <Link
           href="/dashboard"
           className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors mb-6"
