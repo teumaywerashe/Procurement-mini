@@ -82,7 +82,7 @@ export function VendorRightSidebar({ vendors, isLoading }: RightProps) {
 
   return (
     <aside className="hidden xl:flex flex-col shrink-0 border-l border-(--border) bg-(--bg-base) sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%"}}>
-    <aside className="hidden xl:flex flex-col shrink-0 border-l border-(--border)] bg-(--bg-base)] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "20%" }}>
+    <aside className="hidden xl:flex flex-col shrink-0 border-l border-(--border)] bg-(--bg-base)] sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto" style={{ width: "100%" }}>
       <div className="p-4 space-y-4">
         <div className="flex items-center gap-2 px-1"><IconChartBar size={14} className="text-indigo-400" /><p className="text-xs font-semibold text-(--text-primary)]">Vendor Analytics</p></div>
         <div className="h-px bg-(--border)]" />

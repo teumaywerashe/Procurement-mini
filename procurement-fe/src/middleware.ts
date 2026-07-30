@@ -12,11 +12,11 @@ function decodeJwtPayload(
   }
 }
 
-const AUTH_ROUTES = ["/dashboard"];
+const AUTH_ROUTES = ["/dashboard","/profile"];
 
 const ADMIN_ROUTES = ["/tender/manage", "/tender/create", "/vendors"];
 
-const VENDOR_ROUTES = ["/profile", "/bids/my"];
+const VENDOR_ROUTES = [ "/bids/my"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

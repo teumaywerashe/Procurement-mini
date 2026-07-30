@@ -8,13 +8,13 @@ interface Props {
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
 }
 
-const INPUT_CLS = "w-full bg-[#14120e] border border-[#3a3630] rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-indigo-500 transition-colors";
+const INPUT_CLS = "w-full bg-(--bg-input) border border-(--border) rounded-lg px-4 py-2.5 text-sm text-(--text-primary) placeholder-(--text-faint) outline-none focus:border-indigo-500 transition-colors";
 
 export default function TenderFormFields({ form, onChange }: Props) {
   return (
     <>
       <div>
-        <label className="block text-xs font-medium text-gray-400 mb-1.5">
+        <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
           Title <span className="text-red-400">*</span>
         </label>
         <input type="text" name="title" value={form.title} onChange={onChange} required
@@ -22,7 +22,7 @@ export default function TenderFormFields({ form, onChange }: Props) {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-gray-400 mb-1.5">
+        <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
           Category <span className="text-red-400">*</span>
         </label>
         <select name="name" value={form.name} onChange={onChange} className={INPUT_CLS}>
@@ -33,14 +33,14 @@ export default function TenderFormFields({ form, onChange }: Props) {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-gray-400 mb-1.5">Description</label>
+        <label className="block text-xs font-medium text-(--text-muted) mb-1.5">Description</label>
         <textarea name="description" value={form.description} onChange={onChange} rows={4}
           placeholder="Describe the tender scope and requirements..."
           className={`${INPUT_CLS} resize-none`} />
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-gray-400 mb-1.5">
+        <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
           Status <span className="text-red-400">*</span>
         </label>
         <select name="status" value={form.status} onChange={onChange} required
@@ -51,14 +51,14 @@ export default function TenderFormFields({ form, onChange }: Props) {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1.5">
+          <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
             Closing Date <span className="text-red-400">*</span>
           </label>
           <input type="datetime-local" name="closingDate" value={form.closingDate}
             onChange={onChange} required className={INPUT_CLS} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-400 mb-1.5">
+          <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
             Estimated Value ($) <span className="text-red-400">*</span>
           </label>
           <input type="number" name="estimatedValue" value={form.estimatedValue}

@@ -66,7 +66,7 @@ export default function VendorBidSection({ tender, closing }: Props) {
         {!hasVendorProfile ? (
           showVendorForm ? (
             <form onSubmit={handleCreateVendor} className="space-y-4">
-              <div><h2 className="text-sm font-semibold text-(--text-primary)]">Create Vendor Profile</h2><p className="text-xs text-(--text-subtle) mt-0.5">You need a vendor profile before you can submit bids.</p></div>
+              <div><h2 className="text-sm font-semibold text-(--text-primary)">Create Vendor Profile</h2><p className="text-xs text-(--text-subtle) mt-0.5">You need a vendor profile before you can submit bids.</p></div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
                   { label: "Company name", field: "name", required: true, placeholder: "Acme Corporation" },
@@ -91,7 +91,7 @@ export default function VendorBidSection({ tender, closing }: Props) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-orange-950/60 flex items-center justify-center shrink-0"><IconGavel size={18} className="text-orange-400" /></div>
-                <div><p className="text-sm font-semibold text-(--text-primary)]">Vendor profile required</p><p className="text-xs text-(--text-subtle) mt-0.5">You need a vendor profile to submit bids.</p></div>
+                <div><p className="text-sm font-semibold text-(--text-primary)">Vendor profile required</p><p className="text-xs text-(--text-subtle) mt-0.5">You need a vendor profile to submit bids.</p></div>
               </div>
               <button onClick={() => setShowVendorForm(true)} className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-sm font-semibold text-white transition-colors">Create Vendor Profile</button>
             </div>
@@ -103,8 +103,8 @@ export default function VendorBidSection({ tender, closing }: Props) {
           </div>
         ) : !canBid ? (
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-(--bg-elevated) flex items-center justify-center"><IconGavel size={18} className="text-(--text-faint)]" /></div>
-            <div><p className="text-sm font-medium text-(--text-subtle)]">Bidding not available</p><p className="text-xs text-(--text-faint) mt-0.5">This tender is {tender.status} and is not accepting bids.</p></div>
+            <div className="w-10 h-10 rounded-full bg-(--bg-elevated) flex items-center justify-center"><IconGavel size={18} className="text-(--text-faint)" /></div>
+            <div><p className="text-sm font-medium text-(--text-subtle)">Bidding not available</p><p className="text-xs text-(--text-faint) mt-0.5">This tender is {tender.status} and is not accepting bids.</p></div>
           </div>
         ) : showBidForm ? (
           <form onSubmit={handleSubmitBid}>
@@ -123,7 +123,7 @@ export default function VendorBidSection({ tender, closing }: Props) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-indigo-950/60 flex items-center justify-center"><IconGavel size={18} className="text-indigo-400" /></div>
-              <div><p className="text-sm font-semibold text-(--text-primary)]">Submit a Bid</p><p className="text-xs text-(--text-subtle) mt-0.5">Estimated value: ${Number(tender.estimatedValue).toLocaleString()}</p></div>
+              <div><p className="text-sm font-semibold text-(--text-primary)">Submit a Bid</p><p className="text-xs text-(--text-subtle) mt-0.5">Estimated value: ${Number(tender.estimatedValue).toLocaleString()}</p></div>
             </div>
             <button onClick={() => setShowBidForm(true)} className="flex items-center gap-1.5 px-5 py-2.5 cursor-pointer rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white transition-colors">
               <IconGavel size={15} /> Place Bid

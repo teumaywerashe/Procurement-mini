@@ -59,7 +59,7 @@ export default function TenderDetailPage() {
   return (
     <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
-      <div className="max-w-4xl mx-auto w-full px-6 py-8 flex-1">
+      <div className="max-w-4xl mx-auto w-full px-6 py-8 mt-14 flex-1">
         <Link href="/tender" className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors mb-6">
           <IconArrowLeft size={16} /> Back to tenders
         </Link>
@@ -83,10 +83,10 @@ export default function TenderDetailPage() {
               <h3 className="font-semibold text-(--text-primary) text-base">Delete tender?</h3>
             </div>
             <p className="text-sm text-(--text-subtle) mb-5 leading-relaxed">
-              This will permanently delete <span className="text-[var(--text-primary) font-medium">{tender.title}</span>. This action cannot be undone.
+              This will permanently delete <span className="text-(--text-primary) font-medium">{tender.title}</span>. This action cannot be undone.
             </p>
             <div className="flex items-center gap-3">
-              <button onClick={() => setShowConfirm(false)} disabled={isDeleting} className="flex-1 py-2.5 rounded-lg border border-[var(--border-strong) text-sm text-[var(--text-muted) hover:text-[var(--text-primary) transition-colors">Cancel</button>
+              <button onClick={() => setShowConfirm(false)} disabled={isDeleting} className="flex-1 py-2.5 rounded-lg border border-(--border-strong) text-sm text-(--text-muted) hover:text-(--text-primary) transition-colors">Cancel</button>
               <button onClick={handleDelete} disabled={isDeleting} className="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-sm font-medium text-white transition-colors disabled:opacity-50">
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>

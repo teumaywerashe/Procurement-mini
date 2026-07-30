@@ -56,7 +56,7 @@ export default function Navbar() {
     : "?";
 
   return (
-    <header className="w-full  fixed right-0 left-0 ml-0 mr-0 bg-(--bg-base) border-b border-(--border) shrink-0  top-0 z-40">
+    <header className="w-full sticky ml-0 mr-0 bg-(--bg-base) border-b border-(--border) shrink-0  top-0 z-40">
       <div className="w-full px-6 h-14 flex items-center gap-6">
         {/* Logo */}
         <Link

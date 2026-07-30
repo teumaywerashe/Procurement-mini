@@ -43,16 +43,16 @@ export default function CreateTenderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#14120e] text-white flex flex-col">
+    <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
-      <div className="max-w-2xl mx-auto w-full px-6 py-8 flex-1">
-        <Link href="/tender" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-white transition-colors mb-6">
+      <div className="max-w-2xl mx-auto w-full px-6 py-8 mt-14 flex-1">
+        <Link href="/tender" className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors mb-6">
           <IconArrowLeft size={16} /> Back to tenders
         </Link>
-        <div className="bg-[#1c1a16] border border-[#2a2620] rounded-2xl overflow-hidden">
-          <div className="px-8 py-5 border-b border-[#2a2620]">
-            <h1 className="text-lg font-bold text-white">Create Tender</h1>
-            <p className="text-xs text-gray-500 mt-0.5">A reference number will be generated automatically.</p>
+        <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden">
+          <div className="px-8 py-5 border-b border-(--border)">
+            <h1 className="text-lg font-bold text-(--text-primary)">Create Tender</h1>
+            <p className="text-xs text-(--text-subtle) mt-0.5">A reference number will be generated automatically.</p>
           </div>
           <form onSubmit={handleSubmit} className="px-8 py-6 space-y-5">
             <TenderFormFields form={form} onChange={handleChange} />
@@ -67,8 +67,8 @@ export default function CreateTenderPage() {
               </div>
             )}
             <div className="flex items-center gap-3 pt-2">
-              <Link href="/tender" className="flex-1 text-center py-2.5 rounded-lg border border-[#3a3630] text-sm text-gray-300 hover:text-white hover:border-gray-400 transition-colors">Cancel</Link>
-              <button type="submit" disabled={isLoading} className="flex-1 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-sm font-medium text-white transition-colors disabled:opacity-50">
+              <Link href="/tender" className="flex-1 text-center py-2.5 rounded-lg border border-(--border-strong) text-sm text-(--text-muted) hover:text-(--text-primary) hover:border-(--border-strong) transition-colors">Cancel</Link>
+              <button type="submit" disabled={isLoading} className="flex-1 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50">
                 {isLoading ? "Creating..." : "Create tender"}
               </button>
             </div>
