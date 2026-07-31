@@ -25,25 +25,39 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { getErrorMessage } from "@/src/utilis/getErrorMessage";
+import { registerSchema } from "@/src/lib/schemas";
 
 export default function RegistrationPage() {
-  // const [error, setError] = useState('');
+  const [registerUser, { error, isLoading: loading }] = useRegisterMutation();
+
   const [success, setSuccess] = useState(false);
-  // const [loading, setLoading] = useState(false);
 
   const form = useForm({
     initialValues: { name: "", email: "", password: "", confirmPassword: "" },
     validate: {
-      name: (v) => (v.trim().length > 0 ? null : "Name is required"),
-      email: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : "Enter a valid email"),
-      password: (v) =>
-        v.length >= 8 ? null : "Password must be at least 8 characters",
-      confirmPassword: (v, values) =>
-        v === values.password ? null : "Passwords do not match",
+      name: (v) => {
+        const r = registerSchema.shape.name.safeParse(v);
+        return r.success ? null : r.error.issues[0].message;
+      },
+      email: (v) => {
+        const r = registerSchema.shape.email.safeParse(v);
+        return r.success ? null : r.error.issues[0].message;
+      },
+      password: (v) => {
+        const r = registerSchema.shape.password.safeParse(v);
+        return r.success ? null : r.error.issues[0].message;
+      },
+      confirmPassword: (v, values) => {
+        const r = registerSchema.safeParse({ ...values, confirmPassword: v });
+        if (r.success) return null;
+        const issue = r.error.issues.find(
+          (i) => i.path[0] === "confirmPassword",
+        );
+        return issue ? issue.message : null;
+      },
     },
   });
 
-  const [registerUser, { error, isLoading: loading }] = useRegisterMutation();
   const handleSubmit = async (values: typeof form.values) => {
     try {
       await registerUser({
@@ -116,12 +130,15 @@ export default function RegistrationPage() {
           zIndex: 50,
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.background = "var(--mantine-color-dark-6)";
-          (e.currentTarget as HTMLElement).style.color = "var(--mantine-color-gray-0)";
+          (e.currentTarget as HTMLElement).style.background =
+            "var(--mantine-color-dark-6)";
+          (e.currentTarget as HTMLElement).style.color =
+            "var(--mantine-color-gray-0)";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLElement).style.background = "transparent";
-          (e.currentTarget as HTMLElement).style.color = "var(--mantine-color-dimmed)";
+          (e.currentTarget as HTMLElement).style.color =
+            "var(--mantine-color-dimmed)";
         }}
         title="Back to home"
       >

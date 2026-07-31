@@ -1,4 +1,9 @@
-export type TenderStatus = "draft" | "published" | "closed" | "awarded" | "cancelled";
+export type TenderStatus =
+  | "draft"
+  | "published"
+  | "closed"
+  | "awarded"
+  | "cancelled";
 
 export interface Tender {
   id: number;
@@ -6,7 +11,7 @@ export interface Tender {
   name: string;
   description?: string;
   status: TenderStatus;
-  closingDate: string;
+  closingDate: Date;
   referenceNumber: string;
   estimatedValue: number;
   createdAt: string;
@@ -44,7 +49,6 @@ export interface AuthResponse {
   access_token: string;
   user: User;
 }
-
 
 export interface AuthState {
   user: User | null;

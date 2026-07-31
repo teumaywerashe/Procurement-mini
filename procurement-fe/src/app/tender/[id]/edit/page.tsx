@@ -8,12 +8,11 @@ import {
   useGetTenderQuery,
   useUpdateTenderMutation,
 } from "@/src/store/api/tenderApi";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/src/store/store";
 import { IconArrowLeft, IconAlertTriangle } from "@tabler/icons-react";
 import type { Tender, FormState } from "@/src/types";
 import { notifications } from "@mantine/notifications";
 import TenderFormFields from "@/src/components/shared/TenderFormFields";
+import { tenderSchema } from "@/src/lib/schemas";
 
 function toFormState(tender: Tender): FormState {
   return {
@@ -21,9 +20,7 @@ function toFormState(tender: Tender): FormState {
     name: tender.name,
     description: tender.description ?? "",
     status: tender.status,
-    closingDate: tender.closingDate
-      ? new Date(tender.closingDate).toISOString().slice(0, 16)
-      : null,
+    closingDate: new Date(tender.closingDate),
     estimatedValue: String(tender.estimatedValue),
   };
 }
@@ -37,6 +34,9 @@ function EditForm({
 }) {
   const [updateTender, { isLoading, error }] = useUpdateTenderMutation();
   const [form, setForm] = React.useState<FormState>(() => toFormState(tender));
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
+    {},
+  );
 
   function handleChange(
     e: React.ChangeEvent<
@@ -44,19 +44,39 @@ function EditForm({
     >,
   ) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    const parsed = tenderSchema.safeParse({
+      ...form,
+      closingDate: form.closingDate
+        ? new Date(form.closingDate).toISOString()
+        : "",
+    });
+
+    if (!parsed.success) {
+      const errors: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        const key = String(issue.path[0]);
+        errors[key] = issue.message;
+      });
+      setFormErrors(errors);
+      return;
+    }
+
+    setFormErrors({});
     try {
       await updateTender({
         id: tender.id,
-        title: form.title,
-        name: form.name,
-        description: form.description || undefined,
-        status: form.status,
-        closingDate: new Date(form.closingDate).toISOString(),
-        estimatedValue: Number(form.estimatedValue),
+        title: parsed.data.title,
+        name: parsed.data.name,
+        description: parsed.data.description || undefined,
+        status: parsed.data.status,
+        closingDate: new Date(parsed.data.closingDate),
+        estimatedValue: Number(parsed.data.estimatedValue),
       }).unwrap();
       notifications.show({
         title: "Tender updated",
@@ -75,7 +95,11 @@ function EditForm({
 
   return (
     <form onSubmit={handleSubmit} className="px-8 py-6 space-y-5">
-      <TenderFormFields form={form} onChange={handleChange} />
+      <TenderFormFields
+        form={form}
+        onChange={handleChange}
+        errors={formErrors}
+      />
       {error && (
         <p className="text-xs text-red-400 bg-red-900/20 border border-red-800/40 rounded-lg px-4 py-2.5">
           Failed to update tender.
@@ -103,7 +127,7 @@ function EditForm({
 export default function EditTenderPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const user = useSelector((s: RootState) => s.auth.user);
+  // const user = useSelector((s: RootState) => s.auth.user);
 
   const { data: tender, isLoading } = useGetTenderQuery(Number(id));
 

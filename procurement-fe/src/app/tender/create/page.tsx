@@ -9,11 +9,13 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import type { FormState } from "@/src/types";
 import { notifications } from "@mantine/notifications";
 import TenderFormFields from "@/src/components/shared/TenderFormFields";
+import { tenderSchema } from "@/src/lib/schemas";
 
 export default function CreateTenderPage() {
   const router = useRouter();
 
   const [createTender, { isLoading, error }] = useCreateTenderMutation();
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({});
   const [form, setForm] = React.useState<FormState>({
     title: "",
     name: "Infrastructure",
@@ -29,17 +31,37 @@ export default function CreateTenderPage() {
     >,
   ) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const parsed = tenderSchema.safeParse({
+      ...form,
+      closingDate: form.closingDate
+        ? new Date(form.closingDate).toISOString()
+        : "",
+    });
+
+    if (!parsed.success) {
+      const errors: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => {
+        const key = String(issue.path[0]);
+        errors[key] = issue.message;
+      });
+      setFormErrors(errors);
+      return;
+    }
+
+    setFormErrors({});
     const result = await createTender({
-      title: form.title,
-      name: form.name,
-      description: form.description || undefined,
-      status: form.status,
-      closingDate: new Date(form.closingDate).toLocaleString(),
-      estimatedValue: Number(form.estimatedValue),
+      title: parsed.data.title,
+      name: parsed.data.name,
+      description: parsed.data.description || undefined,
+      status: parsed.data.status,
+      closingDate: new Date(parsed.data.closingDate),
+      estimatedValue: Number(parsed.data.estimatedValue),
     });
     if ("data" in result && result.data) {
       notifications.show({
@@ -71,7 +93,7 @@ export default function CreateTenderPage() {
             </p>
           </div>
           <form onSubmit={handleSubmit} className="px-8 py-6 space-y-5">
-            <TenderFormFields form={form} onChange={handleChange} />
+            <TenderFormFields form={form} onChange={handleChange} errors={formErrors} />
             {error && (
               <div className="text-xs text-red-400 bg-red-900/20 border border-red-800/40 rounded-lg px-4 py-2.5">
                 {(() => {

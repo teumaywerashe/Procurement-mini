@@ -6,6 +6,7 @@ import { useGetMyVendorQuery, useCreateVendorMutation } from "@/src/store/api/ve
 import { useGetBidsByVendorQuery, useCreateBidMutation } from "@/src/store/api/bidApi";
 import { notifications } from "@mantine/notifications";
 import type { Tender } from "@/src/types";
+import { vendorSchema, bidSchema } from "@/src/lib/schemas";
 
 interface Props {
   tender: Tender;
@@ -22,17 +23,27 @@ export default function VendorBidSection({ tender, closing }: Props) {
 
   const [showVendorForm, setShowVendorForm] = useState(false);
   const [vendorForm, setVendorForm] = useState({ name: "", registrationNumber: "", email: "", phoneNumber: "" });
+  const [vendorErrors, setVendorErrors] = useState<Record<string, string>>({});
   const [createVendor, { isLoading: isCreatingVendor }] = useCreateVendorMutation();
 
   const [bidAmount, setBidAmount]   = useState("");
+  const [bidAmountError, setBidAmountError] = useState<string | null>(null);
   const [showBidForm, setShowBidForm] = useState(false);
   const [createBid, { isLoading: isSubmitting }] = useCreateBidMutation();
 
   async function handleSubmitBid(e: React.FormEvent) {
     e.preventDefault();
     if (!vendor?.id) return;
+
+    const parsed = bidSchema.safeParse({ amount: bidAmount });
+    if (!parsed.success) {
+      setBidAmountError(parsed.error.issues[0].message);
+      return;
+    }
+    setBidAmountError(null);
+
     try {
-      await createBid({ tenderId: tender.id, vendorId: vendor.id, amount: Number(bidAmount) }).unwrap();
+      await createBid({ tenderId: tender.id, vendorId: vendor.id, amount: Number(parsed.data.amount) }).unwrap();
       notifications.show({ title: "Bid Submitted", message: "Your bid has been submitted successfully.", color: "green" });
       setBidAmount(""); setShowBidForm(false);
     } catch {
@@ -42,8 +53,18 @@ export default function VendorBidSection({ tender, closing }: Props) {
 
   async function handleCreateVendor(e: React.FormEvent) {
     e.preventDefault();
+
+    const parsed = vendorSchema.safeParse(vendorForm);
+    if (!parsed.success) {
+      const errors: Record<string, string> = {};
+      parsed.error.issues.forEach((issue) => { errors[String(issue.path[0])] = issue.message; });
+      setVendorErrors(errors);
+      return;
+    }
+    setVendorErrors({});
+
     try {
-      await createVendor({ name: vendorForm.name, registrationNumber: vendorForm.registrationNumber, email: vendorForm.email || undefined, phoneNumber: vendorForm.phoneNumber || undefined }).unwrap();
+      await createVendor({ name: parsed.data.name, registrationNumber: parsed.data.registrationNumber, email: parsed.data.email || undefined, phoneNumber: parsed.data.phoneNumber || undefined }).unwrap();
       notifications.show({ title: "Vendor Created", message: "Your vendor profile is ready.", color: "green" });
       setShowVendorForm(false);
     } catch {
@@ -77,8 +98,9 @@ export default function VendorBidSection({ tender, closing }: Props) {
                   <div key={field}>
                     <label className="block text-xs font-medium text-(--text-subtle) mb-1">{label}{required && <span className="text-red-400"> *</span>}</label>
                     <input required={required} value={(vendorForm as Record<string, string>)[field]} placeholder={placeholder}
-                      onChange={(e) => setVendorForm((f) => ({ ...f, [field]: e.target.value }))}
-                      className="w-full bg-(--bg-input) border border-(--border-strong) rounded-lg px-3 py-2 text-sm text-(--text-primary) placeholder-(--text-faint) outline-none focus:border-indigo-500 transition-colors" />
+                      onChange={(e) => { setVendorForm((f) => ({ ...f, [field]: e.target.value })); setVendorErrors((er) => ({ ...er, [field]: "" })); }}
+                      className={`w-full bg-(--bg-input) border rounded-lg px-3 py-2 text-sm text-(--text-primary) placeholder-(--text-faint) outline-none focus:border-indigo-500 transition-colors ${vendorErrors[field] ? "border-red-500" : "border-(--border-strong)"}`} />
+                    {vendorErrors[field] && <p className="text-xs text-red-400 mt-1">{vendorErrors[field]}</p>}
                   </div>
                 ))}
               </div>
@@ -110,14 +132,15 @@ export default function VendorBidSection({ tender, closing }: Props) {
           <form onSubmit={handleSubmitBid}>
             <h2 className="text-sm font-semibold text-(--text-primary) mb-4">Submit Your Bid</h2>
             <div className="flex items-center gap-3">
-              <div className="flex-1 flex items-center bg-(--bg-input) border border-(--border-strong) rounded-lg px-3 py-2.5 gap-2 focus-within:border-indigo-500 transition-colors">
+              <div className={`flex-1 flex items-center bg-(--bg-input) border rounded-lg px-3 py-2.5 gap-2 focus-within:border-indigo-500 transition-colors ${bidAmountError ? "border-red-500" : "border-(--border-strong)"}`}>
                 <IconCurrencyDollar size={15} className="text-(--text-faint) shrink-0" />
-                <input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} placeholder="Enter bid amount" min={1} step="0.01" required autoFocus
+                <input type="number" value={bidAmount} onChange={(e) => { setBidAmount(e.target.value); setBidAmountError(null); }} placeholder="Enter bid amount" min={1} step="0.01" required autoFocus
                   className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none flex-1" />
               </div>
               <button type="submit" disabled={isSubmitting || !bidAmount} className="px-5 py-2.5 cursor-pointer rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50">{isSubmitting ? "Submitting..." : "Submit Bid"}</button>
-              <button type="button" onClick={() => setShowBidForm(false)} className="px-4 py-2.5 rounded-lg border border-(--border-strong) text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors">Cancel</button>
+              <button type="button" onClick={() => { setShowBidForm(false); setBidAmountError(null); }} className="px-4 py-2.5 rounded-lg border border-(--border-strong) text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors">Cancel</button>
             </div>
+            {bidAmountError && <p className="text-xs text-red-400 mt-2">{bidAmountError}</p>}
           </form>
         ) : (
           <div className="flex items-center justify-between">

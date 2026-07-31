@@ -38,20 +38,35 @@ export class BidService {
   async findAll() {
     return await db.select().from(bid);
   }
-  async findByVendorId(vendorId: number) {
+  async findByVendorId(uid: number) {
     const [existingVendor] = await db
       .select()
       .from(vendor)
-      .where(eq(vendor.ownerId, vendorId))
+      .where(eq(vendor.ownerId, uid))
       .limit(1);
     if (!existingVendor) {
-      throw new NotFoundException(`Vendor with ID ${vendorId} not found`);
+      throw new NotFoundException(`Vendor with owner ID ${uid} not found`);
     }
     return await db
       .select()
       .from(bid)
       .where(eq(bid.vendorId, existingVendor.id));
   }
+
+  // async findByVendorIdForAdmin(vendorId: number) {
+  //   const [existingVendor] = await db
+  //     .select()
+  //     .from(vendor)
+  //     .where(eq(vendor.ownerId, vendorId))
+  //     .limit(1);
+  //   if (!existingVendor) {
+  //     throw new NotFoundException(`Vendor with ID ${vendorId} not found`);
+  //   }
+  //   return await db
+  //     .select()
+  //     .from(bid)
+  //     .where(eq(bid.vendorId, existingVendor.id));
+  // }
 
   async findByTenderId(tenderId: number) {
     return await db.select().from(bid).where(eq(bid.tenderId, tenderId));

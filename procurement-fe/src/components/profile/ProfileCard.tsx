@@ -5,6 +5,7 @@ import { useUpdateUserMutation } from "@/src/store/api/userApi";
 import { useDispatch } from "react-redux";
 import { logIn } from "@/src/store/auth/authSlice";
 import { notifications } from "@mantine/notifications";
+import { updateUserSchema } from "@/src/lib/schemas";
 
 interface User { id: number; name?: string; email?: string; role?: string; createdAt?: string; }
 
@@ -25,10 +26,17 @@ export default function ProfileCard({ user }: { user: User }) {
   const [updateUser, { isLoading }] = useUpdateUserMutation();
   const [editing, setEditing] = useState(false);
   const [name, setName]       = useState(user.name ?? "");
+  const [nameError, setNameError] = useState<string | null>(null);
 
   const initials = user.name ? user.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "?";
 
   async function handleSave() {
+    const parsed = updateUserSchema.safeParse({ name });
+    if (!parsed.success) {
+      setNameError(parsed.error.issues[0].message);
+      return;
+    }
+    setNameError(null);
     try {
       const updated = await updateUser({ id: user.id, name }).unwrap();
       dispatch(logIn(updated));
@@ -45,11 +53,14 @@ export default function ProfileCard({ user }: { user: User }) {
         <div className="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center text-xl font-bold text-white shrink-0">{initials}</div>
         <div className="flex-1 min-w-0">
           {editing ? (
-            <div className="flex items-center gap-2">
-              <input value={name} onChange={(e) => setName(e.target.value)} autoFocus
-                className="flex-1 bg-(--bg-input) border border-(--border-strong) rounded-lg px-3 py-1.5 text-sm text-(--text-primary) outline-none focus:border-indigo-500" />
-              <button onClick={handleSave} disabled={isLoading} className="p-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:opacity-50"><IconCheck size={15} /></button>
-              <button onClick={() => { setEditing(false); setName(user.name ?? ""); }} className="p-1.5 rounded-md border border-(--border) text-(--text-subtle) hover:text-(--text-primary) transition-colors"><IconX size={15} /></button>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <input value={name} onChange={(e) => { setName(e.target.value); setNameError(null); }} autoFocus
+                  className={`flex-1 bg-(--bg-input) border rounded-lg px-3 py-1.5 text-sm text-(--text-primary) outline-none focus:border-indigo-500 ${nameError ? "border-red-500" : "border-(--border-strong)"}`} />
+                <button onClick={handleSave} disabled={isLoading} className="p-1.5 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:opacity-50"><IconCheck size={15} /></button>
+                <button onClick={() => { setEditing(false); setName(user.name ?? ""); setNameError(null); }} className="p-1.5 rounded-md border border-(--border) text-(--text-subtle) hover:text-(--text-primary) transition-colors"><IconX size={15} /></button>
+              </div>
+              {nameError && <p className="text-xs text-red-400">{nameError}</p>}
             </div>
           ) : (
             <div className="flex items-center gap-2">

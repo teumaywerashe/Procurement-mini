@@ -48,7 +48,7 @@ export const STATUS_OPTIONS: { label: string; value: TenderStatus }[] = [
   { label: "Cancelled", value: "cancelled" },
 ];
 
-export function daysLeft(dateStr: string) {
+export function daysLeft(dateStr: Date | string ) {
   const diff = new Date(dateStr).getTime() - Date.now();
   const days = Math.ceil(diff / 86_400_000);
   if (days < 0) return "Closed";

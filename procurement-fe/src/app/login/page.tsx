@@ -23,6 +23,7 @@ import { useDispatch } from "react-redux";
 import { logIn } from "@/src/store/auth/authSlice";
 import { AuthResponse } from "@/src/types";
 import { getErrorMessage } from "@/src/utilis/getErrorMessage";
+import { loginSchema } from "@/src/lib/schemas";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,9 +33,14 @@ export default function LoginPage() {
   const form = useForm({
     initialValues: { email: "", password: "" },
     validate: {
-      email: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : "Enter a valid email"),
-      password: (v) =>
-        v.length >= 8 ? null : "Password must be at least 8 characters",
+      email: (v) => {
+        const result = loginSchema.shape.email.safeParse(v);
+        return result.success ? null : result.error.issues[0].message;
+      },
+      password: (v) => {
+        const result = loginSchema.shape.password.safeParse(v);
+        return result.success ? null : result.error.issues[0].message;
+      },
     },
   });
 

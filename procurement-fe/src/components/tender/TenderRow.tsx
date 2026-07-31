@@ -7,7 +7,7 @@ import type { Tender } from "@/src/types";
 
 export default function TenderRow({ tender, now }: { tender: Tender; now: number }) {
   const status  = TENDER_STATUS_COLORS[tender.status] ?? TENDER_STATUS_COLORS.draft;
-  const closing = daysLeft(tender.closingDate);
+  const closing =  daysLeft(tender.closingDate);
   const isUrgent = closing !== "Closed" && parseInt(closing) <= 3;
 
   return (
