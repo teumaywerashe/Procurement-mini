@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useState } from "react";
 import {
   TextInput,
   PasswordInput,
@@ -20,17 +19,19 @@ import { useRegisterMutation } from "@/src/store/api/userApi";
 import {
   IconShoppingBag,
   IconAlertCircle,
-  IconCircleCheck,
   IconX,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { getErrorMessage } from "@/src/utilis/getErrorMessage";
 import { registerSchema } from "@/src/lib/schemas";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { logIn } from "@/src/store/auth/authSlice";
 
 export default function RegistrationPage() {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const [registerUser, { error, isLoading: loading }] = useRegisterMutation();
-
-  const [success, setSuccess] = useState(false);
 
   const form = useForm({
     initialValues: { name: "", email: "", password: "", confirmPassword: "" },
@@ -60,44 +61,18 @@ export default function RegistrationPage() {
 
   const handleSubmit = async (values: typeof form.values) => {
     try {
-      await registerUser({
+      const result = await registerUser({
         name: values.name,
         email: values.email,
         password: values.password,
       }).unwrap();
-      setSuccess(true);
+      dispatch(logIn(result.user));
+      router.push("/tender");
     } catch (error: unknown) {
       console.log(error);
     }
   };
 
-  if (success) {
-    return (
-      <Box
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "var(--mantine-color-dark-8)",
-          padding: "1rem",
-        }}
-      >
-        <Stack align="center" gap="md">
-          <ThemeIcon size={64} radius="xl" variant="light" color="teal">
-            <IconCircleCheck size={36} />
-          </ThemeIcon>
-          <Title order={2}>Account created</Title>
-          <Text c="dimmed" size="sm">
-            You&apos;re all set. Sign in to get started.
-          </Text>
-          <Button component={Link} href="/login" variant="filled" mt="xs">
-            Go to login
-          </Button>
-        </Stack>
-      </Box>
-    );
-  }
 
   return (
     <Box

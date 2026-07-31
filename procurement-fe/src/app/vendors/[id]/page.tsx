@@ -22,9 +22,9 @@ export default function VendorDetailPage() {
   console.log("vendor", vendor);
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
+      <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center text-zinc-500 text-sm">
+        <div className="flex-1 flex items-center justify-center text-(--text-subtle) text-sm">
           Loading...
         </div>
       </div>
@@ -33,7 +33,7 @@ export default function VendorDetailPage() {
 
   if (isError || !vendor) {
     return (
-      <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
+      <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <IconAlertTriangle size={36} className="text-red-400" />
@@ -51,27 +51,27 @@ export default function VendorDetailPage() {
 
   const details = [
     {
-      icon: <IconHash size={15} className="text-zinc-500" />,
+      icon: <IconHash size={15} className="text-(--text-faint)" />,
       label: "Vendor ID",
       value: `#${vendor.id}`,
     },
     {
-      icon: <IconBuilding size={15} className="text-zinc-500" />,
+      icon: <IconBuilding size={15} className="text-(--text-faint)" />,
       label: "Company",
       value: vendor.name,
     },
     {
-      icon: <IconPhone size={15} className="text-zinc-500" />,
+      icon: <IconPhone size={15} className="text-(--text-faint)" />,
       label: "Phone",
       value: vendor.phoneNumber ?? "—",
     },
     {
-      icon: <IconMapPin size={15} className="text-zinc-500" />,
+      icon: <IconMapPin size={15} className="text-(--text-faint)" />,
       label: "Address",
       value: vendor.email ?? "—",
     },
     {
-      icon: <IconCalendar size={15} className="text-zinc-500" />,
+      icon: <IconCalendar size={15} className="text-(--text-faint)" />,
       label: "Registered",
       value: new Date(vendor.createdAt).toLocaleDateString("en-US", {
         month: "long",
@@ -82,39 +82,39 @@ export default function VendorDetailPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f0e0b] text-white flex flex-col">
+    <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
 
       <div className="max-w-2xl mx-auto w-full px-6 py-8 flex-1">
         <Link
           href="/vendors"
-          className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors mb-6"
+          className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors mb-6"
         >
           <IconArrowLeft size={15} />
           Back to vendors
         </Link>
 
-        <div className="bg-[#1c1a16] border border-[#2a2620] rounded-2xl overflow-hidden">
+        <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden">
           {/* Header */}
-          <div className="px-8 py-6 border-b border-[#2a2620] flex items-center gap-4">
+          <div className="px-8 py-6 border-b border-(--border) flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-indigo-950/60 flex items-center justify-center shrink-0">
               <IconBuilding size={26} className="text-indigo-400" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">{vendor.name}</h1>
-              <p className="text-xs text-zinc-500 mt-0.5">Vendor profile</p>
+              <h1 className="text-xl font-bold text-(--text-primary)">{vendor.name}</h1>
+              <p className="text-xs text-(--text-faint) mt-0.5">Vendor profile</p>
             </div>
           </div>
 
           {/* Details */}
-          <div className="divide-y divide-[#1e1c18]">
+          <div className="divide-y divide-(--border-subtle)">
             {details.map((d) => (
               <div key={d.label} className="flex items-center gap-4 px-8 py-4">
                 {d.icon}
-                <span className="text-xs text-zinc-600 w-24 shrink-0">
+                <span className="text-xs text-(--text-subtle) w-24 shrink-0">
                   {d.label}
                 </span>
-                <span className="text-sm text-zinc-300">{d.value}</span>
+                <span className="text-sm text-(--text-muted)">{d.value}</span>
               </div>
             ))}
           </div>

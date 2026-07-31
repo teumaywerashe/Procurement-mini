@@ -6,7 +6,7 @@ import Navbar from "@/src/components/layout/Navbar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/src/store/store";
 import { useGetBidsByVendorQuery } from "@/src/store/api/bidApi";
-import { useGetVendorQuery } from "@/src/store/api/vendorApi";
+import { useGetMyVendorQuery } from "@/src/store/api/vendorApi";
 import { useGetTendersQuery } from "@/src/store/api/tenderApi";
 import type { Bid } from "@/src/types";
 import {
@@ -26,7 +26,7 @@ export default function MyBidsPage() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<Bid["bidStatus"] | "">("");
 
-  const { data: vendor } = useGetVendorQuery(user?.id ?? 0, {
+  const { data: vendor } = useGetMyVendorQuery(undefined, {
     skip: !isVendor,
   });
   const {

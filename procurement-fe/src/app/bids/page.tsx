@@ -3,8 +3,6 @@
 import React, { useState } from "react";
 // import { useRouter } from "next/navigation";
 import Navbar from "@/src/components/layout/Navbar";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/src/store/store";
 import {
   useGetAllBidsQuery,
   useUpdateBidStatusMutation,

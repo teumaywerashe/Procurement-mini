@@ -39,16 +39,16 @@ export class VendorController {
   async findAll() {
     return await this.vendorService.findAll();
   }
+  @Get('owner/me')
+  @ApiOperation({ summary: 'Get logged-in vendor' })
+  async findByOwnerId(@CurrentUser() user: JwtPayload) {
+    return await this.vendorService.findByOwnerId(user.uid);
+  }
   @Get(':id')
   @AdminOrOwner()
   @ApiOperation({ summary: 'Get a vendor by ID' })
   async findOne(@Param('id') id: number) {
     return await this.vendorService.findOne(id);
-  }
-  @Get('owner/me')
-  @ApiOperation({ summary: 'Get logged-in vendor' })
-  async findByOwnerId(@CurrentUser() user: JwtPayload) {
-    return await this.vendorService.findByOwnerId(user.uid);
   }
   @Patch(':id')
   @AdminOrOwner()
