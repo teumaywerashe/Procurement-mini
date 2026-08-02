@@ -3,15 +3,15 @@ import React from "react";
 import Link from "next/link";
 import { IconCurrencyDollar, IconClock } from "@tabler/icons-react";
 import { BID_STATUS_STYLES } from "@/src/components/shared/constants";
-import type { Bid, Tender } from "@/src/types";
+import type { Bid } from "@/src/types";
 
 interface Props {
   bid: Bid;
-  tender?: Tender;
 }
 
-export default function BidTableRow({ bid, tender }: Props) {
+export default function BidTableRow({ bid }: Props) {
   const s = BID_STATUS_STYLES[bid.bidStatus];
+  const tender = bid.tender;
   return (
     <div className="border-b border-(--border-subtle) hover:bg-(--bg-elevated) transition-colors px-5 py-4">
       {/* Mobile layout */}

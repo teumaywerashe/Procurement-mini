@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 // import { useRouter } from "next/navigation";
 import Navbar from "@/src/components/layout/Navbar";
 import {
   useGetAllBidsQuery,
   useUpdateBidStatusMutation,
 } from "@/src/store/api/bidApi";
-import { useGetTendersQuery } from "@/src/store/api/tenderApi";
 import type { Bid } from "@/src/types";
 import { notifications } from "@mantine/notifications";
 import { IconGavel, IconAlertTriangle } from "@tabler/icons-react";
@@ -26,22 +25,12 @@ export default function AdminBidsPage() {
     useState<Bid["bidStatus"]>("pending");
 
   const { data: bids = [], isLoading, isError } = useGetAllBidsQuery();
-  const { data: tenders = [] } = useGetTendersQuery({});
   const [updateBidStatus, { isLoading: isUpdating }] =
     useUpdateBidStatusMutation();
 
-  const tenderMap = React.useMemo(() => {
-    const m: Record<number, (typeof tenders)[0]> = {};
-    tenders.forEach((t) => {
-      m[t.id] = t;
-    });
-    return m;
-  }, [tenders]);
-
   const filtered = bids.filter((b) => {
-    const tender = tenderMap[b.tenderId];
     const matchCat = categoryFilter
-      ? tender?.name?.toLowerCase() === categoryFilter.toLowerCase()
+      ? b.tender?.name?.toLowerCase() === categoryFilter.toLowerCase()
       : true;
     const matchStatus = statusFilter ? b.bidStatus === statusFilter : true;
     return matchCat && matchStatus;
@@ -136,7 +125,6 @@ export default function AdminBidsPage() {
                   <AdminBidTableRow
                     key={bid.id}
                     bid={bid}
-                    tender={tenderMap[bid.tenderId]}
                     isEditing={editingId === bid.id}
                     editingStatus={editingStatus}
                     isUpdating={isUpdating}
@@ -157,7 +145,6 @@ export default function AdminBidsPage() {
 
         <AdminBidsRightSidebar
           bids={bids}
-          tenderMap={tenderMap}
           isLoading={isLoading}
         />
       </div>

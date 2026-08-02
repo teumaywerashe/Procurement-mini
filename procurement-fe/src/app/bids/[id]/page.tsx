@@ -11,7 +11,6 @@ import {
   useUpdateBidStatusMutation,
   useDeleteBidMutation,
 } from "@/src/store/api/bidApi";
-import { useGetTenderQuery } from "@/src/store/api/tenderApi";
 import { useGetMyVendorQuery } from "@/src/store/api/vendorApi";
 import { notifications } from "@mantine/notifications";
 import {
@@ -93,7 +92,6 @@ export default function BidDetailPage() {
   const [showDelete, setShowDelete] = useState(false);
 
   const { data: bid, isLoading, isError } = useGetBidByIdQuery(Number(id));
-  const { data: tender } = useGetTenderQuery(bid?.tenderId ?? 0, { skip: !bid?.tenderId });
   const { data: myVendor } = useGetMyVendorQuery(undefined, { skip: !isVendor });
 
   const [updateBidStatus, { isLoading: isUpdating }] = useUpdateBidStatusMutation();
@@ -156,6 +154,7 @@ export default function BidDetailPage() {
   }
 
   const bidStyle    = BID_STATUS_STYLES[bid.bidStatus];
+  const tender      = bid.tender;
   const tenderStyle = tender ? (TENDER_STATUS_COLORS[tender.status] ?? TENDER_STATUS_COLORS.draft) : null;
 
   return (

@@ -11,6 +11,7 @@ import { db } from '../database/db';
 import type { JwtPayload } from '../auth/decorators/types';
 import { eq } from 'drizzle-orm';
 import { vendor } from '../database/schema/vendor.schema';
+
 @Injectable()
 export class BidService {
   async create(createBidDto: CreateBidDto, user: JwtPayload) {
@@ -36,48 +37,42 @@ export class BidService {
   }
 
   async findAll() {
-    return await db.select().from(bid);
+    return await db.query.bid.findMany({
+      with: { tender: true },
+    });
   }
+
   async findByVendorId(uid: number) {
-    const [existingVendor] = await db
+    const existingVendor = await db
       .select()
       .from(vendor)
       .where(eq(vendor.ownerId, uid))
-      .limit(1);
+      .limit(1)
+      .then((rows) => rows[0]);
     if (!existingVendor) {
       throw new NotFoundException(`Vendor with owner ID ${uid} not found`);
     }
-    return await db
-      .select()
-      .from(bid)
-      .where(eq(bid.vendorId, existingVendor.id));
+    return await db.query.bid.findMany({
+      where: { vendorId: existingVendor.id },
+      with: { tender: true },
+    });
   }
 
-  // async findByVendorIdForAdmin(vendorId: number) {
-  //   const [existingVendor] = await db
-  //     .select()
-  //     .from(vendor)
-  //     .where(eq(vendor.ownerId, vendorId))
-  //     .limit(1);
-  //   if (!existingVendor) {
-  //     throw new NotFoundException(`Vendor with ID ${vendorId} not found`);
-  //   }
-  //   return await db
-  //     .select()
-  //     .from(bid)
-  //     .where(eq(bid.vendorId, existingVendor.id));
-  // }
-
   async findByTenderId(tenderId: number) {
-    return await db.select().from(bid).where(eq(bid.tenderId, tenderId));
+    return await db.query.bid.findMany({
+      where: { tenderId },
+      with: { tender: true },
+    });
   }
 
   async findOne(id: number) {
-    const [bidById] = await db.select().from(bid).where(eq(bid.id, id));
+    const bidById = await db.query.bid.findFirst({
+      where: { id },
+      with: { tender: true },
+    });
     if (!bidById) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }
-    console.log(bidById);
     return bidById;
   }
 
@@ -101,7 +96,6 @@ export class BidService {
     if (!updatingVendor) {
       throw new UnauthorizedException('Vendor not found');
     }
-
     const [updatedBid] = await db
       .update(bid)
       .set(updateBidDto)
@@ -135,8 +129,7 @@ export class BidService {
         `Vendor ID mismatch. Cannot delete bid with a different vendor ID.`,
       );
     }
-
     const [deleted] = await db.delete(bid).where(eq(bid.id, id)).returning();
-    return { deleted: deleted, success: true, message: 'deleted succefully' };
+    return { deleted, success: true, message: 'deleted successfully' };
   }
 }

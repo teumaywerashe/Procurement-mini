@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/src/components/layout/Navbar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/src/store/store";
 import { useGetBidsByVendorQuery } from "@/src/store/api/bidApi";
 import { useGetMyVendorQuery } from "@/src/store/api/vendorApi";
-import { useGetTendersQuery } from "@/src/store/api/tenderApi";
 import type { Bid } from "@/src/types";
 import {
   IconGavel,
@@ -34,20 +33,10 @@ export default function MyBidsPage() {
     isLoading,
     isError,
   } = useGetBidsByVendorQuery(undefined, { skip: !vendor?.id });
-  const { data: tenders = [] } = useGetTendersQuery({});
-
-  const tenderMap = React.useMemo(() => {
-    const m: Record<number, (typeof tenders)[0]> = {};
-    tenders.forEach((t) => {
-      m[t.id] = t;
-    });
-    return m;
-  }, [tenders]);
 
   const filtered = bids.filter((b) => {
-    const tender = tenderMap[b.tenderId];
     const matchCat = categoryFilter
-      ? tender?.name?.toLowerCase() === categoryFilter.toLowerCase()
+      ? b.tender?.name?.toLowerCase() === categoryFilter.toLowerCase()
       : true;
     const matchStatus = statusFilter ? b.bidStatus === statusFilter : true;
     return matchCat && matchStatus;
@@ -134,7 +123,6 @@ export default function MyBidsPage() {
                   <BidTableRow
                     key={bid.id}
                     bid={bid}
-                    tender={tenderMap[bid.tenderId]}
                   />
                 ))
               )}

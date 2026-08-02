@@ -16,6 +16,7 @@ export interface Tender {
   estimatedValue: number;
   createdAt: string;
   createdBy: number;
+  bids?: Bid[];
 }
 
 export interface User {
@@ -33,6 +34,7 @@ export interface Vendor {
   phoneNumber?: string;
   email?: string;
   createdAt: string;
+  bids?: Bid[];
 }
 
 export interface Bid {
@@ -43,6 +45,7 @@ export interface Bid {
   bidStatus: "pending" | "accepted" | "rejected";
   submittedAt: string;
   referenceNumber: string;
+  tender?: Tender;
 }
 
 export interface AuthResponse {

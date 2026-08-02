@@ -55,17 +55,24 @@ export class VendorService {
   }
 
   async findAll() {
-    return await db.select().from(vendor).execute();
+    return await db.query.vendor.findMany({
+      with: {
+        bids: true,
+        user: true,
+      },
+    });
   }
   async findOne(id: number) {
     if (!id) {
       throw new BadRequestException('Vendor ID is required');
     }
-    const [existingVendor] = await db
-      .select()
-      .from(vendor)
-      .where(eq(vendor.id, id))
-      .execute();
+    const existingVendor = await db.query.vendor.findFirst({
+      where: { id },
+      with: {
+        bids: true,
+        user: true,
+      },
+    });
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
     }
@@ -75,11 +82,13 @@ export class VendorService {
     if (!ownerId) {
       throw new BadRequestException('Owner ID is required');
     }
-    const [existingVendor] = await db
-      .select()
-      .from(vendor)
-      .where(eq(vendor.ownerId, ownerId))
-      .execute();
+    const existingVendor = await db.query.vendor.findFirst({
+      where: { ownerId },
+      with: {
+        bids: true,
+        user: true,
+      },
+    });
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found for this owner');
     }

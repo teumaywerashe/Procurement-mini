@@ -9,6 +9,7 @@ export default function TenderRow({ tender, now }: { tender: Tender; now: number
   const status  = TENDER_STATUS_COLORS[tender.status] ?? TENDER_STATUS_COLORS.draft;
   const closing =  daysLeft(tender.closingDate);
   const isUrgent = closing !== "Closed" && parseInt(closing) <= 3;
+  const bidCount = tender.bids?.length ?? 0;
 
   return (
     <Link href={`/tender/${tender.id}`} className="group flex items-start gap-3 sm:gap-5 px-4 sm:px-8 py-4  sm:py-6 border rounded-2xl border-(--border) hover:bg-(--bg-elevated) hover:border-blue-950 transition-colors">
@@ -36,6 +37,11 @@ export default function TenderRow({ tender, now }: { tender: Tender; now: number
                 <span className="text-(--text-primary) font-semibold text-xs sm:text-sm">${Number(tender.estimatedValue).toLocaleString()}</span>
               </span>
               <span className="capitalize text-xs hidden sm:inline">{tender.name}</span>
+              {bidCount > 0 && (
+                <span className="flex items-center gap-1 text-xs text-(--text-faint)">
+                  <IconFileText size={12} />{bidCount} bid{bidCount !== 1 ? "s" : ""}
+                </span>
+              )}
               <span className={`flex items-center gap-1 text-xs sm:hidden font-medium ${isUrgent && closing !== "Closed" ? "text-orange-400" : closing === "Closed" ? "text-(--text-faint)" : "text-(--text-subtle)"}`}>
                 <IconClock size={12} />{closing}
               </span>

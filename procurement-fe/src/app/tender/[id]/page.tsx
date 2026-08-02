@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/src/components/layout/Navbar";
 import { useGetTenderQuery, useDeleteTenderMutation } from "@/src/store/api/tenderApi";
-import { useGetBidsByTenderQuery } from "@/src/store/api/bidApi";
 import { useSelector } from "react-redux";
 import { notifications } from "@mantine/notifications";
 import type { RootState } from "@/src/store/store";
@@ -24,7 +23,6 @@ export default function TenderDetailPage() {
 
   const { data: tender, isLoading, isError } = useGetTenderQuery(Number(id));
   const [deleteTender, { isLoading: isDeleting }] = useDeleteTenderMutation();
-  const { data: tenderBids = [] } = useGetBidsByTenderQuery(Number(id), { skip: !isAdmin });
   const [showConfirm, setShowConfirm] = useState(false);
 
   async function handleDelete() {
@@ -72,7 +70,7 @@ export default function TenderDetailPage() {
         </div>
 
         {isVendor && <VendorBidSection tender={tender} closing={closing} />}
-        {isAdmin  && <AdminBidsSection bids={tenderBids} />}
+        {isAdmin  && <AdminBidsSection bids={tender.bids ?? []} />}
       </div>
 
       {showConfirm && (

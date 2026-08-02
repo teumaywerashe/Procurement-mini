@@ -79,8 +79,8 @@ export default function TenderBidsSidebar({ userId, isVendor }: Props) {
                   className="px-3 py-3 cursor-pointer rounded-lg bg-(--bg-elevated) border border-(--border) space-y-1.5"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] text-(--text-faint) font-medium">
-                      Tender #{bid.tenderId}
+                    <span className="text-[10px] text-(--text-faint) font-medium truncate">
+                      {bid.tender?.title ?? `Tender #${bid.tenderId}`}
                     </span>
                     <span
                       className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${colors?.bg ?? "bg-zinc-800"} ${colors?.text ?? "text-zinc-400"}`}

@@ -9,11 +9,10 @@ import {
   IconEdit,
 } from "@tabler/icons-react";
 import { BID_STATUS_STYLES } from "@/src/components/shared/constants";
-import type { Bid, Tender } from "@/src/types";
+import type { Bid } from "@/src/types";
 
 interface Props {
   bid: Bid;
-  tender?: Tender;
   isEditing: boolean;
   editingStatus: Bid["bidStatus"];
   isUpdating: boolean;
@@ -25,7 +24,6 @@ interface Props {
 
 export default function AdminBidTableRow({
   bid,
-  tender,
   isEditing,
   editingStatus,
   isUpdating,
@@ -35,6 +33,7 @@ export default function AdminBidTableRow({
   onStatusChange,
 }: Props) {
   const s = BID_STATUS_STYLES[bid.bidStatus];
+  const tender = bid.tender;
 
   const statusCell = isEditing ? (
     <div className="flex items-center gap-1.5   ">
