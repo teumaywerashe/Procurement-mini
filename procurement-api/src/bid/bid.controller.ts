@@ -63,8 +63,8 @@ export class BidController {
   }
 
   @Patch(':id/status')
-  @ApiOperation({ summary: 'Update bid status by ID (Admin only)' })
   @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Update bid status by ID (Admin only)' })
   updateBidStatus(@Param('id') id: number, @Body('status') status: string) {
     const updateBidDto = new UpdateBidDto();
     updateBidDto.bidStatus = status as 'pending' | 'accepted' | 'rejected';

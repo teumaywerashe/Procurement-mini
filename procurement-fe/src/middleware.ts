@@ -24,6 +24,8 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get("access_token")?.value;
   const payload = token ? decodeJwtPayload(token) : null;
 
+  // payload ={uid,name,email,role}
+
   const isLoggedIn = !!payload?.uid;
   const role = payload?.role;
 

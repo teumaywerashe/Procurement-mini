@@ -41,7 +41,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   SwaggerModule.setup(
-    'api/docs',
+    'api',
     app,
     SwaggerModule.createDocument(app, swaggerConfig),
     {

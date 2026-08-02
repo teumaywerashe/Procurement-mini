@@ -1,6 +1,3 @@
-// utils/getErrorMessage.ts
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-
 export function getErrorMessage(error: unknown): string {
   const data = (error as { data?: unknown }).data;
   const msg = (data as { message?: unknown } | undefined)?.message;

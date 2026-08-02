@@ -120,7 +120,7 @@ export default function CreateTenderPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50"
+                className="flex-1 py-2.5 cursor-pointer rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50"
               >
                 {isLoading ? "Creating..." : "Create tender"}
               </button>

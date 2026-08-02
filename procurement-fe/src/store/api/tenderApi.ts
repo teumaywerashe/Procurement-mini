@@ -17,7 +17,15 @@ export const tenderApi = baseApi.injectEndpoints({
     }),
     updateTender: builder.mutation<Tender, { id: number } & Partial<Tender>>({
       query: ({ id, ...body }) => ({ url: `/tender/${id}`, method: "PATCH", body }),
-      invalidatesTags: (_r, _e, { id }) => [{ type: "Tender", id }],
+      invalidatesTags: (_r, _e, { id }) => ["Tender", { type: "Tender", id }],
+      async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
+        try {
+          const { data: updated } = await queryFulfilled;
+          dispatch(
+            tenderApi.util.updateQueryData("getTender", id, () => updated)
+          );
+        } catch {}
+      },
     }),
     deleteTender: builder.mutation<void, number>({
       query: (id) => ({ url: `/tender/${id}`, method: "DELETE" }),

@@ -143,7 +143,6 @@ export default function AdminBidsPage() {
                     onEdit={(b) => {
                       setEditingId(b.id);
                       setEditingStatus(b.bidStatus);
-                      updateBidStatus({ id: b.id, status: editingStatus });
                     }}
                     onConfirm={confirmEdit}
                     onCancel={() => setEditingId(null)}

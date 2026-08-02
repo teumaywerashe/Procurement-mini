@@ -15,12 +15,17 @@ import TenderFormFields from "@/src/components/shared/TenderFormFields";
 import { tenderSchema } from "@/src/lib/schemas";
 
 function toFormState(tender: Tender): FormState {
+  const d = new Date(tender.closingDate);
+  // datetime-local input requires "YYYY-MM-DDTHH:mm"
+  const closingDate = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
   return {
     title: tender.title,
     name: tender.name,
     description: tender.description ?? "",
     status: tender.status,
-    closingDate: new Date(tender.closingDate),
+    closingDate,
     estimatedValue: String(tender.estimatedValue),
   };
 }
@@ -115,7 +120,7 @@ function EditForm({
         <button
           type="submit"
           disabled={isLoading}
-          className="flex-1 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50"
+          className="flex-1 py-2.5 cursor-pointer rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50"
         >
           {isLoading ? "Saving..." : "Save changes"}
         </button>
