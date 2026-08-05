@@ -41,8 +41,8 @@ export default function AdminBidsRightSidebar({ bids, isLoading }: Props) {
       if (!lowMap[b.tenderId]  || Number(b.amount) < Number(lowMap[b.tenderId].amount))  lowMap[b.tenderId]  = b;
     });
     return {
-      highest: Object.values(highMap).sort((a, b) => Number(b.amount) - Number(a.amount)).slice(0, 6),
-      lowest:  Object.values(lowMap).sort((a, b)  => Number(a.amount) - Number(b.amount)).slice(0, 6),
+      highest: Object.values(highMap).sort((a, b) => Number(b.amount) - Number(a.amount)),
+      lowest:  Object.values(lowMap).sort((a, b)  => Number(a.amount) - Number(b.amount)),
     };
   }, [bids]);
 
@@ -60,7 +60,13 @@ export default function AdminBidsRightSidebar({ bids, isLoading }: Props) {
         <div className="h-px bg-(--border)" />
         {isLoading ? <div className="space-y-2">{skeleton}</div>
           : highest.length === 0 ? <p className="text-xs text-(--text-subtle) text-center py-4">No bids yet.</p>
-          : <div className="space-y-2">{highest.map((b) => <BidCard key={`h-${b.id}`} bid={b} label="Highest" color="text-emerald-400" />)}</div>}
+          : <div className="space-y-2">{highest.map((b,i) =>
+           <BidCard key={`h-${b.id}`} bid={b} label="Highest" color="text-emerald-400" />
+           
+          )
+           }
+           
+           </div>}
 
         <div className="h-px bg-(--border)" />
         <div className="flex items-center gap-2 px-1">

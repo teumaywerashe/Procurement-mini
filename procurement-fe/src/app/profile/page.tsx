@@ -57,7 +57,7 @@ export default function ProfilePage() {
           <IconArrowLeft size={16} /> Back to dashboard
         </Link>
 
-        <ProfileCard user={user} />
+        <ProfileCard  user={user} />
 
         {isVendor && vendor && (
           <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden">
@@ -70,20 +70,20 @@ export default function ProfilePage() {
               <InfoRow
                 icon={<IconBuilding size={15} />}
                 label="Company name"
-                value={vendor.companyName}
+                value={vendor.name}
               />
-              {vendor.contactPhone && (
+              {vendor.phoneNumber && (
                 <InfoRow
                   icon={<IconPhone size={15} />}
                   label="Phone"
-                  value={vendor.contactPhone}
+                  value={vendor.phoneNumber}
                 />
               )}
-              {vendor.address && (
+              {vendor.email && (
                 <InfoRow
                   icon={<IconMapPin size={15} />}
                   label="Address"
-                  value={vendor.address}
+                  value={vendor.email}
                 />
               )}
               <InfoRow

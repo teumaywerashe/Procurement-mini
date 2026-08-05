@@ -85,12 +85,15 @@ export default function LoginPage() {
           zIndex: 50,
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.background = "var(--mantine-color-dark-6)";
-          (e.currentTarget as HTMLElement).style.color = "var(--mantine-color-gray-0)";
+          (e.currentTarget as HTMLElement).style.background =
+            "var(--mantine-color-dark-6)";
+          (e.currentTarget as HTMLElement).style.color =
+            "var(--mantine-color-gray-0)";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLElement).style.background = "transparent";
-          (e.currentTarget as HTMLElement).style.color = "var(--mantine-color-dimmed)";
+          (e.currentTarget as HTMLElement).style.color =
+            "var(--mantine-color-dimmed)";
         }}
         title="Back to home"
       >
@@ -120,9 +123,7 @@ export default function LoginPage() {
               mb="md"
               variant="light"
             >
-              {error
-                ? getErrorMessage(error)
-                : "An error occurred. Please try again."}
+              {getErrorMessage(error)}
             </Alert>
           )}
 

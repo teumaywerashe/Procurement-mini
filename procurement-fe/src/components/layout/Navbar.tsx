@@ -137,7 +137,7 @@ export default function Navbar() {
                   </button>
                 </div>
 
-                {/* Mobile hamburger */}
+             
                 <button
                   onClick={() => setMenuOpen((v) => !v)}
                   className="md:hidden p-2 text-(--text-subtle) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors"
@@ -170,7 +170,7 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile drawer */}
+   
       {isLoggedIn && menuOpen && (
         <div className="fixed inset-0 z-30 md:hidden" onClick={() => setMenuOpen(false)}>
           <div className="absolute inset-0 bg-black/40" />

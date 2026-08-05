@@ -32,7 +32,7 @@ import { BID_STATUS_STYLES, TENDER_STATUS_COLORS } from "@/src/components/shared
 
 const STATUS_OPTIONS = ["pending", "accepted", "rejected"] as const;
 
-// ── Info row ──────────────────────────────────────────────────
+//  Info row
 function InfoRow({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-3 border-b border-(--border) last:border-0">
@@ -45,7 +45,7 @@ function InfoRow({ icon, label, children }: { icon: React.ReactNode; label: stri
   );
 }
 
-// ── Delete confirm modal ──────────────────────────────────────
+//  Delete confirm modal 
 function DeleteModal({ onConfirm, onCancel, isDeleting }: { onConfirm: () => void; onCancel: () => void; isDeleting: boolean }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
@@ -80,7 +80,7 @@ function DeleteModal({ onConfirm, onCancel, isDeleting }: { onConfirm: () => voi
   );
 }
 
-// ── Main page ─────────────────────────────────────────────────
+//  Main page
 export default function BidDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router  = useRouter();
@@ -96,8 +96,7 @@ export default function BidDetailPage() {
 
   const [updateBidStatus, { isLoading: isUpdating }] = useUpdateBidStatusMutation();
   const [deleteBid,       { isLoading: isDeleting }] = useDeleteBidMutation();
-   console.log(id,bid)
-  // A vendor can only delete their own bid
+  //  console.log(id,bid)
   const isOwnBid = isVendor && myVendor?.id === bid?.vendorId;
 
   async function handleStatusSave() {
@@ -122,7 +121,7 @@ export default function BidDetailPage() {
     }
   }
 
-  // ── Loading ──
+  //  Loading 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
@@ -137,7 +136,7 @@ export default function BidDetailPage() {
     );
   }
 
-  // ── Error ──
+  //  Error 
   if (isError || !bid) {
     return (
       <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
@@ -171,7 +170,7 @@ export default function BidDetailPage() {
           <IconArrowLeft size={16} /> Back to bids
         </Link>
 
-        {/* ── Header card ── */}
+        {/*  Header card  */}
         <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden mb-4">
           <div className="px-6 sm:px-8 py-6 border-b border-(--border)">
             <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -244,7 +243,7 @@ export default function BidDetailPage() {
             </div>
           </div>
 
-          {/* ── Stats strip ── */}
+          {/*  Stats strip  */}
           <div className="grid grid-cols-2 sm:grid-cols-3 border-b border-(--border)">
             {[
               {
@@ -276,7 +275,7 @@ export default function BidDetailPage() {
             ))}
           </div>
 
-          {/* ── Detail rows ── */}
+          {/*  Detail rows  */}
           <div className="px-6 sm:px-8 py-2">
             <InfoRow icon={<IconHash size={15} />} label="Bid Reference">
               <span className="font-mono text-xs bg-(--bg-elevated) px-2 py-0.5 rounded">{bid.referenceNumber}</span>
@@ -322,7 +321,7 @@ export default function BidDetailPage() {
           </div>
         </div>
 
-        {/* ── Tender description card ── */}
+        {/*  Tender description card  */}
         {tender?.description && (
           <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden mb-4">
             <div className="px-6 sm:px-8 py-4 border-b border-(--border)">
@@ -334,7 +333,7 @@ export default function BidDetailPage() {
           </div>
         )}
 
-        {/* ── Vendor-only notice ── */}
+        {/*  Vendor-only notice  */}
         {isVendor && !isOwnBid && bid && (
           <div className="bg-yellow-950/30 border border-yellow-800/40 rounded-xl px-5 py-4 flex items-start gap-3">
             <IconAlertTriangle size={16} className="text-yellow-400 shrink-0 mt-0.5" />
