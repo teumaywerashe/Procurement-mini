@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '../.env' });
 
-console.log('DATABASE URL:', process.env.DATABASE_URL);
+// console.log('DATABASE URL:', process.env.DATABASE_URL);
 
 export default defineConfig({
   dialect: 'postgresql',

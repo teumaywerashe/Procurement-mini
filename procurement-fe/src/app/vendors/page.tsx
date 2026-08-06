@@ -14,7 +14,7 @@ export default function VendorsPage() {
   
 
   const { data: vendors = [], isLoading, isError } = useGetVendorsQuery();
-  console.log("vendors", vendors);
+  // console.log("vendors", vendors);
 
   const filtered = vendors
     .filter((v) => search ? (v.name ?? "").toLowerCase().includes(search.toLowerCase()) : true)

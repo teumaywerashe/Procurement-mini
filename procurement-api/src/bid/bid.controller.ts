@@ -58,6 +58,7 @@ export class BidController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a bid by ID (Bid Owner only)' })
+  @AdminOrOwner()
   update(@Param('id') id: number, @Body() updateBidDto: UpdateBidDto) {
     return this.bidService.update(+id, updateBidDto);
   }

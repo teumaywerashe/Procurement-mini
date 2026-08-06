@@ -19,7 +19,7 @@ export default function VendorDetailPage() {
   const { id } = useParams<{ id: string }>();
 
   const { data: vendor, isLoading, isError } = useGetVendorQuery(Number(id));
-  console.log("vendor", vendor);
+  // console.log("vendor", vendor);
   if (isLoading) {
     return (
       <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">

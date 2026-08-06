@@ -39,7 +39,7 @@ export class VendorService {
       .from(vendor)
       .where(eq(vendor.ownerId, user.uid))
       .execute();
-    console.log(userOwneVendor);
+    // console.log(userOwneVendor);
     if (userOwneVendor) {
       throw new ConflictException(
         'You already own a vendor. Each user can only register one vendor.',
