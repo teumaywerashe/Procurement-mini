@@ -15,13 +15,15 @@ export default function CreateTenderPage() {
   const router = useRouter();
 
   const [createTender, { isLoading, error }] = useCreateTenderMutation();
-  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({});
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
+    {},
+  );
   const [form, setForm] = React.useState<FormState>({
     title: "",
     name: "Infrastructure",
     description: "",
     status: "draft",
-    closingDate: new Date(),
+    closingDate: "",
     estimatedValue: "",
   });
 
@@ -93,7 +95,11 @@ export default function CreateTenderPage() {
             </p>
           </div>
           <form onSubmit={handleSubmit} className="px-8 py-6 space-y-5">
-            <TenderFormFields form={form} onChange={handleChange} errors={formErrors} />
+            <TenderFormFields
+              form={form}
+              onChange={handleChange}
+              errors={formErrors}
+            />
             {error && (
               <div className="text-xs text-red-400 bg-red-900/20 border border-red-800/40 rounded-lg px-4 py-2.5">
                 {(() => {

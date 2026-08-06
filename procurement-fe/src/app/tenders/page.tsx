@@ -41,7 +41,6 @@ function TendersPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Initialise state from URL query params
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
   const [statusFilter, setStatusFilter] = useState(
     searchParams.get("status") ?? "",
@@ -52,10 +51,6 @@ function TendersPageContent() {
     searchParams.get("sort") !== "oldest",
   );
   const [now] = useState(() => Date.now());
-  const [priceRange, setPriceRange] = useState<[number, number]>([
-    0,
-    Number(searchParams.get("maxPrice") ?? 1000000),
-  ]);
 
   const user = useSelector((s: RootState) => s.auth.user);
   const isAdmin = user?.role == "Admin";
@@ -67,17 +62,8 @@ function TendersPageContent() {
     isError,
   } = useGetTendersQuery({
     ...(search ? { title: search } : {}),
-    maxPrice: priceRange[1],
   });
 
-  // Calculate max price from loaded tenders
-  const maxTenderPrice =
-    tenders.length > 0
-      ? Math.ceil(Math.max(...tenders.map((t) => t.estimatedValue)) / 100000) *
-        100000
-      : 1000000;
-
-  // Sync all filters back to the URL whenever they change
   const syncUrl = useCallback(
     (
       overrides: Partial<{
@@ -85,7 +71,6 @@ function TendersPageContent() {
         status: string;
         category: string;
         sort: string;
-        maxPrice: number;
       }>,
     ) => {
       const params = new URLSearchParams();
@@ -93,25 +78,15 @@ function TendersPageContent() {
       const st = overrides.status ?? statusFilter;
       const cat = overrides.category ?? category;
       const sort = overrides.sort ?? (sortNewest ? "newest" : "oldest");
-      const max = overrides.maxPrice ?? priceRange[1];
 
       if (s) params.set("search", s);
       if (st) params.set("status", st);
       if (cat) params.set("category", cat);
       if (sort !== "newest") params.set("sort", sort);
-      if (max < maxTenderPrice) params.set("maxPrice", String(max));
 
       router.replace(`/tenders?${params.toString()}`, { scroll: false });
     },
-    [
-      search,
-      statusFilter,
-      category,
-      sortNewest,
-      priceRange,
-      maxTenderPrice,
-      router,
-    ],
+    [search, statusFilter, category, sortNewest, router],
   );
 
   const handleSearch = (value: string) => {
@@ -132,11 +107,6 @@ function TendersPageContent() {
   const handleSort = (value: string) => {
     setSortNewest(value === "newest");
     syncUrl({ sort: value });
-  };
-
-  const handlePriceRange = (range: [number, number]) => {
-    setPriceRange(range);
-    syncUrl({ maxPrice: range[1] });
   };
 
   const filtered = tenders.filter((t) => {
@@ -182,68 +152,48 @@ function TendersPageContent() {
         />
 
         <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-          {/* Search / toolbar */}
-          <div className="sticky top-0 z-30 bg-(--bg-base) border-b border-(--border) px-4 sm:px-6 py-3 space-y-3">
-            {/* Price Range Filter */}
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-(--text-faint) whitespace-nowrap shrink-0">
-                Max price:
-              </label>
+          {/* Toolbar */}
+          <div className="sticky top-0 z-30 bg-(--bg-base) border-b border-(--border) px-4 sm:px-6 py-3 flex items-center gap-2 sm:gap-3">
+            {/* Search */}
+            <div className="flex items-center flex-1 bg-(--bg-elevated) border border-(--border) rounded-lg px-3 py-2 gap-2 min-w-0">
+              <IconSearch size={14} className="text-(--text-faint) shrink-0" />
               <input
-                type="range"
-                min="0"
-                max={maxTenderPrice}
-                step="10000"
-                value={priceRange[1]}
-                onChange={(e) => handlePriceRange([0, Number(e.target.value)])}
-                className="flex-1 h-1 rounded-full appearance-auto cursor-pointer accent-indigo-500"
+                type="text"
+                value={search}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Search tenders..."
+                className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none flex-1 min-w-0"
               />
-              <span className="text-xs text-(--text-faint) whitespace-nowrap shrink-0 w-20 text-right">
-                ${priceRange[1].toLocaleString()}
-              </span>
             </div>
 
-            {/* Search Bar */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center flex-1 bg-(--bg-elevated) border border-(--border) rounded-lg px-3 py-2 gap-2">
-                <IconSearch
-                  size={14}
-                  className="text-(--text-faint) shrink-0"
-                />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  placeholder="Search tenders..."
-                  className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none flex-1 min-w-0"
-                />
-              </div>
-              {/* Mobile filter toggle */}
-              <button
-                onClick={() => setShowFilters((v) => !v)}
-                className={`lg:hidden flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border transition-colors shrink-0 ${showFilters ? "border-indigo-500 text-indigo-400 bg-indigo-950/40" : "border-(--border) text-(--text-subtle) hover:text-(--text-primary)"}`}
+            {/* Mobile filter toggle */}
+            <button
+              onClick={() => setShowFilters((v) => !v)}
+              className={`lg:hidden flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border transition-colors shrink-0 ${showFilters ? "border-indigo-500 text-indigo-400 bg-indigo-950/40" : "border-(--border) text-(--text-subtle) hover:text-(--text-primary)"}`}
+            >
+              {showFilters ? <IconX size={14} /> : <IconFilter size={14} />}
+              <span className="hidden xs:inline">Filters</span>
+            </button>
+
+            {/* Sort */}
+            <select
+              value={sortNewest ? "newest" : "oldest"}
+              onChange={(e) => handleSort(e.target.value)}
+              className="bg-(--bg-elevated) border border-(--border) text-xs text-(--text-primary) rounded-lg px-2 sm:px-3 py-2 outline-none cursor-pointer shrink-0"
+            >
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
+
+            {isAdmin && (
+              <Link
+                href="/tenders/create"
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 sm:px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0"
               >
-                {showFilters ? <IconX size={14} /> : <IconFilter size={14} />}
-                <span className="hidden xs:inline">Filters</span>
-              </button>
-              <select
-                value={sortNewest ? "newest" : "oldest"}
-                onChange={(e) => handleSort(e.target.value)}
-                className="bg-(--bg-elevated) border border-(--border) text-xs text-(--text-primary) rounded-lg px-2 sm:px-3 py-2 outline-none cursor-pointer shrink-0"
-              >
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
-              </select>
-              {isAdmin && (
-                <Link
-                  href="/tenders/create"
-                  className="flex items-center gap-1.5 text-xs font-semibold px-3 sm:px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0"
-                >
-                  <IconPlus size={14} />
-                  <span className="hidden sm:inline">New Tender</span>
-                </Link>
-              )}
-            </div>
+                <IconPlus size={14} />
+                <span className="hidden sm:inline">New Tender</span>
+              </Link>
+            )}
           </div>
 
           {/* Mobile filter drawer */}

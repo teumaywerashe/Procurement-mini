@@ -33,11 +33,11 @@ export default function LoginPage() {
   const form = useForm({
     initialValues: { email: "", password: "" },
     validate: {
-      email: (v) => {
+      email: (v:string) => {
         const result = loginSchema.shape.email.safeParse(v);
         return result.success ? null : result.error.issues[0].message;
       },
-      password: (v) => {
+      password: (v:string) => {
         const result = loginSchema.shape.password.safeParse(v);
         return result.success ? null : result.error.issues[0].message;
       },

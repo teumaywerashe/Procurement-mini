@@ -63,6 +63,6 @@ export interface FormState {
   name: string;
   description: string;
   status: TenderStatus;
-  closingDate: Date | null;
+  closingDate: string;
   estimatedValue: string;
 }

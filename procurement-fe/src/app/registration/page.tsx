@@ -16,11 +16,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useRegisterMutation } from "@/src/store/api/userApi";
-import {
-  IconShoppingBag,
-  IconAlertCircle,
-  IconX,
-} from "@tabler/icons-react";
+import { IconShoppingBag, IconAlertCircle, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import { getErrorMessage } from "@/src/utilis/getErrorMessage";
 import { registerSchema } from "@/src/lib/schemas";
@@ -36,19 +32,27 @@ export default function RegistrationPage() {
   const form = useForm({
     initialValues: { name: "", email: "", password: "", confirmPassword: "" },
     validate: {
-      name: (v) => {
+      name: (v: string) => {
         const r = registerSchema.shape.name.safeParse(v);
         return r.success ? null : r.error.issues[0].message;
       },
-      email: (v) => {
+      email: (v: string) => {
         const r = registerSchema.shape.email.safeParse(v);
         return r.success ? null : r.error.issues[0].message;
       },
-      password: (v) => {
+      password: (v: string) => {
         const r = registerSchema.shape.password.safeParse(v);
         return r.success ? null : r.error.issues[0].message;
       },
-      confirmPassword: (v , values) => {
+      confirmPassword: (
+        v: string,
+        values: {
+          name: string;
+          email: string;
+          password: string;
+          confirmPassword: string;
+        },
+      ) => {
         const r = registerSchema.safeParse({ ...values, confirmPassword: v });
         if (r.success) return null;
         const issue = r.error.issues.find(
@@ -72,7 +76,6 @@ export default function RegistrationPage() {
       console.log(error);
     }
   };
-
 
   return (
     <Box
