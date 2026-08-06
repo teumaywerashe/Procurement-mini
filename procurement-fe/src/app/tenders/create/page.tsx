@@ -71,7 +71,7 @@ export default function CreateTenderPage() {
         message: "Tender has been created successfully.",
         color: "green",
       });
-      router.push(`/tender/${result.data.id}`);
+      router.push(`/tenders/${result.data.id}`);
     }
   }
 
@@ -104,12 +104,12 @@ export default function CreateTenderPage() {
               <div className="text-xs text-red-400 bg-red-900/20 border border-red-800/40 rounded-lg px-4 py-2.5">
                 {(() => {
                   const data = ("data" in error ? error.data : null) as {
-                    message?: string | string[];
+                    message?: unknown;
                   } | null;
                   const raw = data?.message;
                   const msgs = Array.isArray(raw)
-                    ? raw
-                    : raw
+                    ? raw.map(String)
+                    : typeof raw === "string"
                       ? [raw]
                       : ["Failed to create tender."];
                   return msgs.map((m, i) => <p key={i}>{m}</p>);

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
 import {
   IconFileText,
   IconGavel,
@@ -49,7 +48,7 @@ function DashboardLeftSidebar({
       vendorOnly: true,
     },
     {
-      href: "/tender/create",
+      href: "/tenders/create",
       icon: <IconPlus size={15} />,
       label: "Create tender",
       color: "text-emerald-400",
@@ -57,7 +56,7 @@ function DashboardLeftSidebar({
       adminOnly: true,
     },
     {
-      href: "/tender/manage",
+      href: "/tenders/manage",
       icon: <IconFileText size={15} />,
       label: "Manage tenders",
       color: "text-orange-400",
@@ -75,62 +74,33 @@ function DashboardLeftSidebar({
   ].filter(
     (l) => l.always || (l.adminOnly && isAdmin) || (l.vendorOnly && isVendor),
   );
+
   return (
     <aside
       className="hidden lg:flex flex-col shrink-0 border-r border-(--border) bg-(--bg-base) sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto"
       style={{ width: "20%" }}
     >
       <div className="p-4 space-y-6">
-        {/* Overview stats */}
         <div className="space-y-1">
           <p className="text-[10px] font-semibold text-(--text-faint) uppercase tracking-wider px-2 mb-2">
             Overview
           </p>
           {[
-            {
-              label: "Total tenders",
-              value: tendersLoading ? "—" : tenders.length,
-            },
-            {
-              label: "Active",
-              value: tendersLoading ? "—" : published.length,
-            },
-            {
-              label: "Closing soon",
-              value: tendersLoading ? "—" : closingSoon.length,
-            },
-            ...(isAdmin
-              ? [
-                  {
-                    label: "Vendors",
-                    value: vendorsLoading ? "—" : vendors.length,
-                  },
-                ]
-              : []),
-            ...(isVendor
-              ? [
-                  {
-                    label: "My bids",
-                    value: bidsLoading ? "—" : myBids.length,
-                  },
-                ]
-              : []),
+            { label: "Total tenders", value: tendersLoading ? "\u2014" : tenders.length },
+            { label: "Active", value: tendersLoading ? "\u2014" : published.length },
+            { label: "Closing soon", value: tendersLoading ? "\u2014" : closingSoon.length },
+            ...(isAdmin ? [{ label: "Vendors", value: vendorsLoading ? "\u2014" : vendors.length }] : []),
+            ...(isVendor ? [{ label: "My bids", value: bidsLoading ? "\u2014" : myBids.length }] : []),
           ].map((s) => (
-            <div
-              key={s.label}
-              className="flex items-center justify-between px-2 py-1.5"
-            >
+            <div key={s.label} className="flex items-center justify-between px-2 py-1.5">
               <span className="text-xs text-(--text-subtle)">{s.label}</span>
-              <span className="text-xs font-semibold text-(--text-primary) tabular-nums">
-                {s.value}
-              </span>
+              <span className="text-xs font-semibold text-(--text-primary) tabular-nums">{s.value}</span>
             </div>
           ))}
         </div>
 
         <div className="h-px bg-(--border)" />
 
-        {/* Quick Actions nav */}
         <div>
           <div className="flex items-center gap-2 px-2 mb-2">
             <IconLayoutDashboard size={12} className="text-(--text-faint)" />

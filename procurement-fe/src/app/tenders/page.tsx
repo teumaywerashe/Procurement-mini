@@ -277,7 +277,9 @@ function TendersPageContent() {
                 )}
               </div>
             ) : (
-              sorted.map((t) => <TenderRow key={t.id} tender={t} now={now} />)
+              <div className="py-2">
+                {sorted.map((t) => <TenderRow key={t.id} tender={t} now={now} />)}
+              </div>
             )}
           </div>
 

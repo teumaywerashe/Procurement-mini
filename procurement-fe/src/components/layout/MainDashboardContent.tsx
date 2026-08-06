@@ -133,7 +133,7 @@ function MainDashboardContent({
               recentTenders.map((t) => (
                 <Link
                   key={t.id}
-                  href={`/tender/${t.id}`}
+                  href={`/tenders/${t.id}`}
                   className="flex items-center justify-between px-5 py-3.5 border-b border-(--border-subtle) hover:bg-(--bg-elevated) transition-colors group"
                 >
                   <div className="min-w-0">
@@ -164,7 +164,7 @@ function MainDashboardContent({
           {isAdmin && (
             <div className="px-5 py-3 border-t border-(--border)">
               <Link
-                href="/tender/create"
+                href="/tenders/create"
                 className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
               >
                 <IconPlus size={13} /> Create new tender

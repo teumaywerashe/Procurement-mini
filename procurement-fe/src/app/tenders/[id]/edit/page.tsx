@@ -112,7 +112,7 @@ function EditForm({
       )}
       <div className="flex items-center gap-3 pt-2">
         <Link
-          href={`/tender/${tender.id}`}
+          href={`/tenders/${tender.id}`}
           className="flex-1 text-center py-2.5 rounded-lg border border-(--border-strong) text-sm text-(--text-muted) hover:text-(--text-primary) transition-colors"
         >
           Cancel
@@ -168,7 +168,7 @@ export default function EditTenderPage() {
       <Navbar />
       <div className="max-w-2xl mx-auto w-full px-6 py-8 mt-14 flex-1">
         <Link
-          href={`/tender/${id}`}
+          href={`/tenders/${id}`}
           className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors mb-6"
         >
           <IconArrowLeft size={16} /> Back to tender
@@ -184,7 +184,7 @@ export default function EditTenderPage() {
           </div>
           <EditForm
             tender={tender}
-            onSaved={() => router.push(`/tender/${id}`)}
+            onSaved={() => router.push(`/tenders/${id}`)}
           />
         </div>
       </div>

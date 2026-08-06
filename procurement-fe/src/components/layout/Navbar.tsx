@@ -35,7 +35,7 @@ export default function Navbar() {
         ...(isVendor ? [{ label: "My Bids", href: "/bids/my" }] : []),
         ...(isAdmin
           ? [
-              { label: "Manage", href: "/tender/manage" },
+              { label: "Manage", href: "/tenders/manage" },
               { label: "Vendors", href: "/vendors" },
               { label: "Bids", href: "/bids" },
             ]

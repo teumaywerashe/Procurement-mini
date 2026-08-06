@@ -35,7 +35,7 @@ export function middleware(req: NextRequest) {
   const isAdminRoute =
     ADMIN_ROUTES.some((route) => pathname.startsWith(route)) ||
     pathname === "/bids" ||
-    /^\/tender\/[^/]+\/edit$/.test(pathname);
+    /^\/tenders\/[^/]+\/edit$/.test(pathname);
 
   if (isAdminRoute) {
     if (!isLoggedIn) {
@@ -87,11 +87,12 @@ export const config = {
     "/tenders/manage/:path*",
     "/tenders/create/:path*",
     "/tenders/:path*/edit",
+    "/tenders/:path*",
     "/dashboard/:path*",
     "/vendors/:path*",
     "/profile/:path*",
-    "/registration",
     "/bids/:path*",
+    "/registration",
     "/login",
     "/",
   ],
