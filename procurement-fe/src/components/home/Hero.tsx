@@ -46,7 +46,7 @@ export default function Hero() {
             <Link href="/registration" className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors">
               Get started <IconArrowRight size={15} />
             </Link>
-            <Link href="/tender" className="flex items-center gap-2 border border-(--border-strong) text-(--text-subtle) hover:text-(--text-primary) hover:border-(--text-faint) text-sm font-medium px-6 py-2.5 rounded-lg transition-colors">
+            <Link href="/tenders" className="flex items-center gap-2 border border-(--border-strong) text-(--text-subtle) hover:text-(--text-primary) hover:border-(--text-faint) text-sm font-medium px-6 py-2.5 rounded-lg transition-colors">
               Browse tenders
             </Link>
           </div>
@@ -54,7 +54,7 @@ export default function Hero() {
           {/* Category pills */}
           <div className="flex flex-wrap gap-2">
             {categories.map((c) => (
-              <Link key={c.label} href="/tender"
+              <Link key={c.label} href="/tenders"
                 className="flex items-center gap-1.5 text-xs text-(--text-subtle) hover:text-(--text-primary) border border-(--border) hover:border-(--border-strong) bg-(--bg-surface) px-3 py-1.5 rounded-full transition-colors">
                 {c.icon}{c.label}
               </Link>

@@ -66,7 +66,7 @@ export default function ManageTendersPage() {
                   <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..."
                     className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none w-28 sm:w-36" />
                 </div>
-                <Link href="/tender/create" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0">
+                <Link href="/tenders/create" className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors shrink-0">
                   <IconPlus size={14} /> <span className="hidden sm:inline">New</span>
                 </Link>
               </div>

@@ -105,9 +105,11 @@ function MainDashboardContent({
         {/* Recent tenders */}
         <div className="bg-(--bg-surface) border border-(--border) rounded-xl overflow-hidden mb-6">
           <div className="px-5 py-4 border-b border-(--border) flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-(--text-primary)">Recent Tenders</h2>
+            <h2 className="text-sm font-semibold text-(--text-primary)">
+              Recent Tenders
+            </h2>
             <Link
-              href="/tender"
+              href="/tenders"
               className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
             >
               View all <IconChevronRight size={13} />

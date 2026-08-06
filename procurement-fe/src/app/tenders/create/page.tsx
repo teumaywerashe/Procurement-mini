@@ -78,7 +78,7 @@ export default function CreateTenderPage() {
       <Navbar />
       <div className="max-w-2xl mx-auto w-full px-6 py-8 mt-14 flex-1">
         <Link
-          href="/tender"
+          href="/tenders"
           className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors mb-6"
         >
           <IconArrowLeft size={16} /> Back to tenders
@@ -112,7 +112,7 @@ export default function CreateTenderPage() {
             )}
             <div className="flex items-center gap-3 pt-2">
               <Link
-                href="/tender"
+                href="/tenders"
                 className="flex-1 text-center py-2.5 rounded-lg border border-(--border-strong) text-sm text-(--text-muted) hover:text-(--text-primary) hover:border-(--border-strong) transition-colors"
               >
                 Cancel

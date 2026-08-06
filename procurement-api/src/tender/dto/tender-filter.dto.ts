@@ -11,10 +11,20 @@ export class TenderFilterDto {
   title?: string;
 
   @ApiPropertyOptional({
-    example: 100000,
+    example: 10000,
+    description: 'Minimum estimated value',
   })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  estimatedValue?: number;
+  minPrice?: number;
+
+  @ApiPropertyOptional({
+    example: 100000,
+    description: 'Maximum estimated value',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  maxPrice?: number;
 }

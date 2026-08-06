@@ -14,7 +14,7 @@ function decodeJwtPayload(
 
 const AUTH_ROUTES = ["/dashboard", "/profile"];
 
-const ADMIN_ROUTES = ["/tender/manage", "/tender/create", "/vendors"];
+const ADMIN_ROUTES = ["/tenders/manage", "/tenders/create", "/vendors"];
 
 const VENDOR_ROUTES = ["/bids/my"];
 
@@ -84,9 +84,9 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/tender/manage/:path*",
-    "/tender/create/:path*",
-    "/tender/:path*/edit",
+    "/tenders/manage/:path*",
+    "/tenders/create/:path*",
+    "/tenders/:path*/edit",
     "/dashboard/:path*",
     "/vendors/:path*",
     "/profile/:path*",

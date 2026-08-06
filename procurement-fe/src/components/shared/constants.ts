@@ -56,6 +56,9 @@ export function daysLeft(dateStr: Date | string ) {
   return `${days} day${days !== 1 ? "s" : ""} left`;
 }
 
+
+// 265264615
+
 export function daysLeftShort(dateStr: string, now: number) {
   const diff = new Date(dateStr).getTime() - now;
   const days = Math.ceil(diff / 86_400_000);

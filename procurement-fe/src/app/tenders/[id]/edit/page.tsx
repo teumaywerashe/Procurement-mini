@@ -154,7 +154,7 @@ export default function EditTenderPage() {
           <IconAlertTriangle size={40} className="text-red-400" />
           <p className="text-red-400">Tender not found.</p>
           <Link
-            href="/tender"
+            href="/tenders"
             className="text-indigo-400 hover:text-indigo-300"
           >
             ← Back to tenders

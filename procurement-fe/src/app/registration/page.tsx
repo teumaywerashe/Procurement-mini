@@ -48,7 +48,7 @@ export default function RegistrationPage() {
         const r = registerSchema.shape.password.safeParse(v);
         return r.success ? null : r.error.issues[0].message;
       },
-      confirmPassword: (v, values) => {
+      confirmPassword: (v , values) => {
         const r = registerSchema.safeParse({ ...values, confirmPassword: v });
         if (r.success) return null;
         const issue = r.error.issues.find(
@@ -67,7 +67,7 @@ export default function RegistrationPage() {
         password: values.password,
       }).unwrap();
       dispatch(logIn(result.user));
-      router.push("/tender");
+      router.push("/tenders");
     } catch (error: unknown) {
       console.log(error);
     }

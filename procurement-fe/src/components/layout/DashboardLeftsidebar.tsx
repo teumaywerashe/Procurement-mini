@@ -34,7 +34,7 @@ function DashboardLeftSidebar({
 }) {
   const quickLinks = [
     {
-      href: "/tender",
+      href: "/tenders",
       icon: <IconFileText size={15} />,
       label: "Browse tenders",
       color: "text-indigo-400",

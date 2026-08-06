@@ -48,7 +48,7 @@ export default function LoginPage() {
     try {
       const result: AuthResponse = await loginUser(values).unwrap();
       dispatch(logIn(result.user));
-      router.push("/tender");
+      router.push("/tenders");
     } catch (error: unknown) {
       console.log("error occurred", error);
     }

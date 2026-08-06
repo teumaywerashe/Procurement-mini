@@ -31,7 +31,7 @@ export default function Navbar() {
   const navLinks = isLoggedIn
     ? [
         { label: "Dashboard", href: "/dashboard" },
-        { label: "Tenders", href: "/tender" },
+        { label: "Tenders", href: "/tenders" },
         ...(isVendor ? [{ label: "My Bids", href: "/bids/my" }] : []),
         ...(isAdmin
           ? [
@@ -51,7 +51,12 @@ export default function Navbar() {
   }
 
   const initials = user?.name
-    ? user.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
     : "?";
 
   return (
@@ -60,7 +65,7 @@ export default function Navbar() {
         <div className="w-full px-4 sm:px-6 h-14 flex items-center gap-3">
           {/* Logo */}
           <Link
-            href={isLoggedIn ? "/tender" : "/"}
+            href={isLoggedIn ? "/tenders" : "/"}
             className="flex items-center gap-2 shrink-0 p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <IconShoppingBag size={22} className="text-[#9fef00]" />
@@ -102,14 +107,21 @@ export default function Navbar() {
             <button
               onClick={toggle}
               className="p-2 text-(--text-subtle) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors"
-              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              title={
+                theme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
             >
-              {theme === "dark" ? <IconSun size={18} /> : <IconMoon size={18} />}
+              {theme === "dark" ? (
+                <IconSun size={18} />
+              ) : (
+                <IconMoon size={18} />
+              )}
             </button>
 
             {isLoggedIn ? (
               <>
-               
                 {/* User avatar — desktop only shows name */}
                 <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-(--border)">
                   <Link
@@ -124,10 +136,17 @@ export default function Navbar() {
                       {initials}
                     </div>
                     <div className="hidden lg:block">
-                      <p className="text-xs font-medium text-(--text-primary) leading-none">{user?.name ?? "User"}</p>
-                      <p className="text-[10px] text-(--text-faint) capitalize leading-none mt-0.5">{user?.role ?? ""}</p>
+                      <p className="text-xs font-medium text-(--text-primary) leading-none">
+                        {user?.name ?? "User"}
+                      </p>
+                      <p className="text-[10px] text-(--text-faint) capitalize leading-none mt-0.5">
+                        {user?.role ?? ""}
+                      </p>
                     </div>
-                    <IconChevronDown size={12} className="text-(--text-faint)" />
+                    <IconChevronDown
+                      size={12}
+                      className="text-(--text-faint)"
+                    />
                   </Link>
                   <button
                     onClick={handleLogout}
@@ -137,7 +156,6 @@ export default function Navbar() {
                   </button>
                 </div>
 
-             
                 <button
                   onClick={() => setMenuOpen((v) => !v)}
                   className="md:hidden p-2 text-(--text-subtle) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors"
@@ -170,9 +188,11 @@ export default function Navbar() {
         </div>
       </header>
 
-   
       {isLoggedIn && menuOpen && (
-        <div className="fixed inset-0 z-30 md:hidden" onClick={() => setMenuOpen(false)}>
+        <div
+          className="fixed inset-0 z-30 md:hidden"
+          onClick={() => setMenuOpen(false)}
+        >
           <div className="absolute inset-0 bg-black/40" />
           <nav
             className="absolute top-14 left-0 right-0 bg-(--bg-base) border-b border-(--border) shadow-xl px-4 py-4 space-y-1"
@@ -205,8 +225,12 @@ export default function Navbar() {
                 {initials}
               </div>
               <div>
-                <p className="text-sm font-medium text-(--text-primary)">{user?.name ?? "User"}</p>
-                <p className="text-xs text-(--text-faint) capitalize">{user?.role ?? ""}</p>
+                <p className="text-sm font-medium text-(--text-primary)">
+                  {user?.name ?? "User"}
+                </p>
+                <p className="text-xs text-(--text-faint) capitalize">
+                  {user?.role ?? ""}
+                </p>
               </div>
             </Link>
             <button

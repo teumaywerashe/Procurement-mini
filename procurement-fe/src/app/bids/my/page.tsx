@@ -111,7 +111,7 @@ export default function MyBidsPage() {
                   </p>
                   {bids.length === 0 && (
                     <Link
-                      href="/tender"
+                      href="/tenders"
                       className="flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors mt-1"
                     >
                       <IconFileText size={13} /> Browse tenders

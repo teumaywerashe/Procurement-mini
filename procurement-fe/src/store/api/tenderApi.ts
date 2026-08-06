@@ -3,7 +3,10 @@ import type { Tender } from "@/src/types";
 
 export const tenderApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getTenders: builder.query<Tender[], { title?: string; estimatedValue?: number }>({
+    getTenders: builder.query<
+      Tender[],
+      { title?: string; minPrice?: number; maxPrice?: number }
+    >({
       query: (params = {}) => ({ url: "/tender/all", params }),
       providesTags: ["Tender"],
     }),
@@ -12,17 +15,21 @@ export const tenderApi = baseApi.injectEndpoints({
       providesTags: (_r, _e, id) => [{ type: "Tender", id }],
     }),
     createTender: builder.mutation<Tender, Partial<Tender>>({
-      query: (body) => ({ url: "/tender", method: "POST", body }),
+      query: (body) => ({ url: "/tenders", method: "POST", body }),
       invalidatesTags: ["Tender"],
     }),
     updateTender: builder.mutation<Tender, { id: number } & Partial<Tender>>({
-      query: ({ id, ...body }) => ({ url: `/tender/${id}`, method: "PATCH", body }),
+      query: ({ id, ...body }) => ({
+        url: `/tender/${id}`,
+        method: "PATCH",
+        body,
+      }),
       invalidatesTags: (_r, _e, { id }) => ["Tender", { type: "Tender", id }],
       async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
         try {
           const { data: updated } = await queryFulfilled;
           dispatch(
-            tenderApi.util.updateQueryData("getTender", id, () => updated)
+            tenderApi.util.updateQueryData("getTender", id, () => updated),
           );
         } catch {}
       },

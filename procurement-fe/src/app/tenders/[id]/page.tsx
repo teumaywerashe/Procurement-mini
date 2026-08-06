@@ -29,7 +29,7 @@ export default function TenderDetailPage() {
     try {
       await deleteTender(Number(id)).unwrap();
       notifications.show({ title: "Tender Deleted", message: "Tender has been deleted successfully.", color: "green" });
-      router.push("/tender");
+      router.push("/tenders");
     } catch {
       notifications.show({ title: "Error", message: "Failed to delete tender.", color: "red" });
     }
@@ -47,7 +47,7 @@ export default function TenderDetailPage() {
       <div className="flex-1 flex flex-col items-center justify-center gap-4 text-sm">
         <IconAlertTriangle size={40} className="text-red-400" />
         <p className="text-red-400">Tender not found or failed to load.</p>
-        <Link href="/tender" className="text-indigo-400 hover:text-indigo-300 transition-colors">← Back to tenders</Link>
+        <Link href="/tenders" className="text-indigo-400 hover:text-indigo-300 transition-colors">← Back to tenders</Link>
       </div>
     </div>
   );
@@ -58,7 +58,7 @@ export default function TenderDetailPage() {
     <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
       <Navbar />
       <div className="max-w-4xl mx-auto w-full px-6 py-8 mt-14 flex-1">
-        <Link href="/tender" className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors mb-6">
+        <Link href="/tenders" className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors mb-6">
           <IconArrowLeft size={16} /> Back to tenders
         </Link>
 

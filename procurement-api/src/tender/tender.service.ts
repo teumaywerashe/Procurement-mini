@@ -4,7 +4,7 @@ import { UpdateTenderDto } from './dto/update-tender.dto';
 import { JwtPayload } from '../auth/decorators/types';
 import { db } from '../database/db';
 import { tender } from '../database/schema/tender.schema';
-import { eq, and, desc, ilike, lte } from 'drizzle-orm';
+import { eq, and, desc, ilike, lte, gte } from 'drizzle-orm';
 import { TenderFilterDto } from './dto/tender-filter.dto';
 
 @Injectable()
@@ -45,8 +45,12 @@ export class TenderService {
       conditions.push(ilike(tender.title, `%${filter.title}%`));
     }
 
-    if (filter.estimatedValue) {
-      conditions.push(lte(tender.estimatedValue, filter.estimatedValue));
+    if (filter.minPrice !== undefined) {
+      conditions.push(gte(tender.estimatedValue, filter.minPrice));
+    }
+
+    if (filter.maxPrice !== undefined) {
+      conditions.push(lte(tender.estimatedValue, filter.maxPrice));
     }
 
     const tenders = await db
