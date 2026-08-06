@@ -53,7 +53,10 @@ export class VendorController {
   @Patch(':id')
   @AdminOrOwner()
   @ApiOperation({ summary: 'Update a vendor by ID' })
-  async updateVendor(id: string, updateVendorDto: UpdateVendorDto) {
+  async updateVendor(
+    @Param('id') id: string,
+    @Body() updateVendorDto: UpdateVendorDto,
+  ) {
     return await this.vendorService.updateVendor(id, updateVendorDto);
   }
 

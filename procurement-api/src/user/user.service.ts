@@ -10,7 +10,6 @@ import * as bcrypt from 'bcryptjs';
 function omitPassword<T extends { password?: string }>(
   user: T,
 ): Omit<T, 'password'> {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password: _pw, ...safe } = user;
   return safe;
 }
