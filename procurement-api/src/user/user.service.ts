@@ -7,6 +7,14 @@ import { users } from '../database/schema/user.schema';
 import { db } from '../database/db';
 import * as bcrypt from 'bcryptjs';
 
+function omitPassword<T extends { password?: string }>(
+  user: T,
+): Omit<T, 'password'> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { password: _pw, ...safe } = user;
+  return safe;
+}
+
 @Injectable()
 export class UserService {
   constructor() {}
@@ -29,23 +37,29 @@ export class UserService {
       .values(CreateUserDto)
       .returning()
       .execute();
-    return newUser;
+    return newUser.map(omitPassword);
   }
 
   async findAll() {
-    return await db.select().from(users).execute();
+    const allUsers = await db.select().from(users).execute();
+    return allUsers.map(omitPassword);
   }
 
   async findOne(id: string) {
-    return await db
+    const result = await db
       .select()
       .from(users)
       .where(eq(users.id, id as any as number))
       .execute();
+    return result.map(omitPassword);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    const [user] = await this.findOne(id);
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id as any as number))
+      .execute();
     if (!user) {
       throw new BadRequestException('User not found');
     }
@@ -58,18 +72,19 @@ export class UserService {
       .where(eq(users.id, id as any as number))
       .returning()
       .execute();
-    return { updated, success: true, message: 'User updated successfully' };
+    return {
+      updated: omitPassword(updated),
+      success: true,
+      message: 'User updated successfully',
+    };
   }
-  //   return await db
-  //     .update(users)
-  //     .set(updateUserDto as any as Partial<typeof users>)
-  //     .where(eq(users.id, id as any as number))
-  //     .returning()
-  //     .execute();
-  // }
 
   async remove(id: string) {
-    const [user] = await this.findOne(id);
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id as any as number))
+      .execute();
     if (!user) {
       throw new BadRequestException('User not found');
     }
@@ -79,7 +94,7 @@ export class UserService {
       .returning()
       .execute();
     return {
-      deleted: deleted,
+      deleted: omitPassword(deleted),
       success: true,
       message: 'User deleted successfully',
     };

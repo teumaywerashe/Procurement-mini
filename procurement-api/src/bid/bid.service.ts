@@ -12,6 +12,8 @@ import type { JwtPayload } from '../auth/decorators/types';
 import { eq } from 'drizzle-orm';
 import { vendor } from '../database/schema/vendor.schema';
 
+import { UserRole } from '../user/enum/userRole..enum';
+
 @Injectable()
 export class BidService {
   async create(createBidDto: CreateBidDto, user: JwtPayload) {
@@ -76,7 +78,7 @@ export class BidService {
     return bidById;
   }
 
-  async update(id: number, updateBidDto: UpdateBidDto) {
+  async update(id: number, updateBidDto: UpdateBidDto, user: JwtPayload) {
     if (!id) {
       throw new BadRequestException('Bid ID is required for update');
     }
@@ -95,6 +97,12 @@ export class BidService {
       .limit(1);
     if (!updatingVendor) {
       throw new UnauthorizedException('Vendor not found');
+    }
+    // Only the bid owner or an admin may update
+    if (user.role !== UserRole.ADMIN && updatingVendor.ownerId !== user.uid) {
+      throw new UnauthorizedException(
+        'You are not allowed to update this bid.',
+      );
     }
     const [updatedBid] = await db
       .update(bid)

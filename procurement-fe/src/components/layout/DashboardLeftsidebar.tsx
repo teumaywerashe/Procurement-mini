@@ -86,15 +86,35 @@ function DashboardLeftSidebar({
             Overview
           </p>
           {[
-            { label: "Total tenders", value: tendersLoading ? "\u2014" : tenders.length },
-            { label: "Active", value: tendersLoading ? "\u2014" : published.length },
-            { label: "Closing soon", value: tendersLoading ? "\u2014" : closingSoon.length },
-            ...(isAdmin ? [{ label: "Vendors", value: vendorsLoading ? "\u2014" : vendors.length }] : []),
-            ...(isVendor ? [{ label: "My bids", value: bidsLoading ? "\u2014" : myBids.length }] : []),
+            {
+              label: "Total tenders",
+              value: tendersLoading ? "—" : tenders.length,
+            },
+            { label: "Active", value: tendersLoading ? "—" : published.length },
+            {
+              label: "Closing soon",
+              value: tendersLoading ? "—" : closingSoon.length,
+            },
+            ...(isAdmin
+              ? [
+                  {
+                    label: "Vendors",
+                    value: vendorsLoading ? "—" : vendors.length,
+                  },
+                ]
+              : []),
+            ...(isVendor
+              ? [{ label: "My bids", value: bidsLoading ? "—" : myBids.length }]
+              : []),
           ].map((s) => (
-            <div key={s.label} className="flex items-center justify-between px-2 py-1.5">
+            <div
+              key={s.label}
+              className="flex items-center justify-between px-2 py-1.5"
+            >
               <span className="text-xs text-(--text-subtle)">{s.label}</span>
-              <span className="text-xs font-semibold text-(--text-primary) tabular-nums">{s.value}</span>
+              <span className="text-xs font-semibold text-(--text-primary) tabular-nums">
+                {s.value}
+              </span>
             </div>
           ))}
         </div>

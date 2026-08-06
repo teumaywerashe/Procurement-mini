@@ -16,11 +16,12 @@ import type { JwtPayload } from '../auth/decorators/types';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { AdminOrOwnerGuard } from '../auth/guards/adminOrOwner.guard';
 import { UserRole } from '../user/enum/userRole..enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AdminOrOwner } from '../auth/decorators/adminOrOwner.decorator';
 @ApiTags('Bid')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwnerGuard)
 @Controller('bid')
 export class BidController {
   constructor(private readonly bidService: BidService) {}
@@ -59,17 +60,25 @@ export class BidController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a bid by ID (Bid Owner only)' })
   @AdminOrOwner()
-  update(@Param('id') id: number, @Body() updateBidDto: UpdateBidDto) {
-    return this.bidService.update(+id, updateBidDto);
+  update(
+    @Param('id') id: number,
+    @Body() updateBidDto: UpdateBidDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.bidService.update(+id, updateBidDto, user);
   }
 
   @Patch(':id/status')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update bid status by ID (Admin only)' })
-  updateBidStatus(@Param('id') id: number, @Body('status') status: string) {
+  updateBidStatus(
+    @Param('id') id: number,
+    @Body('status') status: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
     const updateBidDto = new UpdateBidDto();
     updateBidDto.bidStatus = status as 'pending' | 'accepted' | 'rejected';
-    return this.bidService.update(+id, updateBidDto);
+    return this.bidService.update(+id, updateBidDto, user);
   }
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a bid by ID (Bid Owner only)' })
