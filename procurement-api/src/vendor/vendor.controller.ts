@@ -15,7 +15,7 @@ import { ApiOperation } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/decorators/types';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../user/enum/userRole..enum';
+import { UserRole } from '../user/enum/userRole.enum';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
@@ -36,9 +36,9 @@ export class VendorController {
   }
 
   @Get()
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN)
   @ApiOperation({
-    summary: 'Get all vendors with pagination/search (admin only)',
+    summary: 'Get all vendors with pagination/search (super admin only)',
   })
   findAll(@Query() query: CollectionQueryDto) {
     return this.vendorService.findAll(query);
@@ -57,7 +57,7 @@ export class VendorController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a vendor (owner or admin)' })
+  @ApiOperation({ summary: 'Update a vendor (owner or super admin)' })
   updateVendor(
     @Param('id') id: string,
     @Body() updateVendorDto: UpdateVendorDto,
@@ -67,7 +67,8 @@ export class VendorController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a vendor (owner or admin)' })
+  @Roles(UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Delete a vendor (super_admin only)' })
   deleteVendor(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.vendorService.deleteVendor(+id, user);
   }

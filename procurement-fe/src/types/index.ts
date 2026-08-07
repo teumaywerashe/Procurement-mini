@@ -44,7 +44,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  role: "Admin" | "Vendor";
+  role: "SuperAdmin" | "Admin" | "Vendor";
   createdAt: Date;
 }
 

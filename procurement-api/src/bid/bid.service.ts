@@ -14,7 +14,7 @@ import type { JwtPayload } from '../auth/decorators/types';
 import { eq } from 'drizzle-orm';
 import { vendor } from '../database/schema/vendor.schema';
 import { tender } from '../database/schema/tender.schema';
-import { UserRole } from '../user/enum/userRole..enum';
+import { UserRole } from '../user/enum/userRole.enum';
 
 @Injectable()
 export class BidService {
@@ -51,10 +51,20 @@ export class BidService {
   }
 
   async findAll(user: JwtPayload) {
-    // Each admin sees only bids submitted on their own tenders
+    // SUPER_ADMIN sees all bids system-wide
+    if (user.role === UserRole.SUPER_ADMIN) {
+      return await db.query.bid.findMany({
+        with: { tender: true, vendor: true },
+      });
+    }
+    // ADMIN sees bids only on their own tenders
     const adminTenders = await db.query.tender.findMany({
       where: { createdBy: user.uid },
-      with: { bids: true },
+      with: {
+        bids: {
+          with: { vendor: true },
+        },
+      },
     });
     return adminTenders.flatMap((t) =>
       t.bids.map((b) => ({ ...b, tender: t })),
@@ -73,36 +83,53 @@ export class BidService {
     }
     return await db.query.bid.findMany({
       where: { vendorId: existingVendor.id },
-      with: { tender: true },
+      with: { tender: true, vendor: true },
     });
   }
 
   async findByTenderId(tenderId: number, user: JwtPayload) {
-    // Verify the tender belongs to this admin
     const ownedTender = await db.query.tender.findFirst({
       where: { id: tenderId },
     });
     if (!ownedTender) {
       throw new NotFoundException(`Tender ${tenderId} not found`);
     }
-    if (ownedTender.createdBy !== user.uid) {
+    // SUPER_ADMIN can view bids on any tender; ADMIN can only view bids on their own tenders
+    if (
+      user.role !== UserRole.SUPER_ADMIN &&
+      ownedTender.createdBy !== user.uid
+    ) {
       throw new ForbiddenException(
         'You can only view bids on your own tenders',
       );
     }
     return await db.query.bid.findMany({
       where: { tenderId },
-      with: { tender: true },
+      with: { tender: true, vendor: true },
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, user: JwtPayload) {
     const bidById = await db.query.bid.findFirst({
       where: { id },
-      with: { tender: true },
+      with: { tender: true, vendor: true },
     });
     if (!bidById) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
+    }
+    if (user.role === UserRole.SUPER_ADMIN) {
+      return bidById;
+    }
+    if (user.role === UserRole.ADMIN) {
+      if (bidById.tender?.createdBy !== user.uid) {
+        throw new ForbiddenException(
+          'You can only view bids applied to your own tenders',
+        );
+      }
+      return bidById;
+    }
+    if (bidById.vendor?.ownerId !== user.uid) {
+      throw new ForbiddenException('You can only view your own bids');
     }
     return bidById;
   }
@@ -119,20 +146,29 @@ export class BidService {
     if (!foundBid) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }
-    const [updatingVendor] = await db
-      .select()
-      .from(vendor)
-      .where(eq(vendor.id, foundBid.vendorId))
-      .limit(1);
-    if (!updatingVendor) {
-      throw new UnauthorizedException('Vendor not found');
+
+    if (user.role === UserRole.ADMIN) {
+      const ownedTender = await db.query.tender.findFirst({
+        where: { id: foundBid.tenderId },
+      });
+      if (!ownedTender || ownedTender.createdBy !== user.uid) {
+        throw new ForbiddenException(
+          'You can only update bids applied to your own tenders',
+        );
+      }
+    } else if (user.role !== UserRole.SUPER_ADMIN) {
+      const [updatingVendor] = await db
+        .select()
+        .from(vendor)
+        .where(eq(vendor.id, foundBid.vendorId))
+        .limit(1);
+      if (!updatingVendor || updatingVendor.ownerId !== user.uid) {
+        throw new ForbiddenException(
+          'You are not allowed to update this bid.',
+        );
+      }
     }
-    // Only the bid owner or an admin may update
-    if (user.role !== UserRole.ADMIN && updatingVendor.ownerId !== user.uid) {
-      throw new UnauthorizedException(
-        'You are not allowed to update this bid.',
-      );
-    }
+
     const [updatedBid] = await db
       .update(bid)
       .set(updateBidDto)

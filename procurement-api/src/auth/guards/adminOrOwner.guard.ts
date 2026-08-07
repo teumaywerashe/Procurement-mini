@@ -1,5 +1,3 @@
-// common/guards/admin-or-owner.guard.ts
-
 import {
   CanActivate,
   ExecutionContext,
@@ -9,8 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { JwtPayload } from '../decorators/types';
-import { UserRole } from '../../user/enum/userRole..enum';
-// import { UserRole } from '../enum/userRole..enum';
+import { UserRole } from '../../user/enum/userRole.enum';
 
 @Injectable()
 export class AdminOrOwnerGuard implements CanActivate {
@@ -22,26 +19,22 @@ export class AdminOrOwnerGuard implements CanActivate {
       context.getHandler(),
     );
 
-    if (!enabled) {
-      return true;
-    }
+    if (!enabled) return true;
 
     const request = context
       .switchToHttp()
       .getRequest<Request & { user: JwtPayload }>();
 
-    const user = request.user; // Comes from JwtAuthGuard
+    const user = request.user;
     const userId = request.params.id;
 
-    // Admin can do everything
-    if (user.role === UserRole.ADMIN) {
+    // SUPER_ADMIN and ADMIN can access any resource
+    if (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN) {
       return true;
     }
 
     // Owner can access their own resource
-    if (String(user.uid) === userId) {
-      return true;
-    }
+    if (String(user.uid) === userId) return true;
 
     throw new ForbiddenException('You are not allowed to perform this action.');
   }

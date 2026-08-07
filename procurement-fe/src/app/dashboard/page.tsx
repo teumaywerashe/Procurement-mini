@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const { user } = useSelector((s: RootState) => s.auth);
   const isAdmin = user?.role === "Admin";
   const isVendor = user?.role === "Vendor";
+  const isSuperAdmin = user?.role === "SuperAdmin";
 
   const { data: tendersResult, isLoading: tendersLoading } = useGetTendersQuery(
     { limit: 100 },
@@ -28,7 +29,7 @@ export default function DashboardPage() {
   const tenders = tendersResult?.data ?? [];
   const { data: vendorsResult, isLoading: vendorsLoading } = useGetVendorsQuery(
     { limit: 100 },
-    { skip: !isAdmin },
+    { skip: !isSuperAdmin },
   );
   const vendors = vendorsResult?.data ?? [];
   const { data: vendor } = useGetMyVendorQuery(undefined, {
@@ -66,6 +67,7 @@ export default function DashboardPage() {
           tenders={tenders}
           isVendor={isVendor}
           isAdmin={isAdmin}
+          isSuperAdmin={isSuperAdmin}
           closingSoon={closingSoon}
           bidsLoading={bidsLoading}
           myBids={myBids}
@@ -79,6 +81,7 @@ export default function DashboardPage() {
           user={user}
           isAdmin={isAdmin}
           isVendor={isVendor}
+          isSuperAdmin={isSuperAdmin}
           tenders={tenders}
           tendersLoading={tendersLoading}
           published={published}

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
-import { UserRole } from '../../user/enum/userRole..enum';
+import { UserRole } from '../../user/enum/userRole.enum';
 import { JwtPayload } from '../decorators/types';
 
 @Injectable()
@@ -19,32 +19,27 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
     );
 
-    if (!requiredRoles) {
-      return true;
-    }
+    if (!requiredRoles) return true;
 
     const request = context
       .switchToHttp()
       .getRequest<Request & { user?: JwtPayload }>();
 
     const user = request.user;
-
     if (!user) {
       throw new ForbiddenException(
         'User information is missing in the request context',
       );
     }
 
-    const roleMatches = this.matchRoles(requiredRoles, user.role);
-    if (!roleMatches) {
+    // SUPER_ADMIN has unrestricted access everywhere
+    if (user.role === UserRole.SUPER_ADMIN) return true;
+
+    if (!requiredRoles.includes(user.role)) {
       throw new ForbiddenException(
-        'you do not have permission to access this resource',
+        'You do not have permission to access this resource',
       );
     }
     return true;
-  }
-
-  private matchRoles(requiredRoles: UserRole[], userRole: UserRole): boolean {
-    return requiredRoles.includes(userRole);
   }
 }

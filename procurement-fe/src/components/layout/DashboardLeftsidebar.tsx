@@ -13,6 +13,7 @@ function DashboardLeftSidebar({
   tenders,
   closingSoon,
   isAdmin,
+  isSuperAdmin,
   isVendor,
   bidsLoading,
   myBids,
@@ -24,6 +25,7 @@ function DashboardLeftSidebar({
   tenders: any[];
   closingSoon: any[];
   isAdmin: boolean;
+  isSuperAdmin?: boolean;
   isVendor: boolean;
   bidsLoading: boolean;
   myBids: any[];
@@ -69,10 +71,14 @@ function DashboardLeftSidebar({
       label: "Manage vendors",
       color: "text-purple-400",
       always: false,
-      adminOnly: true,
+      superAdminOnly: true,
     },
   ].filter(
-    (l) => l.always || (l.adminOnly && isAdmin) || (l.vendorOnly && isVendor),
+    (l) =>
+      l.always ||
+      (l.adminOnly && isAdmin) ||
+      (l.superAdminOnly && isSuperAdmin) ||
+      (l.vendorOnly && isVendor),
   );
 
   return (
@@ -95,7 +101,7 @@ function DashboardLeftSidebar({
               label: "Closing soon",
               value: tendersLoading ? "—" : closingSoon.length,
             },
-            ...(isAdmin
+            ...(isSuperAdmin
               ? [
                   {
                     label: "Vendors",

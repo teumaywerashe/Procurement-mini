@@ -14,7 +14,9 @@ function decodeJwtPayload(
 
 const AUTH_ROUTES = ["/dashboard", "/profile"];
 
-const ADMIN_ROUTES = ["/tenders/manage", "/tenders/create", "/vendors"];
+const ADMIN_ROUTES = ["/tenders/manage", "/tenders/create"];
+
+const SUPER_ADMIN_ROUTES = ["/vendors", "/users"];
 
 const VENDOR_ROUTES = ["/bids/my"];
 
@@ -29,8 +31,25 @@ export function middleware(req: NextRequest) {
   const isLoggedIn = !!payload?.uid;
   const role = payload?.role;
 
-  const isAdmin = role === "Admin";
+  const isAdmin = role === "Admin" || role === "SuperAdmin";
+  const isSuperAdmin = role === "SuperAdmin";
   const isVendor = role === "Vendor";
+
+  const isSuperAdminRoute = SUPER_ADMIN_ROUTES.some((route) =>
+    pathname.startsWith(route),
+  );
+
+  if (isSuperAdminRoute) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+
+    if (!isSuperAdmin) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    return NextResponse.next();
+  }
 
   const isAdminRoute =
     ADMIN_ROUTES.some((route) => pathname.startsWith(route)) ||

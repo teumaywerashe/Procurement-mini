@@ -13,7 +13,7 @@ import { db } from '../database/db';
 import { vendor } from '../database/schema/vendor.schema';
 import { JwtPayload } from '../auth/decorators/types';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
-import { UserRole } from '../user/enum/userRole..enum';
+import { UserRole } from '../user/enum/userRole.enum';
 import { CollectionQueryDto } from '../common/dto/collection-query.dto';
 import type { CollectionResult } from '../common/dto/collection-result';
 
@@ -128,8 +128,11 @@ export class VendorService {
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
     }
-    // Vendors can only view their own profile; admins can view any
-    if (user.role !== UserRole.ADMIN && existingVendor.ownerId !== user.uid) {
+    // Vendors can only view their own profile; super admin can view any
+    if (
+      user.role !== UserRole.SUPER_ADMIN &&
+      existingVendor.ownerId !== user.uid
+    ) {
       throw new ForbiddenException('You can only view your own vendor profile');
     }
     return existingVendor;
@@ -163,7 +166,10 @@ export class VendorService {
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
     }
-    if (user.role !== UserRole.ADMIN && existingVendor.ownerId !== user.uid) {
+    if (
+      user.role !== UserRole.SUPER_ADMIN &&
+      existingVendor.ownerId !== user.uid
+    ) {
       throw new ForbiddenException(
         'You can only update your own vendor profile',
       );
@@ -184,7 +190,10 @@ export class VendorService {
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
     }
-    if (user.role !== UserRole.ADMIN && existingVendor.ownerId !== user.uid) {
+    if (
+      user.role !== UserRole.SUPER_ADMIN &&
+      existingVendor.ownerId !== user.uid
+    ) {
       throw new ForbiddenException(
         'You can only delete your own vendor profile',
       );

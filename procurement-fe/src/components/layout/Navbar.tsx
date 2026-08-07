@@ -21,27 +21,34 @@ export default function Navbar() {
   const { isLoggedIn, user } = useSelector((state: RootState) => state.auth);
   const isAdmin = user?.role === "Admin";
   const isVendor = user?.role === "Vendor";
+  const isSuperAdmin = user?.role === "SuperAdmin";
+
+  const navLinks = isLoggedIn
+    ? [
+        { label: "Dashboard", href: "/dashboard" },
+        ...(isSuperAdmin
+          ? [
+              { label: "Vendors", href: "/vendors" },
+              { label: "Users", href: "/users" },
+            ]
+          : []),
+        ...(!isSuperAdmin ? [{ label: "Tenders", href: "/tenders" }] : []),
+        ...(isVendor ? [{ label: "My Bids", href: "/bids/my" }] : []),
+        ...(isAdmin
+          ? [
+              { label: "Manage", href: "/tenders/manage" },
+              // { label: "Vendors", href: "/vendors" },
+              { label: "Bids", href: "/bids" },
+            ]
+          : []),
+      ]
+    : [];
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
   const [logoutApi] = useLogoutMutation();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const navLinks = isLoggedIn
-    ? [
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Tenders", href: "/tenders" },
-        ...(isVendor ? [{ label: "My Bids", href: "/bids/my" }] : []),
-        ...(isAdmin
-          ? [
-              { label: "Manage", href: "/tenders/manage" },
-              { label: "Vendors", href: "/vendors" },
-              { label: "Bids", href: "/bids" },
-            ]
-          : []),
-      ]
-    : [];
 
   async function handleLogout() {
     await logoutApi();

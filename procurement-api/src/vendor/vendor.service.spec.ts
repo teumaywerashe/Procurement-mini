@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { VendorService } from './vendor.service';
-import { UserRole } from '../user/enum/userRole..enum';
+import { UserRole } from '../user/enum/userRole.enum';
 import type { JwtPayload } from '../auth/decorators/types';
 
 const mockDb = {
@@ -76,24 +76,18 @@ describe('VendorService', () => {
     it('throws ConflictException if registration number already exists', async () => {
       mockDb.select
         .mockReturnValueOnce({
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest
-                .fn()
-                .mockReturnValue({ execute: jest.fn().mockResolvedValue([]) }),
-            }),
+          from: jest.fn().mockReturnValue({
+            where: jest
+              .fn()
+              .mockReturnValue({ execute: jest.fn().mockResolvedValue([]) }),
+          }),
         })
         .mockReturnValueOnce({
-          from: jest
-            .fn()
-            .mockReturnValue({
-              where: jest
-                .fn()
-                .mockReturnValue({
-                  execute: jest.fn().mockResolvedValue([{ id: 1 }]),
-                }),
+          from: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({
+              execute: jest.fn().mockResolvedValue([{ id: 1 }]),
             }),
+          }),
         });
 
       await expect(
@@ -104,24 +98,18 @@ describe('VendorService', () => {
     it('creates a vendor successfully', async () => {
       const newVendor = { id: 1, ...dto, ownerId: adminUser.uid };
       mockDb.select.mockReturnValue({
-        from: jest
-          .fn()
-          .mockReturnValue({
-            where: jest
-              .fn()
-              .mockReturnValue({ execute: jest.fn().mockResolvedValue([]) }),
-          }),
+        from: jest.fn().mockReturnValue({
+          where: jest
+            .fn()
+            .mockReturnValue({ execute: jest.fn().mockResolvedValue([]) }),
+        }),
       });
       mockDb.insert.mockReturnValue({
-        values: jest
-          .fn()
-          .mockReturnValue({
-            returning: jest
-              .fn()
-              .mockReturnValue({
-                execute: jest.fn().mockResolvedValue([newVendor]),
-              }),
+        values: jest.fn().mockReturnValue({
+          returning: jest.fn().mockReturnValue({
+            execute: jest.fn().mockResolvedValue([newVendor]),
           }),
+        }),
       });
 
       const result = await service.create(dto as any, adminUser);

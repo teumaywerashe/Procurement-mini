@@ -16,11 +16,12 @@ import { ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../user/enum/userRole..enum';
+// import { UserRole } from '';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { TenderFilterDto } from './dto/tender-filter.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import type { JwtPayload } from '../auth/decorators/types';
+import { UserRole } from '../user/enum/userRole.enum';
 
 @Controller('tender')
 @ApiTags('Tenders')
@@ -64,7 +65,7 @@ export class TenderController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.tenderService.remove(+id, user);
   }

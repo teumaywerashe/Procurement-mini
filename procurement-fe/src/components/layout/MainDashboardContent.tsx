@@ -15,6 +15,7 @@ import StatusCard from "@/src/components/cards/StatusCard";
 interface MainDashboardContentProps {
   user: { name?: string; role?: string } | null;
   isAdmin: boolean;
+  isSuperAdmin?: boolean;
   isVendor: boolean;
   tenders: any[];
   tendersLoading: boolean;
@@ -32,6 +33,7 @@ interface MainDashboardContentProps {
 function MainDashboardContent({
   user,
   isAdmin,
+  isSuperAdmin,
   isVendor,
   tenders,
   tendersLoading,
@@ -74,7 +76,7 @@ function MainDashboardContent({
             sub="Within 7 days"
             color="bg-orange-950/60"
           />
-          {isAdmin ? (
+          {isSuperAdmin ? (
             <StatusCard
               icon={<IconUsers size={18} className="text-emerald-400" />}
               label="Registered Vendors"

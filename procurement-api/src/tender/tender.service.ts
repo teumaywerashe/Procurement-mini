@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   ForbiddenException,
@@ -13,8 +13,12 @@ import { db } from '../database/db';
 import { tender } from '../database/schema/tender.schema';
 import { eq, and, desc, asc, ilike, lte, gte, SQL, count } from 'drizzle-orm';
 import { TenderFilterDto } from './dto/tender-filter.dto';
-import { UserRole } from '../user/enum/userRole..enum';
+import { UserRole } from '../user/enum/userRole.enum';
 import type { CollectionResult } from '../common/dto/collection-result';
+
+function isAdminLike(user?: JwtPayload) {
+  return user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
+}
 
 @Injectable()
 export class TenderService {
@@ -32,11 +36,16 @@ export class TenderService {
   }
 
   async findAll(user: JwtPayload) {
-    const isAdmin = user.role === UserRole.ADMIN;
+    const adminLike = isAdminLike(user);
+
+    // ADMIN scoped to their own tenders; SUPER_ADMIN and VENDOR see all
+    const whereClause =
+      user.role === UserRole.ADMIN ? eq(tender.createdBy, user.uid) : undefined;
+
     const rows = await db
       .select()
       .from(tender)
-      .where(isAdmin ? eq(tender.createdBy, user.uid) : undefined)
+      .where(whereClause)
       .orderBy(desc(tender.createdAt));
 
     const ids = rows.map((r) => r.id);
@@ -44,7 +53,8 @@ export class TenderService {
 
     const withRelations = await db.query.tender.findMany({
       where: { id: { in: ids } },
-      with: { user: true, ...(isAdmin ? { bids: true } : {}) },
+      // Admins get bids included; vendors/public get tenders only
+      with: { user: true, ...(adminLike ? { bids: true } : {}) },
     });
     return ids.map((id) => withRelations.find((t) => t.id === id)!);
   }
@@ -53,14 +63,16 @@ export class TenderService {
     filter: TenderFilterDto,
     user: JwtPayload,
   ): Promise<CollectionResult<any>> {
-    const isAdmin = user.role === UserRole.ADMIN;
+    const adminLike = isAdminLike(user);
     const page = filter.page ?? 1;
-    const limit = filter.limit ?? 20;
+    const limit = filter.limit ?? 10;
     const offset = (page - 1) * limit;
 
-    // Build WHERE conditions
     const conditions: SQL[] = [];
-    if (isAdmin) conditions.push(eq(tender.createdBy, user.uid));
+    // ADMIN scoped to their own; SUPER_ADMIN sees all
+    if (user.role === UserRole.ADMIN) {
+      conditions.push(eq(tender.createdBy, user.uid));
+    }
 
     const searchTerm = filter.q ?? filter.title;
     if (searchTerm) conditions.push(ilike(tender.title, `%${searchTerm}%`));
@@ -71,7 +83,6 @@ export class TenderService {
 
     const where = conditions.length ? and(...conditions) : undefined;
 
-    // Resolve sort column
     const SORTABLE: Record<string, any> = {
       createdAt: tender.createdAt,
       title: tender.title,
@@ -81,13 +92,11 @@ export class TenderService {
     const sortCol = SORTABLE[filter.sortBy ?? 'createdAt'] ?? tender.createdAt;
     const orderFn = (filter.sortDir ?? 'desc') === 'asc' ? asc : desc;
 
-    // Total count via SQL builder
     const [{ value: total }] = await db
       .select({ value: count() })
       .from(tender)
       .where(where);
 
-    // Paginated rows via SQL builder (no relations yet)
     const rows = await db
       .select()
       .from(tender)
@@ -100,27 +109,34 @@ export class TenderService {
     if (ids.length === 0)
       return { data: [], total: Number(total), page, limit };
 
-    // Fetch relations for returned IDs only, then re-sort to match
     const withRelations = await db.query.tender.findMany({
       where: { id: { in: ids } },
-      with: { user: true, ...(isAdmin ? { bids: true } : {}) },
+      // Admins (ADMIN + SUPER_ADMIN) get bids; vendors/public get tenders only
+      with: { user: true, ...(adminLike ? { bids: true } : {}) },
     });
     const data = ids.map((id) => withRelations.find((t) => t.id === id)!);
 
     return { data, total: Number(total), page, limit };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, user?: JwtPayload) {
+    const existing = await db.query.tender.findFirst({ where: { id } });
+    if (!existing) return null;
+
+    const canSeeBids =
+      user?.role === UserRole.SUPER_ADMIN ||
+      (user?.role === UserRole.ADMIN && existing.createdBy === user?.uid);
+
     return await db.query.tender.findFirst({
       where: { id },
-      with: { bids: true, user: true },
+      with: { user: true, ...(canSeeBids ? { bids: true } : {}) },
     });
   }
 
   async update(id: number, updateTenderDto: UpdateTenderDto, user: JwtPayload) {
     const existing = await db.query.tender.findFirst({ where: { id } });
     if (!existing) throw new NotFoundException(`Tender ${id} not found`);
-    if (existing.createdBy !== user.uid) {
+    if (user.role !== UserRole.SUPER_ADMIN && existing.createdBy !== user.uid) {
       throw new ForbiddenException('You can only update your own tenders');
     }
     const [updated] = await db
@@ -135,11 +151,10 @@ export class TenderService {
   async remove(id: number, user: JwtPayload) {
     const existing = await db.query.tender.findFirst({ where: { id } });
     if (!existing) throw new NotFoundException(`Tender ${id} not found`);
-    if (existing.createdBy !== user.uid) {
+    if (user.role !== UserRole.SUPER_ADMIN && existing.createdBy !== user.uid) {
       throw new ForbiddenException('You can only delete your own tenders');
     }
     const [deleted] = await db
-
       .delete(tender)
       .where(eq(tender.id, id))
       .returning()

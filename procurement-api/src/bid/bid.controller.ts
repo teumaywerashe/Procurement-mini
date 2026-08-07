@@ -17,7 +17,7 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AdminOrOwnerGuard } from '../auth/guards/adminOrOwner.guard';
-import { UserRole } from '../user/enum/userRole..enum';
+import { UserRole } from '../user/enum/userRole.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AdminOrOwner } from '../auth/decorators/adminOrOwner.decorator';
 @ApiTags('Bid')
@@ -33,8 +33,8 @@ export class BidController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all bids on my tenders (admin only)' })
-  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all bids on my tenders (admin / super_admin)' })
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   findAll(@CurrentUser() user: JwtPayload) {
     return this.bidService.findAll(user);
   }
@@ -45,8 +45,10 @@ export class BidController {
     return this.bidService.findByVendorId(+user.uid);
   }
   @Get('tender/:tenderId')
-  @ApiOperation({ summary: 'Get bids by tender ID (tender owner only)' })
-  @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Get bids by tender ID (tender owner / super_admin)',
+  })
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   findByTenderId(
     @Param('tenderId') tenderId: number,
     @CurrentUser() user: JwtPayload,
@@ -56,8 +58,8 @@ export class BidController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a bid by ID' })
   @AdminOrOwner()
-  findOne(@Param('id') id: number) {
-    return this.bidService.findOne(+id);
+  findOne(@Param('id') id: number, @CurrentUser() user: JwtPayload) {
+    return this.bidService.findOne(+id, user);
   }
 
   @Patch(':id')
@@ -72,8 +74,8 @@ export class BidController {
   }
 
   @Patch(':id/status')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Update bid status by ID (Admin only)' })
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Update bid status by ID (Admin / super_admin)' })
   updateBidStatus(
     @Param('id') id: number,
     @Body('status') status: string,
