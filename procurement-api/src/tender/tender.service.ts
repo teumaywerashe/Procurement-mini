@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   ForbiddenException,
   Injectable,
@@ -8,9 +11,10 @@ import { UpdateTenderDto } from './dto/update-tender.dto';
 import type { JwtPayload } from '../auth/decorators/types';
 import { db } from '../database/db';
 import { tender } from '../database/schema/tender.schema';
-import { eq, and, desc, ilike, lte, gte, SQL } from 'drizzle-orm';
+import { eq, and, desc, asc, ilike, lte, gte, SQL, count } from 'drizzle-orm';
 import { TenderFilterDto } from './dto/tender-filter.dto';
 import { UserRole } from '../user/enum/userRole..enum';
+import type { CollectionResult } from '../common/dto/collection-result';
 
 @Injectable()
 export class TenderService {
@@ -20,7 +24,7 @@ export class TenderService {
       .values({
         ...createTenderDto,
         createdBy: user.uid,
-        referenceNumber: `Tender-${new Date().getTime()}`,
+        referenceNumber: `Tender-${new Date().getTime()}-${user.uid}`,
       })
       .returning()
       .execute();
@@ -29,53 +33,81 @@ export class TenderService {
 
   async findAll(user: JwtPayload) {
     const isAdmin = user.role === UserRole.ADMIN;
-
-    const tenders = await db
+    const rows = await db
       .select()
       .from(tender)
       .where(isAdmin ? eq(tender.createdBy, user.uid) : undefined)
-      .orderBy(desc(tender.createdAt))
-      .execute();
+      .orderBy(desc(tender.createdAt));
 
-    if (!isAdmin) return tenders;
+    const ids = rows.map((r) => r.id);
+    if (ids.length === 0) return [];
 
-    // Attach bids + user for admin's own tenders
-    const withBids = await db.query.tender.findMany({
-      where: { createdBy: user.uid },
-      with: { bids: true, user: true },
-    });
-    const metaMap = new Map(
-      withBids.map((t) => [t.id, { bids: t.bids, user: t.user }]),
-    );
-    return tenders.map((t) => ({ ...t, ...metaMap.get(t.id) }));
-  }
-
-  async findAllByFilter(filter: TenderFilterDto, user: JwtPayload) {
-    const isAdmin = user.role === UserRole.ADMIN;
-    const conditions: SQL[] = [];
-
-    if (isAdmin) {
-      conditions.push(eq(tender.createdBy, user.uid));
-    }
-
-    if (filter.title) {
-      conditions.push(ilike(tender.title, `%${filter.title}%`));
-    }
-    if (filter.minPrice !== undefined) {
-      conditions.push(gte(tender.estimatedValue, filter.minPrice));
-    }
-    if (filter.maxPrice !== undefined) {
-      conditions.push(lte(tender.estimatedValue, filter.maxPrice));
-    }
-
-    // Use query API to get user relation for everyone, bids only for admin
-    const tenders = await db.query.tender.findMany({
-      where: conditions.length ? and(...conditions) : undefined,
-      orderBy: [desc(tender.createdAt)],
+    const withRelations = await db.query.tender.findMany({
+      where: { id: { in: ids } },
       with: { user: true, ...(isAdmin ? { bids: true } : {}) },
     });
+    return ids.map((id) => withRelations.find((t) => t.id === id)!);
+  }
 
-    return tenders;
+  async findAllByFilter(
+    filter: TenderFilterDto,
+    user: JwtPayload,
+  ): Promise<CollectionResult<any>> {
+    const isAdmin = user.role === UserRole.ADMIN;
+    const page = filter.page ?? 1;
+    const limit = filter.limit ?? 20;
+    const offset = (page - 1) * limit;
+
+    // Build WHERE conditions
+    const conditions: SQL[] = [];
+    if (isAdmin) conditions.push(eq(tender.createdBy, user.uid));
+
+    const searchTerm = filter.q ?? filter.title;
+    if (searchTerm) conditions.push(ilike(tender.title, `%${searchTerm}%`));
+    if (filter.minPrice !== undefined)
+      conditions.push(gte(tender.estimatedValue, filter.minPrice));
+    if (filter.maxPrice !== undefined)
+      conditions.push(lte(tender.estimatedValue, filter.maxPrice));
+
+    const where = conditions.length ? and(...conditions) : undefined;
+
+    // Resolve sort column
+    const SORTABLE: Record<string, any> = {
+      createdAt: tender.createdAt,
+      title: tender.title,
+      estimatedValue: tender.estimatedValue,
+      closingDate: tender.closingDate,
+    };
+    const sortCol = SORTABLE[filter.sortBy ?? 'createdAt'] ?? tender.createdAt;
+    const orderFn = (filter.sortDir ?? 'desc') === 'asc' ? asc : desc;
+
+    // Total count via SQL builder
+    const [{ value: total }] = await db
+      .select({ value: count() })
+      .from(tender)
+      .where(where);
+
+    // Paginated rows via SQL builder (no relations yet)
+    const rows = await db
+      .select()
+      .from(tender)
+      .where(where)
+      .orderBy(orderFn(sortCol))
+      .limit(limit)
+      .offset(offset);
+
+    const ids = rows.map((r) => r.id);
+    if (ids.length === 0)
+      return { data: [], total: Number(total), page, limit };
+
+    // Fetch relations for returned IDs only, then re-sort to match
+    const withRelations = await db.query.tender.findMany({
+      where: { id: { in: ids } },
+      with: { user: true, ...(isAdmin ? { bids: true } : {}) },
+    });
+    const data = ids.map((id) => withRelations.find((t) => t.id === id)!);
+
+    return { data, total: Number(total), page, limit };
   }
 
   async findOne(id: number) {
@@ -107,6 +139,7 @@ export class TenderService {
       throw new ForbiddenException('You can only delete your own tenders');
     }
     const [deleted] = await db
+
       .delete(tender)
       .where(eq(tender.id, id))
       .returning()

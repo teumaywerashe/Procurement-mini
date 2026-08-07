@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   BadRequestException,
   ConflictException,
@@ -6,12 +8,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateVendorDto } from './dto/create-vendor.dto';
-import { eq } from 'drizzle-orm/sql/expressions/conditions';
+import { asc, count, desc, eq, ilike, or } from 'drizzle-orm';
 import { db } from '../database/db';
 import { vendor } from '../database/schema/vendor.schema';
 import { JwtPayload } from '../auth/decorators/types';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
 import { UserRole } from '../user/enum/userRole..enum';
+import { CollectionQueryDto } from '../common/dto/collection-query.dto';
+import type { CollectionResult } from '../common/dto/collection-result';
 
 @Injectable()
 export class VendorService {
@@ -56,13 +60,62 @@ export class VendorService {
     return newVendor;
   }
 
-  async findAll() {
-    return await db.query.vendor.findMany({
-      with: {
-        bids: true,
-        user: true,
-      },
+  async findAll(query: CollectionQueryDto): Promise<CollectionResult<any>> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const offset = (page - 1) * limit;
+
+    const SORTABLE: Record<string, any> = {
+      createdAt: vendor.createdAt,
+      name: vendor.name,
+      email: vendor.email,
+    };
+    const sortCol = SORTABLE[query.sortBy ?? 'createdAt'] ?? vendor.createdAt;
+    const orderFn = (query.sortDir ?? 'desc') === 'asc' ? asc : desc;
+
+    // Build base query
+    let base = db.select().from(vendor).$dynamic();
+    if (query.q) {
+      base = base.where(
+        or(
+          ilike(vendor.name, `%${query.q}%`),
+          ilike(vendor.email, `%${query.q}%`),
+        ),
+      );
+    }
+
+    // Count
+    const countQuery = db.select({ value: count() }).from(vendor);
+    if (query.q) {
+      countQuery.where(
+        or(
+          ilike(vendor.name, `%${query.q}%`),
+          ilike(vendor.email, `%${query.q}%`),
+        ),
+      );
+    }
+    const [{ value: total }] = await countQuery;
+
+    // Rows
+    const rows = await base
+      .orderBy(orderFn(sortCol))
+      .limit(limit)
+      .offset(offset);
+    const ids = rows.map((r) => r.id);
+
+    if (ids.length === 0)
+      return { data: [], total: Number(total), page, limit };
+
+    // Fetch with relations for returned IDs only
+    const data = await db.query.vendor.findMany({
+      where: { id: { in: ids } },
+      with: { bids: true, user: true },
     });
+
+    // Re-order to match sorted order
+    const ordered = ids.map((id) => data.find((v) => v.id === id)!);
+
+    return { data: ordered, total: Number(total), page, limit };
   }
   async findOne(id: number, user: JwtPayload) {
     if (!id) {

@@ -1,10 +1,10 @@
 import { baseApi } from "./baseApi";
-import type { Vendor } from "@/src/types";
+import type { Vendor, CollectionQuery, CollectionResult } from "@/src/types";
 
 export const vendorApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getVendors: builder.query<Vendor[], void>({
-      query: () => "/vendor",
+    getVendors: builder.query<CollectionResult<Vendor>, CollectionQuery>({
+      query: (params = {}) => ({ url: "/vendor", params }),
       providesTags: ["Vendor"],
     }),
     getVendor: builder.query<Vendor, number>({
@@ -17,13 +17,22 @@ export const vendorApi = baseApi.injectEndpoints({
     }),
     createVendor: builder.mutation<
       Vendor,
-      { name: string; registrationNumber: string; email?: string; phoneNumber?: string }
+      {
+        name: string;
+        registrationNumber: string;
+        email?: string;
+        phoneNumber?: string;
+      }
     >({
       query: (body) => ({ url: "/vendor/register", method: "POST", body }),
       invalidatesTags: ["Vendor"],
     }),
     updateVendor: builder.mutation<Vendor, { id: number } & Partial<Vendor>>({
-      query: ({ id, ...body }) => ({ url: `/vendor/${id}`, method: "PATCH", body }),
+      query: ({ id, ...body }) => ({
+        url: `/vendor/${id}`,
+        method: "PATCH",
+        body,
+      }),
       invalidatesTags: ["Vendor"],
     }),
   }),

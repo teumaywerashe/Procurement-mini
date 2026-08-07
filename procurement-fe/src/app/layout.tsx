@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "mantine-datatable/styles.css";
 import "./globals.css";
 import StoreProvider from "../store/StoreProvider";
 import { ThemeProvider } from "../components/ThemeProvider";

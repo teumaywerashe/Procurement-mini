@@ -22,13 +22,15 @@ export default function DashboardPage() {
   const isAdmin = user?.role === "Admin";
   const isVendor = user?.role === "Vendor";
 
-  const { data: tenders = [], isLoading: tendersLoading } = useGetTendersQuery(
-    {},
+  const { data: tendersResult, isLoading: tendersLoading } = useGetTendersQuery(
+    { limit: 100 },
   );
-  const { data: vendors = [], isLoading: vendorsLoading } = useGetVendorsQuery(
-    undefined,
+  const tenders = tendersResult?.data ?? [];
+  const { data: vendorsResult, isLoading: vendorsLoading } = useGetVendorsQuery(
+    { limit: 100 },
     { skip: !isAdmin },
   );
+  const vendors = vendorsResult?.data ?? [];
   const { data: vendor } = useGetMyVendorQuery(undefined, {
     skip: !isVendor,
   });

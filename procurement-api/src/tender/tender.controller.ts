@@ -28,7 +28,6 @@ import type { JwtPayload } from '../auth/decorators/types';
 export class TenderController {
   constructor(private readonly tenderService: TenderService) {}
 
-  /** Admin only: create a tender linked to their account */
   @Post()
   @Roles(UserRole.ADMIN)
   create(
@@ -39,34 +38,21 @@ export class TenderController {
   }
 
   /**
-   * Admins get their own tenders + bids.
-   * Vendors get all tenders (no bids).
+   * GET /tender?q=&page=&limit=&sortBy=&sortDir=&minPrice=&maxPrice=
+   * Returns a CollectionResult<Tender> with pagination metadata.
+   * Admins see only their own tenders + bids; vendors see all published tenders.
    */
   @Get()
-  findAll(@CurrentUser() user: JwtPayload) {
-    return this.tenderService.findAll(user);
-  }
-
-  /**
-   * Same scoping as findAll but with filters.
-   * Vendors can use this to browse/search all tenders.
-   */
-  @Get('all')
-  findAllByFilter(
-    @Query() filter: TenderFilterDto,
-    @CurrentUser() user: JwtPayload,
-  ) {
+  findAll(@Query() filter: TenderFilterDto, @CurrentUser() user: JwtPayload) {
     return this.tenderService.findAllByFilter(filter, user);
   }
 
-  /** Public: anyone can view a single tender */
   @Get(':id')
   @Public()
   findOne(@Param('id') id: string) {
     return this.tenderService.findOne(+id);
   }
 
-  /** Admin only: update own tender */
   @Patch(':id')
   @Roles(UserRole.ADMIN)
   update(
@@ -77,7 +63,6 @@ export class TenderController {
     return this.tenderService.update(+id, updateTenderDto, user);
   }
 
-  /** Admin only: delete own tender */
   @Delete(':id')
   @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {

@@ -1,3 +1,18 @@
+export interface CollectionQuery {
+  q?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortDir?: "asc" | "desc";
+}
+
+export interface CollectionResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export type TenderStatus =
   | "draft"
   | "published"

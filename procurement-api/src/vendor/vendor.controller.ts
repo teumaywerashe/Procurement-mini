@@ -7,6 +7,7 @@ import {
   UseGuards,
   Patch,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { VendorService } from './vendor.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
@@ -18,6 +19,7 @@ import { UserRole } from '../user/enum/userRole..enum';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
+import { CollectionQueryDto } from '../common/dto/collection-query.dto';
 
 @Controller('vendor')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -35,9 +37,11 @@ export class VendorController {
 
   @Get()
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get all vendors (admin only)' })
-  findAll() {
-    return this.vendorService.findAll();
+  @ApiOperation({
+    summary: 'Get all vendors with pagination/search (admin only)',
+  })
+  findAll(@Query() query: CollectionQueryDto) {
+    return this.vendorService.findAll(query);
   }
 
   @Get('owner/me')

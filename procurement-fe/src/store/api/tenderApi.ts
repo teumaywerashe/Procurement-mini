@@ -1,13 +1,10 @@
 import { baseApi } from "./baseApi";
-import type { Tender } from "@/src/types";
+import type { Tender, CollectionQuery, CollectionResult } from "@/src/types";
 
 export const tenderApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getTenders: builder.query<
-      Tender[],
-      { title?: string; minPrice?: number; maxPrice?: number }
-    >({
-      query: (params = {}) => ({ url: "/tender/all", params }),
+    getTenders: builder.query<CollectionResult<Tender>, CollectionQuery>({
+      query: (params = {}) => ({ url: "/tender", params }),
       providesTags: ["Tender"],
     }),
     getTender: builder.query<Tender, number>({
