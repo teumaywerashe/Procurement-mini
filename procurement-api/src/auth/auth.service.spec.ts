@@ -1,59 +1,138 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { VendorService } from '../vendor/vendor.service';
-import { UserRole } from '../user/entities/user.entity';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
+
+// Mock the db singleton so no real DB connection is needed
+jest.mock('../database/db', () => ({
+  db: {
+    select: jest.fn(),
+    insert: jest.fn(),
+  },
+}));
+
+import { db } from '../database/db';
+
+const mockDb = db as jest.Mocked<typeof db>;
 
 describe('AuthService', () => {
   let service: AuthService;
-  const userService = {
-    createUser: jest.fn(),
-    findByEmail: jest.fn(),
-  };
-  const jwtService = { sign: jest.fn() };
-  const vendorService = { findOne: jest.fn() };
+  const jwtService = { sign: jest.fn().mockReturnValue('signed-token') };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        { provide: UserService, useValue: userService },
-        { provide: JwtService, useValue: jwtService },
-        { provide: VendorService, useValue: vendorService },
-      ],
+      providers: [AuthService, { provide: JwtService, useValue: jwtService }],
     }).compile();
-
     service = module.get<AuthService>(AuthService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  // Helper: chain .from().where().execute() returning a value
+  function mockSelect(rows: unknown[]) {
+    const chain = {
+      from: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      execute: jest.fn().mockResolvedValue(rows),
+    };
+    mockDb.select.mockReturnValue(chain as any);
+    return chain;
+  }
+
+  function mockInsert(rows: unknown[]) {
+    const chain = {
+      into: jest.fn().mockReturnThis(),
+      values: jest.fn().mockReturnThis(),
+      returning: jest.fn().mockReturnThis(),
+      execute: jest.fn().mockResolvedValue(rows),
+    };
+    mockDb.insert.mockReturnValue(chain as any);
+    return chain;
+  }
+
+  describe('register', () => {
+    it('throws ConflictException when email already exists', async () => {
+      mockSelect([{ id: 1, email: 'taken@example.com' }]);
+
+      await expect(
+        service.register({
+          name: 'Alice',
+          email: 'taken@example.com',
+          password: 'password123',
+        }),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('returns accessToken + user on successful registration', async () => {
+      // first select (duplicate check) returns empty
+      mockSelect([]);
+      mockInsert([
+        {
+          id: 2,
+          name: 'Bob',
+          email: 'bob@example.com',
+          role: 'Admin',
+          createdAt: new Date(),
+        },
+      ]);
+
+      const result = await service.register({
+        name: 'Bob',
+        email: 'bob@example.com',
+        password: 'password123',
+      });
+
+      expect(result).toHaveProperty('accessToken', 'signed-token');
+      expect(result.user).toMatchObject({
+        email: 'bob@example.com',
+        role: 'Admin',
+      });
+    });
   });
 
-  it('assigns the vendor role and ID for a vendor signup', async () => {
-    userService.findByEmail.mockResolvedValue(null);
-    vendorService.findOne.mockResolvedValue({ id: 'vendor-id' });
-    userService.createUser.mockResolvedValue({
-      id: 'user-id',
-      email: 'owner@acme.com',
-      role: UserRole.VENDOR,
-      vendorId: 'vendor-id',
-    });
-    jwtService.sign.mockReturnValue('access-token');
+  describe('login', () => {
+    it('throws UnauthorizedException for wrong password', async () => {
+      const hashed = await service.hashPassword('correct-password');
+      mockSelect([
+        {
+          id: 1,
+          email: 'user@example.com',
+          password: hashed,
+          role: 'Vendor',
+          name: 'User',
+          createdAt: new Date(),
+        },
+      ]);
 
-    await service.register({
-      name: 'Vendor Owner',
-      email: 'owner@acme.com',
-      password: 'secure-password-123',
-      vendorId: 'vendor-id',
+      await expect(
+        service.login({
+          email: 'user@example.com',
+          password: 'wrong-password',
+        }),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
-    expect(userService.createUser).toHaveBeenCalledWith(
-      expect.objectContaining({
-        role: UserRole.VENDOR,
-        vendorId: 'vendor-id',
-      }),
-    );
+    it('returns accessToken on valid credentials', async () => {
+      const hashed = await service.hashPassword('correct-password');
+      mockSelect([
+        {
+          id: 1,
+          email: 'user@example.com',
+          password: hashed,
+          role: 'Vendor',
+          name: 'User',
+          createdAt: new Date(),
+        },
+      ]);
+
+      const result = await service.login({
+        email: 'user@example.com',
+        password: 'correct-password',
+      });
+
+      expect(result).toHaveProperty('accessToken', 'signed-token');
+      expect(jwtService.sign).toHaveBeenCalledWith(
+        expect.objectContaining({ uid: 1, email: 'user@example.com' }),
+      );
+    });
   });
 });

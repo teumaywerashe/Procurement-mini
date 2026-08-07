@@ -21,9 +21,10 @@ export default function TenderBidsSidebar({ userId, isVendor }: Props) {
   const { data: bids = [], isLoading: isVendorLoading } =
     useGetBidsByVendorQuery(undefined, { skip: !isVendor || !vendor?.id });
 
-    const route=useRouter()
+  const route = useRouter();
   const { data: allBids = [], isLoading: isAllBidsLoading } =
     useGetAllBidsQuery(undefined, { skip: isVendor });
+  console.log(bids);
 
   const displayBids = isVendor ? bids.slice(0, 5) : allBids.slice(0, 5);
   const totalCount = isVendor ? bids.length : allBids.length;
@@ -66,15 +67,19 @@ export default function TenderBidsSidebar({ userId, isVendor }: Props) {
             <div className="w-10 h-10 rounded-full bg-(--bg-elevated) flex items-center justify-center mx-auto">
               <IconGavel size={18} className="text-(--text-faint)" />
             </div>
-            <p className="text-xs text-(--text-subtle)">No bids submitted yet.</p>
+            <p className="text-xs text-(--text-subtle)">
+              No bids submitted yet.
+            </p>
           </div>
         ) : (
           <div className="space-y-2">
             {displayBids.map((bid) => {
               const colors = BID_STATUS_STYLES[bid.bidStatus];
               return (
-                <div onClick={()=>{route.push(`/bids/${bid.id}`)}} 
-
+                <div
+                  onClick={() => {
+                    route.push(`/bids/${bid.id}`);
+                  }}
                   key={bid.id}
                   className="px-3 py-3 cursor-pointer rounded-lg bg-(--bg-elevated) border border-(--border) space-y-1.5"
                 >

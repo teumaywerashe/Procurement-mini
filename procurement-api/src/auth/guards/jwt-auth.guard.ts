@@ -24,25 +24,25 @@ export class JwtAuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (isPublic) {
-      return true;
-    }
     const request = context
       .switchToHttp()
       .getRequest<Request & { user: JwtPayload }>();
     const token = this.extractToken(request);
 
-    if (!token) {
+    if (token) {
+      try {
+        const payload = this.jwtService.verify<JwtPayload>(token);
+        request.user = payload;
+      } catch {
+        if (!isPublic) {
+          throw new UnauthorizedException('Invalid or expired token');
+        }
+      }
+    } else if (!isPublic) {
       throw new UnauthorizedException('Missing auth token');
     }
 
-    try {
-      const payload = this.jwtService.verify<JwtPayload>(token);
-      request.user = payload;
-      return true;
-    } catch {
-      throw new UnauthorizedException('Invalid or expired token');
-    }
+    return true;
   }
 
   private extractToken(request: Request): string | null {

@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -11,7 +13,7 @@ import { db } from '../database/db';
 import type { JwtPayload } from '../auth/decorators/types';
 import { eq } from 'drizzle-orm';
 import { vendor } from '../database/schema/vendor.schema';
-
+import { tender } from '../database/schema/tender.schema';
 import { UserRole } from '../user/enum/userRole..enum';
 
 @Injectable()
@@ -27,21 +29,36 @@ export class BidService {
         'You cant create a bid with user accound create a vendor first',
       );
     }
-    const [createdBid] = await db
-      .insert(bid)
-      .values({
-        ...createBidDto,
-        vendorId: creatingVendor.id,
-        referenceNumber: `RF-BID-${Date.now()}${user.uid}`,
-      })
-      .returning();
-    return createdBid;
+    try {
+      const [createdBid] = await db
+        .insert(bid)
+        .values({
+          ...createBidDto,
+          vendorId: creatingVendor.id,
+          referenceNumber: `RF-BID-${Date.now()}${user.uid}`,
+        })
+        .returning();
+      return createdBid;
+    } catch (err: any) {
+      // PostgreSQL unique violation
+      if (err?.code === '23505') {
+        throw new ConflictException(
+          'You have already submitted a bid for this tender',
+        );
+      }
+      throw err;
+    }
   }
 
-  async findAll() {
-    return await db.query.bid.findMany({
-      with: { tender: true },
+  async findAll(user: JwtPayload) {
+    // Each admin sees only bids submitted on their own tenders
+    const adminTenders = await db.query.tender.findMany({
+      where: { createdBy: user.uid },
+      with: { bids: true },
     });
+    return adminTenders.flatMap((t) =>
+      t.bids.map((b) => ({ ...b, tender: t })),
+    );
   }
 
   async findByVendorId(uid: number) {
@@ -60,7 +77,19 @@ export class BidService {
     });
   }
 
-  async findByTenderId(tenderId: number) {
+  async findByTenderId(tenderId: number, user: JwtPayload) {
+    // Verify the tender belongs to this admin
+    const ownedTender = await db.query.tender.findFirst({
+      where: { id: tenderId },
+    });
+    if (!ownedTender) {
+      throw new NotFoundException(`Tender ${tenderId} not found`);
+    }
+    if (ownedTender.createdBy !== user.uid) {
+      throw new ForbiddenException(
+        'You can only view bids on your own tenders',
+      );
+    }
     return await db.query.bid.findMany({
       where: { tenderId },
       with: { tender: true },

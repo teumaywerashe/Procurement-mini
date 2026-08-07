@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { db } from '../database/db';
 import { vendor } from '../database/schema/vendor.schema';
 import { JwtPayload } from '../auth/decorators/types';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
+import { UserRole } from '../user/enum/userRole..enum';
 
 @Injectable()
 export class VendorService {
@@ -62,19 +64,20 @@ export class VendorService {
       },
     });
   }
-  async findOne(id: number) {
+  async findOne(id: number, user: JwtPayload) {
     if (!id) {
       throw new BadRequestException('Vendor ID is required');
     }
     const existingVendor = await db.query.vendor.findFirst({
       where: { id },
-      with: {
-        bids: true,
-        user: true,
-      },
+      with: { bids: true, user: true },
     });
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
+    }
+    // Vendors can only view their own profile; admins can view any
+    if (user.role !== UserRole.ADMIN && existingVendor.ownerId !== user.uid) {
+      throw new ForbiddenException('You can only view your own vendor profile');
     }
     return existingVendor;
   }
@@ -95,37 +98,43 @@ export class VendorService {
     return existingVendor;
   }
 
-  async updateVendor(id: string, updateVendorDto: UpdateVendorDto) {
+  async updateVendor(
+    id: number,
+    updateVendorDto: UpdateVendorDto,
+    user: JwtPayload,
+  ) {
     if (!id) {
       throw new BadRequestException('Vendor ID is required');
     }
-    const [existingVendor] = await db
-      .select()
-      .from(vendor)
-      .where(eq(vendor.id, id as any as number))
-      .execute();
+    const existingVendor = await db.query.vendor.findFirst({ where: { id } });
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
+    }
+    if (user.role !== UserRole.ADMIN && existingVendor.ownerId !== user.uid) {
+      throw new ForbiddenException(
+        'You can only update your own vendor profile',
+      );
     }
     const [updatedVendor] = await db
       .update(vendor)
       .set(updateVendorDto as any as Partial<typeof vendor>)
-      .where(eq(vendor.id, id as any as number))
+      .where(eq(vendor.id, id))
       .returning()
       .execute();
     return updatedVendor;
   }
-  async deleteVendor(id: number) {
+  async deleteVendor(id: number, user: JwtPayload) {
     if (!id) {
       throw new BadRequestException('Vendor ID is required');
     }
-    const [existingVendor] = await db
-      .select()
-      .from(vendor)
-      .where(eq(vendor.id, id))
-      .execute();
+    const existingVendor = await db.query.vendor.findFirst({ where: { id } });
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
+    }
+    if (user.role !== UserRole.ADMIN && existingVendor.ownerId !== user.uid) {
+      throw new ForbiddenException(
+        'You can only delete your own vendor profile',
+      );
     }
     const [deletedVendor] = await db
       .delete(vendor)
@@ -133,7 +142,7 @@ export class VendorService {
       .returning()
       .execute();
     return {
-      deletedVendor: deletedVendor,
+      deletedVendor,
       success: true,
       message: 'Vendor deleted successfully',
     };

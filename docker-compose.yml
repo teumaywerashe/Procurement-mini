@@ -73,29 +73,29 @@ services:
     stdin_open: true
     tty: true
 
-  drizzle-studio:
-    image: procurement-api
-    container_name: procurement-drizzle-studio
-    restart: unless-stopped
+  # drizzle-studio:
+  #   image: procurement-api
+  #   container_name: procurement-drizzle-studio
+  #   restart: unless-stopped
 
-    working_dir: /app
+  #   working_dir: /app
 
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
+  #   environment:
+  #     DATABASE_URL: ${DATABASE_URL}
 
-    volumes:
-      - ./procurement-api:/app
-      - /app/node_modules
+  #   volumes:
+  #     - ./procurement-api:/app
+  #     - /app/node_modules
 
-    ports:
-      - "4984:4984"
+  #   ports:
+  #     - "4984:4984"
 
-    depends_on:
-      postgres:
-        condition: service_healthy
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
 
-    command: >
-      npx drizzle-kit studio --host 0.0.0.0 --port 4984
+  #   command: >
+  #     npx drizzle-kit studio --host 0.0.0.0 --port 4984
 
   pgadmin:
     image: dpage/pgadmin4:9.6

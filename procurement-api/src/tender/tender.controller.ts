@@ -21,12 +21,14 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { TenderFilterDto } from './dto/tender-filter.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import type { JwtPayload } from '../auth/decorators/types';
+
 @Controller('tender')
 @ApiTags('Tenders')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class TenderController {
   constructor(private readonly tenderService: TenderService) {}
 
+  /** Admin only: create a tender linked to their account */
   @Post()
   @Roles(UserRole.ADMIN)
   create(
@@ -36,34 +38,49 @@ export class TenderController {
     return this.tenderService.create(createTenderDto, user);
   }
 
+  /**
+   * Admins get their own tenders + bids.
+   * Vendors get all tenders (no bids).
+   */
   @Get()
-  @Public()
-  async findAll() {
-    return await this.tenderService.findAll();
+  findAll(@CurrentUser() user: JwtPayload) {
+    return this.tenderService.findAll(user);
   }
+
+  /**
+   * Same scoping as findAll but with filters.
+   * Vendors can use this to browse/search all tenders.
+   */
   @Get('all')
-  @Public()
-  findAllByFilter(@Query() filter: TenderFilterDto) {
-    return this.tenderService.findAllByFilter(filter);
+  findAllByFilter(
+    @Query() filter: TenderFilterDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.tenderService.findAllByFilter(filter, user);
   }
+
+  /** Public: anyone can view a single tender */
   @Get(':id')
   @Public()
-  async findOne(@Param('id') id: string) {
-    return await this.tenderService.findOne(+id);
+  findOne(@Param('id') id: string) {
+    return this.tenderService.findOne(+id);
   }
 
+  /** Admin only: update own tender */
   @Patch(':id')
   @Roles(UserRole.ADMIN)
-  async update(
+  update(
     @Param('id') id: string,
     @Body() updateTenderDto: UpdateTenderDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return await this.tenderService.update(+id, updateTenderDto);
+    return this.tenderService.update(+id, updateTenderDto, user);
   }
 
+  /** Admin only: delete own tender */
   @Delete(':id')
   @Roles(UserRole.ADMIN)
-  async remove(@Param('id') id: string) {
-    return await this.tenderService.remove(+id);
+  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.tenderService.remove(+id, user);
   }
 }

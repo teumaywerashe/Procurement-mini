@@ -5,9 +5,11 @@ import Navbar from "@/src/components/layout/Navbar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/src/store/store";
 import { useGetTendersQuery } from "@/src/store/api/tenderApi";
-import { useGetVendorsQuery } from "@/src/store/api/vendorApi";
+import {
+  useGetVendorsQuery,
+  useGetMyVendorQuery,
+} from "@/src/store/api/vendorApi";
 import { useGetBidsByVendorQuery } from "@/src/store/api/bidApi";
-import { useGetVendorQuery } from "@/src/store/api/vendorApi";
 
 import DashboardLeftSidebar from "@/src/components/layout/DashboardLeftsidebar";
 import MainDashboardContent from "@/src/components/layout/MainDashboardContent";
@@ -27,14 +29,12 @@ export default function DashboardPage() {
     undefined,
     { skip: !isAdmin },
   );
-  const { data: vendor } = useGetVendorQuery(user?.id ?? 0, {
+  const { data: vendor } = useGetMyVendorQuery(undefined, {
     skip: !isVendor,
   });
   const { data: myBids = [], isLoading: bidsLoading } = useGetBidsByVendorQuery(
     undefined,
-    {
-      skip: !vendor?.id,
-    },
+    { skip: !isVendor },
   );
   const published = tenders.filter((t) => t.status === "published");
 

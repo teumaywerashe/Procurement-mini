@@ -17,15 +17,15 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../user/enum/userRole..enum';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { AdminOrOwnerGuard } from '../auth/guards/adminOrOwner.guard';
-import { AdminOrOwner } from '../auth/decorators/adminOrOwner.decorator';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
+
 @Controller('vendor')
-@UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwnerGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class VendorController {
   constructor(private readonly vendorService: VendorService) {}
+
   @Post('register')
-  @ApiOperation({ summary: 'Create a new vendor' })
+  @ApiOperation({ summary: 'Register a new vendor' })
   create(
     @Body() createVendorDto: CreateVendorDto,
     @CurrentUser() user: JwtPayload,
@@ -35,35 +35,36 @@ export class VendorController {
 
   @Get()
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get all vendors' })
-  async findAll() {
-    return await this.vendorService.findAll();
+  @ApiOperation({ summary: 'Get all vendors (admin only)' })
+  findAll() {
+    return this.vendorService.findAll();
   }
+
   @Get('owner/me')
-  @ApiOperation({ summary: 'Get logged-in vendor' })
-  async findByOwnerId(@CurrentUser() user: JwtPayload) {
-    return await this.vendorService.findByOwnerId(user.uid);
+  @ApiOperation({ summary: 'Get the logged-in vendor profile' })
+  findByOwnerId(@CurrentUser() user: JwtPayload) {
+    return this.vendorService.findByOwnerId(user.uid);
   }
+
   @Get(':id')
-  @AdminOrOwner()
   @ApiOperation({ summary: 'Get a vendor by ID' })
-  async findOne(@Param('id') id: number) {
-    return await this.vendorService.findOne(id);
+  findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.vendorService.findOne(+id, user);
   }
+
   @Patch(':id')
-  @AdminOrOwner()
-  @ApiOperation({ summary: 'Update a vendor by ID' })
-  async updateVendor(
+  @ApiOperation({ summary: 'Update a vendor (owner or admin)' })
+  updateVendor(
     @Param('id') id: string,
     @Body() updateVendorDto: UpdateVendorDto,
+    @CurrentUser() user: JwtPayload,
   ) {
-    return await this.vendorService.updateVendor(id, updateVendorDto);
+    return this.vendorService.updateVendor(+id, updateVendorDto, user);
   }
 
   @Delete(':id')
-  @AdminOrOwner()
-  @ApiOperation({ summary: 'Delete a vendor by ID' })
-  async deleteVendor(@Param('id') id: number) {
-    return await this.vendorService.deleteVendor(id);
+  @ApiOperation({ summary: 'Delete a vendor (owner or admin)' })
+  deleteVendor(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.vendorService.deleteVendor(+id, user);
   }
 }

@@ -4,6 +4,7 @@ import {
   IconFileText,
   IconCurrencyDollar,
   IconClock,
+  IconUser,
 } from "@tabler/icons-react";
 import {
   TENDER_STATUS_COLORS,
@@ -40,6 +41,12 @@ export default function TenderRow({
           <p className="text-xs sm:text-sm text-(--text-subtle) mt-0.5">
             {tender.name}
           </p>
+          {tender.user?.name && (
+            <p className="text-xs text-(--text-faint) mt-0.5 flex items-center gap-1">
+              <IconUser size={11} className="shrink-0" />
+              {tender.user.name}
+            </p>
+          )}
         </div>
 
         {/* Meta row */}

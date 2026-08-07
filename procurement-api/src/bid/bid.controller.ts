@@ -33,10 +33,10 @@ export class BidController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all bids (admin only)' })
+  @ApiOperation({ summary: 'Get all bids on my tenders (admin only)' })
   @Roles(UserRole.ADMIN)
-  findAll() {
-    return this.bidService.findAll();
+  findAll(@CurrentUser() user: JwtPayload) {
+    return this.bidService.findAll(user);
   }
 
   @Get('/me')
@@ -45,10 +45,13 @@ export class BidController {
     return this.bidService.findByVendorId(+user.uid);
   }
   @Get('tender/:tenderId')
-  @ApiOperation({ summary: 'Get bids by tender ID (admin only)' })
+  @ApiOperation({ summary: 'Get bids by tender ID (tender owner only)' })
   @Roles(UserRole.ADMIN)
-  findByTenderId(@Param('tenderId') tenderId: number) {
-    return this.bidService.findByTenderId(+tenderId);
+  findByTenderId(
+    @Param('tenderId') tenderId: number,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.bidService.findByTenderId(+tenderId, user);
   }
   @Get(':id')
   @ApiOperation({ summary: 'Get a bid by ID' })

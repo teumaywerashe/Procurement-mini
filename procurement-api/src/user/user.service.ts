@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
@@ -10,7 +11,7 @@ import * as bcrypt from 'bcryptjs';
 function omitPassword<T extends { password?: string }>(
   user: T,
 ): Omit<T, 'password'> {
-  const { password: _pw, ...safe } = user;
+  const { password: pw, ...safe } = user;
   return safe;
 }
 
@@ -19,11 +20,12 @@ export class UserService {
   constructor() {}
 
   async findByEmail(email: string) {
-    return await db
+    const user = await db
       .select()
       .from(users)
       .where(eq(users.email, email))
       .execute();
+    return user.map(omitPassword);
   }
 
   async createUser(CreateUserDto: CreateUserDto) {

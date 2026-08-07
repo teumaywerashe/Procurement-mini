@@ -17,6 +17,12 @@ export interface Tender {
   createdAt: string;
   createdBy: number;
   bids?: Bid[];
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+  };
 }
 
 export interface User {
