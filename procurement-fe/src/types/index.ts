@@ -65,8 +65,13 @@ export interface Bid {
   amount: number;
   bidStatus: "pending" | "accepted" | "rejected";
   submittedAt: string;
+  createdAt?: string;
   referenceNumber: string;
   tender?: Tender;
+  vendor?: Vendor;
+  proposedPrice?: number;
+  proposal?: string;
+  notes?: string;
 }
 
 export interface AuthResponse {

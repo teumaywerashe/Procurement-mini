@@ -11,6 +11,8 @@ import {
 import { IconArrowLeft, IconAlertTriangle } from "@tabler/icons-react";
 import type { Tender, FormState } from "@/src/types";
 import { notifications } from "@mantine/notifications";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/src/store/store";
 import TenderFormFields from "@/src/components/shared/TenderFormFields";
 import { tenderSchema } from "@/src/lib/schemas";
 
@@ -132,9 +134,13 @@ function EditForm({
 export default function EditTenderPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  // const user = useSelector((s: RootState) => s.auth.user);
+  const user = useSelector((s: RootState) => s.auth.user);
 
   const { data: tender, isLoading } = useGetTenderQuery(Number(id));
+
+  const isSuperAdmin = user?.role === "SuperAdmin";
+  const isAdmin = user?.role === "Admin";
+  const isOwner = tender && (tender.createdBy === user?.id || (tender as any).createdBy === user?.id);
 
   if (isLoading)
     return (
@@ -158,6 +164,26 @@ export default function EditTenderPage() {
             className="text-indigo-400 hover:text-indigo-300"
           >
             ← Back to tenders
+          </Link>
+        </div>
+      </div>
+    );
+
+  if (isAdmin && !isSuperAdmin && !isOwner)
+    return (
+      <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 text-sm mt-14">
+          <IconAlertTriangle size={40} className="text-red-400" />
+          <p className="text-red-400 font-semibold">Access Denied</p>
+          <p className="text-xs text-(--text-subtle)">
+            You are not authorized to edit this tender because you are not the owner.
+          </p>
+          <Link
+            href="/dashboard"
+            className="text-indigo-400 hover:text-indigo-300"
+          >
+            ← Back to Dashboard
           </Link>
         </div>
       </div>

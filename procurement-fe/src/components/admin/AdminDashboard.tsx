@@ -43,9 +43,16 @@ interface AdminDashboardProps {
 export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   // Queries
   const { data: tendersResult, isLoading: tendersLoading } = useGetTendersQuery({ limit: 100 });
-  const myTenders = tendersResult?.data ?? [];
+  const rawTenders = tendersResult?.data ?? [];
+  const myTenders = rawTenders.filter(
+    (t) => t.createdBy === currentUser?.id || (t as any).createdBy === currentUser?.id
+  );
 
-  const { data: myBids = [], isLoading: bidsLoading } = useGetAllBidsQuery();
+  const { data: rawBids = [], isLoading: bidsLoading } = useGetAllBidsQuery();
+  const myBids = rawBids.filter((b) => {
+    if (!b.tender) return true;
+    return b.tender.createdBy === currentUser?.id || (b.tender as any).createdBy === currentUser?.id;
+  });
 
   // Mutations
   const [deleteTender, { isLoading: isDeletingTender }] = useDeleteTenderMutation();

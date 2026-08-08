@@ -26,12 +26,17 @@ export default function TenderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const user = useSelector((s: RootState) => s.auth.user);
-  const isAdmin = user?.role === "Admin";
-  const isVendor = user?.role === "Vendor";
 
   const { data: tender, isLoading, isError } = useGetTenderQuery(Number(id));
   const [deleteTender, { isLoading: isDeleting }] = useDeleteTenderMutation();
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const isSuperAdmin = user?.role === "SuperAdmin";
+  const isAdmin = user?.role === "Admin";
+  const isVendor = user?.role === "Vendor";
+  const canManage =
+    isSuperAdmin ||
+    (isAdmin && (tender?.createdBy === user?.id || (tender as any)?.createdBy === user?.id));
 
   async function handleDelete() {
     try {
@@ -94,7 +99,7 @@ export default function TenderDetailPage() {
         <TenderDetailHeader
           tender={tender}
           closing={closing}
-          isAdmin={isAdmin}
+          isAdmin={canManage}
           onDelete={() => setShowConfirm(true)}
         />
 
@@ -121,7 +126,7 @@ export default function TenderDetailPage() {
         </div>
 
         {isVendor && <VendorBidSection tender={tender} closing={closing} />}
-        {isAdmin && <AdminBidsSection bids={tender.bids ?? []} />}
+        {canManage && <AdminBidsSection bids={tender.bids ?? []} />}
       </div>
 
       {showConfirm && (

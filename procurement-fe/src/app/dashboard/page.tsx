@@ -15,6 +15,7 @@ import DashboardLeftSidebar from "@/src/components/layout/DashboardLeftsidebar";
 import MainDashboardContent from "@/src/components/layout/MainDashboardContent";
 import DashboardRightSidebar from "@/src/components/layout/DashboardRightSidebar";
 import SuperAdminDashboard from "@/src/components/superadmin/SuperAdminDashboard";
+import AdminDashboard from "@/src/components/admin/AdminDashboard";
 
 const now = Date.now();
 
@@ -62,6 +63,17 @@ export default function DashboardPage() {
         <Navbar />
         <div className="flex flex-1 w-full overflow-hidden">
           <SuperAdminDashboard currentUser={user} />
+        </div>
+      </div>
+    );
+  }
+
+  if (isAdmin) {
+    return (
+      <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
+        <Navbar />
+        <div className="flex flex-1 w-full overflow-hidden">
+          <AdminDashboard currentUser={user} />
         </div>
       </div>
     );
