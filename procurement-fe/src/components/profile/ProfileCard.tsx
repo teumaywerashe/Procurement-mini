@@ -7,7 +7,7 @@ import { logIn } from "@/src/store/auth/authSlice";
 import { notifications } from "@mantine/notifications";
 import { updateUserSchema } from "@/src/lib/schemas";
 
-interface User { id: number; name?: string; email?: string; role?: string; createdAt?: string; }
+import type { User } from "@/src/types";
 
 function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (

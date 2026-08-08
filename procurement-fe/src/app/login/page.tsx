@@ -48,7 +48,11 @@ export default function LoginPage() {
     try {
       const result: AuthResponse = await loginUser(values).unwrap();
       dispatch(logIn(result.user));
-      router.push("/tenders");
+      if (result.user?.role === "SuperAdmin") {
+        router.push("/dashboard");
+      } else {
+        router.push("/tenders");
+      }
     } catch (error: unknown) {
       console.log("error occurred", error);
     }

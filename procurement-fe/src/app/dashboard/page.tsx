@@ -14,6 +14,7 @@ import { useGetBidsByVendorQuery } from "@/src/store/api/bidApi";
 import DashboardLeftSidebar from "@/src/components/layout/DashboardLeftsidebar";
 import MainDashboardContent from "@/src/components/layout/MainDashboardContent";
 import DashboardRightSidebar from "@/src/components/layout/DashboardRightSidebar";
+import SuperAdminDashboard from "@/src/components/superadmin/SuperAdminDashboard";
 
 const now = Date.now();
 
@@ -54,6 +55,17 @@ export default function DashboardPage() {
 
   const pendingBids = myBids.filter((b) => b.bidStatus === "pending");
   const acceptedBids = myBids.filter((b) => b.bidStatus === "accepted");
+
+  if (isSuperAdmin) {
+    return (
+      <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
+        <Navbar />
+        <div className="flex flex-1 w-full overflow-hidden">
+          <SuperAdminDashboard currentUser={user} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">

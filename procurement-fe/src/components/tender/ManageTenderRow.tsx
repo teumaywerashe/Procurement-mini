@@ -21,7 +21,7 @@ interface Props {
 
 export default function ManageTenderRow({ tender, now, onDelete }: Props) {
   const s = TENDER_STATUS_COLORS[tender.status] ?? TENDER_STATUS_COLORS.draft;
-  const closing = daysLeftShort(tender.closingDate, now);
+  const closing = daysLeftShort(String(tender.closingDate), now);
   const isUrgent =
     closing !== "Closed" && closing !== "Today" && parseInt(closing) <= 3;
 

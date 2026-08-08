@@ -45,7 +45,7 @@ export interface User {
   name: string;
   email: string;
   role: "SuperAdmin" | "Admin" | "Vendor";
-  createdAt: Date;
+  createdAt: Date | string;
 }
 
 export interface Vendor {

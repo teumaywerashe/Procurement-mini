@@ -22,6 +22,8 @@ import { AdminOrOwnerGuard } from '../auth/guards/adminOrOwner.guard';
 import { IsIn, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+import { CreateUserDto } from './dto/create-user.dto';
+
 class PromoteUserDto {
   @ApiProperty({ enum: UserRole })
   @IsIn(Object.values(UserRole))
@@ -34,6 +36,13 @@ class PromoteUserDto {
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post()
+  @Roles(UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Create user or admin (super_admin only)' })
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.userService.createUser(createUserDto);
+  }
 
   @Get()
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)

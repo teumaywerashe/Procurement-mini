@@ -28,17 +28,23 @@ export class UserService {
     return user.map(omitPassword);
   }
 
-  async createUser(CreateUserDto: CreateUserDto) {
-    const existingUser = await this.findByEmail(CreateUserDto.email);
-    if (existingUser) {
+  async createUser(createUserDto: CreateUserDto) {
+    const existingUser = await this.findByEmail(createUserDto.email);
+    if (existingUser && existingUser.length > 0) {
       throw new BadRequestException('User with this email already exists');
     }
-    const newUser = await db
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const [newUser] = await db
       .insert(users)
-      .values(CreateUserDto)
+      .values({
+        name: createUserDto.name,
+        email: createUserDto.email,
+        password: hashedPassword,
+        role: createUserDto.role ?? ('Admin' as any),
+      })
       .returning()
       .execute();
-    return newUser.map(omitPassword);
+    return omitPassword(newUser);
   }
 
   async findAll() {

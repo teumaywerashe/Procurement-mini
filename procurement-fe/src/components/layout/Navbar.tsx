@@ -26,18 +26,17 @@ export default function Navbar() {
   const navLinks = isLoggedIn
     ? [
         { label: "Dashboard", href: "/dashboard" },
+        { label: "Tenders", href: "/tenders" },
         ...(isSuperAdmin
           ? [
               { label: "Vendors", href: "/vendors" },
               { label: "Users", href: "/users" },
             ]
           : []),
-        ...(!isSuperAdmin ? [{ label: "Tenders", href: "/tenders" }] : []),
         ...(isVendor ? [{ label: "My Bids", href: "/bids/my" }] : []),
         ...(isAdmin
           ? [
               { label: "Manage", href: "/tenders/manage" },
-              // { label: "Vendors", href: "/vendors" },
               { label: "Bids", href: "/bids" },
             ]
           : []),
@@ -72,7 +71,7 @@ export default function Navbar() {
         <div className="w-full px-4 sm:px-6 h-14 flex items-center gap-3">
           {/* Logo */}
           <Link
-            href={isLoggedIn ? "/tenders" : "/"}
+            href={isLoggedIn ? "/dashboard" : "/"}
             className="flex items-center gap-2 shrink-0 p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <IconShoppingBag size={22} className="text-[#9fef00]" />
