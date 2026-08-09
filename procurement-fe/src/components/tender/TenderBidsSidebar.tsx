@@ -2,7 +2,10 @@
 import React from "react";
 import Link from "next/link";
 import { IconGavel, IconArrowRight } from "@tabler/icons-react";
-import { useGetVendorQuery } from "@/src/store/api/vendorApi";
+import {
+  useGetMyVendorQuery,
+  useGetVendorQuery,
+} from "@/src/store/api/vendorApi";
 import {
   useGetAllBidsQuery,
   useGetBidsByVendorQuery,
@@ -16,11 +19,14 @@ interface Props {
 }
 
 export default function TenderBidsSidebar({ userId, isVendor }: Props) {
-  const { data: vendor } = useGetVendorQuery(userId, { skip: !isVendor });
+  const { data: vendor, isLoading: isVendorLoading } = useGetMyVendorQuery(
+    undefined,
+    { skip: !isVendor },
+  );
 
-  const { data: bids = [], isLoading: isVendorLoading } =
-    useGetBidsByVendorQuery(undefined, { skip: !isVendor || !vendor?.id });
-
+  // const { data: bids = [], isLoading: isVendorLoading } =
+  //   useGetBidsByVendorQuery(undefined, { skip: !isVendor || !vendor?.id });
+  const bids = vendor?.bids ?? [];
   const route = useRouter();
   const { data: allBids = [], isLoading: isAllBidsLoading } =
     useGetAllBidsQuery(undefined, { skip: isVendor });
@@ -29,7 +35,7 @@ export default function TenderBidsSidebar({ userId, isVendor }: Props) {
   const displayBids = isVendor ? bids.slice(0, 5) : allBids.slice(0, 5);
   const totalCount = isVendor ? bids.length : allBids.length;
   const isLoading = isVendor ? isVendorLoading : isAllBidsLoading;
-
+  console.log(isVendor, bids, vendor);
   return (
     <aside
       className="hidden xl:flex flex-col shrink-0 border-l border-(--border) bg-(--bg-base) sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto"
