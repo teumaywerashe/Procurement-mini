@@ -1,0 +1,77 @@
+"use client";
+
+import React from "react";
+import { Modal, Text, Stack, NumberInput, Textarea, Group, Button } from "@mantine/core";
+import { IconCurrencyDollar } from "@tabler/icons-react";
+import type { Bid } from "@/src/types";
+
+interface EditBidModalProps {
+  editingBid: Bid | null;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  bidAmount: number | string;
+  onBidAmountChange: (val: number | string) => void;
+  bidNotes: string;
+  onBidNotesChange: (val: string) => void;
+  isUpdatingBid: boolean;
+}
+
+export default function EditBidModal({
+  editingBid,
+  onClose,
+  onSubmit,
+  bidAmount,
+  onBidAmountChange,
+  bidNotes,
+  onBidNotesChange,
+  isUpdatingBid,
+}: EditBidModalProps) {
+  return (
+    <Modal
+      opened={!!editingBid}
+      onClose={onClose}
+      title={
+        <Text fw={700}>
+          Edit Bid — {editingBid?.referenceNumber || `#BID-${editingBid?.id}`}
+        </Text>
+      }
+      centered
+      radius="md"
+    >
+      <form onSubmit={onSubmit}>
+        <Stack gap="md">
+          <Text size="xs" c="dimmed">
+            Tender: {editingBid?.tender?.title || `Tender #${editingBid?.tenderId}`}
+          </Text>
+
+          <NumberInput
+            label="Updated Proposed Price ($)"
+            placeholder="Enter updated amount"
+            required
+            min={1}
+            value={bidAmount}
+            onChange={onBidAmountChange}
+            leftSection={<IconCurrencyDollar size={16} />}
+          />
+
+          <Textarea
+            label="Updated Proposal Notes"
+            placeholder="Update proposal details..."
+            rows={3}
+            value={bidNotes}
+            onChange={(e) => onBidNotesChange(e.target.value)}
+          />
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="default" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button color="indigo" type="submit" loading={isUpdatingBid}>
+              Save Changes
+            </Button>
+          </Group>
+        </Stack>
+      </form>
+    </Modal>
+  );
+}

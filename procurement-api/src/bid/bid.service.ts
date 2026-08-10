@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   BadRequestException,
   ConflictException,
@@ -15,16 +16,35 @@ import { eq } from 'drizzle-orm';
 import { vendor } from '../database/schema/vendor.schema';
 import { tender } from '../database/schema/tender.schema';
 import { UserRole } from '../user/enum/userRole.enum';
+import { bidStatus } from './enum/bidStatus.enum';
 
 @Injectable()
 export class BidService {
   async create(createBidDto: CreateBidDto, user: JwtPayload) {
-    const [creatingVendor] = await db
+    const [existingTender] = await db
+      .select()
+      .from(tender)
+      .where(eq(tender.id, createBidDto.tenderId))
+      .execute();
+    if (!existingTender) {
+      throw new NotFoundException(
+        `Tender with ID ${createBidDto.tenderId} not found`,
+      );
+    }
+    if (user.role !== UserRole.VENDOR) {
+      throw new ForbiddenException('Only vendors are allowed to create bids');
+    }
+    if (existingTender.status !== 'open') {
+      throw new ForbiddenException(
+        'You cannot create a bid for a tender that is not open',
+      );
+    }
+    const [existingVendor] = await db
       .select()
       .from(vendor)
       .where(eq(vendor.ownerId, user.uid))
       .execute();
-    if (!creatingVendor) {
+    if (!existingVendor) {
       throw new UnauthorizedException(
         'You cant create a bid with user accound create a vendor first',
       );
@@ -34,13 +54,12 @@ export class BidService {
         .insert(bid)
         .values({
           ...createBidDto,
-          vendorId: creatingVendor.id,
+          vendorId: existingVendor.id,
           referenceNumber: `RF-BID-${Date.now()}${user.uid}`,
         })
         .returning();
       return createdBid;
     } catch (err: any) {
-      // PostgreSQL unique violation
       if (err?.code === '23505') {
         throw new ConflictException(
           'You have already submitted a bid for this tender',
@@ -57,7 +76,6 @@ export class BidService {
         with: { tender: true, vendor: true },
       });
     }
-    // ADMIN sees bids only on their own tenders
     const adminTenders = await db.query.tender.findMany({
       where: { createdBy: user.uid },
       with: {
@@ -71,7 +89,7 @@ export class BidService {
     );
   }
 
-  async findByVendorId(uid: number) {
+  async findMyBids(uid: number) {
     const existingVendor = await db
       .select()
       .from(vendor)
@@ -110,10 +128,12 @@ export class BidService {
   }
 
   async findOne(id: number, user: JwtPayload) {
+    console.log(user);
     const bidById = await db.query.bid.findFirst({
       where: { id },
       with: { tender: true, vendor: true },
     });
+    console.log(bidById);
     if (!bidById) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }
@@ -128,7 +148,7 @@ export class BidService {
       }
       return bidById;
     }
-    if (bidById.vendor?.ownerId !== user.uid) {
+    if (bidById.vendor?.ownerId != user.uid) {
       throw new ForbiddenException('You can only view your own bids');
     }
     return bidById;
@@ -163,9 +183,7 @@ export class BidService {
         .where(eq(vendor.id, foundBid.vendorId))
         .limit(1);
       if (!updatingVendor || updatingVendor.ownerId !== user.uid) {
-        throw new ForbiddenException(
-          'You are not allowed to update this bid.',
-        );
+        throw new ForbiddenException('You are not allowed to update this bid.');
       }
     }
 
@@ -176,7 +194,37 @@ export class BidService {
       .returning();
     return updatedBid;
   }
+  async updateStatus(id: number, status: bidStatus, user: JwtPayload) {
+    if (!id) {
+      throw new BadRequestException('Bid ID is required for update');
+    }
 
+    if (user.role === UserRole.ADMIN) {
+      const [foundBid] = await db
+        .select()
+        .from(bid)
+        .where(eq(bid.id, id))
+        .limit(1);
+      if (!foundBid) {
+        throw new NotFoundException(`Bid with ID ${id} not found`);
+      }
+      const ownedTender = await db.query.tender.findFirst({
+        where: { id: foundBid.tenderId },
+      });
+      if (!ownedTender || ownedTender.createdBy !== user.uid) {
+        throw new ForbiddenException(
+          'You can only update bids applied to your own tenders',
+        );
+      }
+    }
+
+    const [updatedBid] = await db
+      .update(bid)
+      .set({ bidStatus: status })
+      .where(eq(bid.id, id))
+      .returning();
+    return updatedBid;
+  }
   async remove(id: number, user: JwtPayload) {
     if (!id) {
       throw new UnauthorizedException('Bid ID is required for deletion');
@@ -195,10 +243,10 @@ export class BidService {
       .where(eq(vendor.id, foundBid.vendorId))
       .limit(1);
     if (!foundVendor) {
-      throw new UnauthorizedException('Vendor not found');
+      throw new NotFoundException('Vendor not found');
     }
-    if (foundVendor.ownerId !== user.uid) {
-      throw new UnauthorizedException(
+    if (foundVendor.ownerId !== user.uid && user.role !== UserRole.ADMIN) {
+      throw new BadRequestException(
         `Vendor ID mismatch. Cannot delete bid with a different vendor ID.`,
       );
     }
