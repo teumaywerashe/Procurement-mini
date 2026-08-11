@@ -128,12 +128,10 @@ export class BidService {
   }
 
   async findOne(id: number, user: JwtPayload) {
-    console.log(user);
     const bidById = await db.query.bid.findFirst({
       where: { id },
       with: { tender: true, vendor: true },
     });
-    console.log(bidById);
     if (!bidById) {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }

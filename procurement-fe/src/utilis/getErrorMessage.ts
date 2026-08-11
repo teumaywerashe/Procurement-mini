@@ -1,16 +1,31 @@
 export function getErrorMessage(error: unknown): string {
-  const data = (error as { data?: unknown }).data;
-  const msg = (data as { message?: unknown } | undefined)?.message;
+  const data = (error as { data?: unknown })?.data;
 
-  if (Array.isArray(msg)) {
-    return msg.join(", ");
-  } else if (typeof msg === "string") {
-    return msg;
-  } else if (Array.isArray(data)) {
-    return data.join(", ");
-  } else if (typeof data === "string") {
-    return data;
-  } else {
+  if (!data || typeof data !== "object") {
     return "An error occurred. Please try again.";
   }
+
+  const message = (data as { message?: unknown }).message;
+
+  if (message && typeof message === "object") {
+    const nestedMessage = (message as { message?: unknown }).message;
+
+    if (typeof nestedMessage === "string") {
+      return nestedMessage;
+    }
+  }
+
+  if (Array.isArray(message)) {
+    return message.join(", ");
+  }
+
+  if (typeof message === "string") {
+    return message;
+  }
+
+  if (typeof data === "string") {
+    return data;
+  }
+
+  return "An error occurred. Please try again.";
 }

@@ -21,43 +21,54 @@ import type { CollectionResult } from '../common/dto/collection-result';
 export class VendorService {
   constructor() {}
   async create(createVendorDto: CreateVendorDto, user: JwtPayload) {
-    const [existingVendorWithEmail] = await db
-      .select()
-      .from(vendor)
-      .where(eq(vendor.email, createVendorDto.email as any as string))
-      .execute();
+    return await db.transaction(async (tx) => {
+      if (createVendorDto.email) {
+        const [existingVendorWithEmail] = await tx
+          .select()
+          .from(vendor)
+          .where(eq(vendor.email, createVendorDto.email))
+          .execute();
 
-    if (existingVendorWithEmail) {
-      throw new ConflictException('Email already exists');
-    }
-    const [existingVendor] = await db
-      .select()
-      .from(vendor)
-      .where(eq(vendor.registrationNumber, createVendorDto.registrationNumber))
-      .execute();
-    if (existingVendor) {
-      throw new ConflictException(
-        'Vendor with this registration number already exists',
-      );
-    }
-    const [userOwneVendor] = await db
-      .select()
-      .from(vendor)
-      .where(eq(vendor.ownerId, user.uid))
-      .execute();
-    // console.log(userOwneVendor);
-    if (userOwneVendor) {
-      throw new ConflictException(
-        'You already own a vendor. Each user can only register one vendor.',
-      );
-    }
-    const [newVendor] = await db
-      .insert(vendor)
-      .values({ ...createVendorDto, ownerId: user.uid })
-      .returning()
-      .execute();
+        if (existingVendorWithEmail) {
+          throw new ConflictException('Email already exists');
+        }
+      }
 
-    return newVendor;
+      // Check for existing registration number
+      const [existingVendor] = await tx
+        .select()
+        .from(vendor)
+        .where(
+          eq(vendor.registrationNumber, createVendorDto.registrationNumber),
+        )
+        .execute();
+      if (existingVendor) {
+        throw new ConflictException(
+          'Vendor with this registration number already exists',
+        );
+      }
+
+      // Check if user already owns a vendor
+      const [userOwneVendor] = await tx
+        .select()
+        .from(vendor)
+        .where(eq(vendor.ownerId, user.uid))
+        .execute();
+      if (userOwneVendor) {
+        throw new ConflictException(
+          'You already own a vendor. Each user can only register one vendor.',
+        );
+      }
+
+      // Create the vendor
+      const [newVendor] = await tx
+        .insert(vendor)
+        .values({ ...createVendorDto, ownerId: user.uid })
+        .returning()
+        .execute();
+
+      return newVendor;
+    });
   }
 
   async findAll(query: CollectionQueryDto): Promise<CollectionResult<any>> {

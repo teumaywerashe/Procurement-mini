@@ -37,7 +37,7 @@ export const userApi = baseApi.injectEndpoints({
     }),
     updateUser: builder.mutation<User, { id: number } & Partial<User>>({
       query: ({ id, ...body }) => ({
-        url: `/user/${id}`,
+        url: `/user/${id}/profile`,
         method: "PATCH",
         body,
       }),
@@ -51,13 +51,15 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    deleteUser: builder.mutation<{ success: boolean; message: string }, number>({
-      query: (id) => ({
-        url: `/user/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["User"],
-    }),
+    deleteUser: builder.mutation<{ success: boolean; message: string }, number>(
+      {
+        query: (id) => ({
+          url: `/user/${id}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["User"],
+      },
+    ),
   }),
 });
 
@@ -72,4 +74,3 @@ export const {
   useUpdateUserRoleMutation,
   useDeleteUserMutation,
 } = userApi;
-

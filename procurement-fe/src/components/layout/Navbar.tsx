@@ -30,7 +30,7 @@ export default function Navbar() {
         ...(isSuperAdmin
           ? [
               { label: "Vendors", href: "/vendors" },
-              { label: "Users", href: "/users" },
+             
             ]
           : []),
         ...(isVendor ? [{ label: "My Bids", href: "/bids/my" }] : []),

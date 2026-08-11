@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Body,
@@ -10,26 +11,15 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateRoleDto } from './dto/update-role.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/decorators/types';
 import { UserRole } from './enum/userRole.enum';
-import { AdminOrOwner } from '../auth/decorators/adminOrOwner.decorator';
 import { AdminOrOwnerGuard } from '../auth/guards/adminOrOwner.guard';
-import { IsIn, IsNotEmpty } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-
-import { CreateUserDto } from './dto/create-user.dto';
-
-class PromoteUserDto {
-  @ApiProperty({ enum: UserRole })
-  @IsIn(Object.values(UserRole))
-  @IsNotEmpty()
-  role!: UserRole;
-}
 
 @ApiTags('Users')
 @UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwnerGuard)
@@ -40,7 +30,7 @@ export class UserController {
   @Post()
   @Roles(UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Create user or admin (super_admin only)' })
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: any) {
     return await this.userService.createUser(createUserDto);
   }
 
@@ -64,25 +54,49 @@ export class UserController {
     return await this.userService.findOne(id);
   }
 
-  @Patch(':id')
-  @AdminOrOwner()
-  @ApiOperation({ summary: 'Update user (own profile, admin, or super_admin)' })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.userService.update(id, updateUserDto);
+  @Patch(':id/profile')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.VENDOR)
+  @ApiOperation({
+    summary: 'Update own profile - vendors can update name and password',
+  })
+  async updateProfile(
+    @Param('id') id: string,
+    @Body() updateProfileDto: UpdateProfileDto,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
+    // Users can only update their own profile
+    if (String(currentUser.uid) !== id) {
+      throw new BadRequestException('You can only update your own profile');
+    }
+
+    return await this.userService.update(id, updateProfileDto);
+  }
+
+  @Patch(':id/role')
+  @Roles(UserRole.SUPER_ADMIN)
+  @ApiOperation({
+    summary: 'Update user role (super_admin only)',
+  })
+  async updateRole(
+    @Param('id') id: string,
+    @Body() updateRoleDto: UpdateRoleDto,
+  ) {
+    return await this.userService.update(id, {
+      role: updateRoleDto.role,
+    } as any);
   }
 
   @Delete(':id')
-  @AdminOrOwner()
-  @ApiOperation({ summary: 'Delete user (admin or super_admin)' })
+  @Roles(UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Delete user (super_admin only)' })
   async remove(@Param('id') id: string) {
     return await this.userService.remove(id);
   }
 
-  /** SUPER_ADMIN only: promote or demote any user's role */
   @Post(':id/role')
   @Roles(UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Set user role (super_admin only)' })
-  async setRole(@Param('id') id: string, @Body() dto: PromoteUserDto) {
+  async setRole(@Param('id') id: string, @Body() dto: UpdateRoleDto) {
     return await this.userService.update(id, { role: dto.role } as any);
   }
 }

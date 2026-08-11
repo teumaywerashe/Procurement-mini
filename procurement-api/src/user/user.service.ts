@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -53,32 +54,49 @@ export class UserService {
   }
 
   async findOne(id: string) {
+    const userId = parseInt(id, 10);
+    if (isNaN(userId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
     const result = await db
       .select()
       .from(users)
-      .where(eq(users.id, id as any as number))
+      .where(eq(users.id, userId))
       .execute();
     return result.map(omitPassword);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: any) {
+    const userId = parseInt(id, 10);
+    if (isNaN(userId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.id, id as any as number))
+      .where(eq(users.id, userId))
       .execute();
     if (!user) {
       throw new BadRequestException('User not found');
     }
+
+    // Prevent email updates
+    if (updateUserDto.email !== undefined) {
+      throw new BadRequestException('Email cannot be updated');
+    }
+
+    // Hash password if provided
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
+
     const [updated] = await db
       .update(users)
-      .set(updateUserDto as any as Partial<typeof users>)
-      .where(eq(users.id, id as any as number))
+      .set(updateUserDto)
+      .where(eq(users.id, userId))
       .returning()
       .execute();
+
     return {
       updated: omitPassword(updated),
       success: true,
@@ -87,17 +105,21 @@ export class UserService {
   }
 
   async remove(id: string) {
+    const userId = parseInt(id, 10);
+    if (isNaN(userId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.id, id as any as number))
+      .where(eq(users.id, userId))
       .execute();
     if (!user) {
       throw new BadRequestException('User not found');
     }
     const [deleted] = await db
       .delete(users)
-      .where(eq(users.id, id as any as number))
+      .where(eq(users.id, userId))
       .returning()
       .execute();
     return {

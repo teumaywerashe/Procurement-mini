@@ -49,21 +49,21 @@ export class BidController {
   })
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   findByTenderId(
-    @Param('tenderId') tenderId: number,
+    @Param('tenderId') tenderId: string,
     @CurrentUser() user: JwtPayload,
   ) {
     return this.bidService.findByTenderId(+tenderId, user);
   }
   @Get(':id')
   @ApiOperation({ summary: 'Get a bid by ID' })
-  findOne(@Param('id') id: number, @CurrentUser() user: JwtPayload) {
+  findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.bidService.findOne(+id, user);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a bid by ID (Bid Owner only)' })
   update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateBidDto: UpdateBidDto,
     @CurrentUser() user: JwtPayload,
   ) {
@@ -74,17 +74,15 @@ export class BidController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
   @ApiOperation({ summary: 'Update bid status by ID (Admin / super_admin)' })
   updateBidStatus(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body('status') status: string,
     @CurrentUser() user: JwtPayload,
   ) {
-    const updateBidDto = new UpdateBidDto();
-    updateBidDto.bidStatus = status as 'pending' | 'accepted' | 'rejected';
     return this.bidService.updateStatus(+id, status as bidStatus, user);
   }
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a bid by ID (Bid Owner only)' })
-  remove(@Param('id') id: number, @CurrentUser() user: JwtPayload) {
+  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.bidService.remove(+id, user);
   }
 }
