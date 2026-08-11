@@ -35,7 +35,10 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    updateUser: builder.mutation<User, { id: number } & Partial<User>>({
+    updateUser: builder.mutation<
+      User,
+      { id: number; name?: string; password?: string } & Partial<User>
+    >({
       query: ({ id, ...body }) => ({
         url: `/user/${id}/profile`,
         method: "PATCH",

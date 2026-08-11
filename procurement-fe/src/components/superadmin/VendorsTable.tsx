@@ -65,7 +65,7 @@ export function VendorsTable({
               <tr>
                 <th className="px-6 py-3.5">Company Name</th>
                 <th className="px-6 py-3.5">Email</th>
-                <th className="px-6 py-3.5">Registration No.</th>
+                <th className="px-6 py-3.5">Vendor ID</th>
                 <th className="px-6 py-3.5">Phone Number</th>
                 <th className="px-6 py-3.5">Bids Count</th>
                 <th className="px-6 py-3.5">Joined Date</th>
@@ -85,7 +85,7 @@ export function VendorsTable({
                     {vendor.email || "—"}
                   </td>
                   <td className="px-6 py-4 font-mono text-(--text-faint)">
-                    {vendor.registrationNumber || "N/A"}
+                    #{vendor.id}
                   </td>
                   <td className="px-6 py-4 text-(--text-subtle)">
                     {vendor.phoneNumber || "—"}

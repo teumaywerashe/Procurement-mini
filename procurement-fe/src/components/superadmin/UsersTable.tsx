@@ -11,7 +11,6 @@ import {
   Text,
   PasswordInput,
   TextInput,
-  SelectItem,
 } from "@mantine/core";
 import {
   IconPlus,

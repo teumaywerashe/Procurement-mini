@@ -68,8 +68,9 @@ export default function ProfileCard({ user }: { user: User }) {
     }
     setNameError(null);
     try {
-      const updated = await updateUser({ id: user.id, name }).unwrap();
-      dispatch(logIn(updated));
+      const res = await updateUser({ id: user.id, name }).unwrap();
+      const updatedUser = (res as any).updated ?? res;
+      dispatch(logIn(updatedUser));
       notifications.show({
         title: "Profile updated",
         message: "Your name has been updated.",
@@ -92,12 +93,12 @@ export default function ProfileCard({ user }: { user: User }) {
     }
     setPasswordError(null);
     try {
-      const { updated } = await updateUser({
+      const res = await updateUser({
         id: user.id,
         password: newPassword,
       }).unwrap();
-      console.log(updated);
-      dispatch(logIn(updated));
+      const updatedUser = (res as any).updated ?? res;
+      dispatch(logIn(updatedUser));
       notifications.show({
         title: "Password updated",
         message: "Your password has been changed.",
