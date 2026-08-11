@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 function decodeJwtPayload(
   token: string,
-): { uid?: number; role?: string } | null {
+): { uid?: number; role?: string; exp?: number } | null {
   try {
     const base64 = token.split(".")[1];
     const json = Buffer.from(base64, "base64url").toString("utf-8");
@@ -28,7 +28,10 @@ export function middleware(req: NextRequest) {
 
   // payload ={uid,name,email,role}
 
-  const isLoggedIn = !!payload?.uid;
+  // Check if token is expired
+  const isTokenExpired =
+    payload && payload.exp ? payload.exp * 1000 < Date.now() : false;
+  const isLoggedIn = !!payload?.uid && !isTokenExpired;
   const role = payload?.role;
 
   const isAdmin = role === "Admin" || role === "SuperAdmin";

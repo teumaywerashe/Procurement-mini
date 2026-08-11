@@ -1,5 +1,7 @@
 export interface CollectionQuery {
   q?: string;
+  status?: string;
+  category?: string;
   page?: number;
   limit?: number;
   sortBy?: string;

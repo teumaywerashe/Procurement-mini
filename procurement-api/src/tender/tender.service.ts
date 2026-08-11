@@ -37,7 +37,6 @@ export class TenderService {
   async findAll(user: JwtPayload) {
     const adminLike = isAdminLike(user);
 
-    // ADMIN scoped to their own tenders; SUPER_ADMIN and VENDOR see all
     const whereClause =
       user.role === UserRole.ADMIN ? eq(tender.createdBy, user.uid) : undefined;
 
@@ -47,15 +46,16 @@ export class TenderService {
       .where(whereClause)
       .orderBy(desc(tender.createdAt));
 
-    const ids = rows.map((r) => r.id);
-    if (ids.length === 0) return [];
+    const ids = new Set(rows.map((r) => r.id));
+    if (ids.size === 0) return [];
+
+    const queryWhere = user.role === UserRole.ADMIN ? { createdBy: user.uid } : undefined;
 
     const withRelations = await db.query.tender.findMany({
-      where: { id: { in: ids } },
-      // Admins get bids included; vendors/public get tenders only
+      where: queryWhere as any,
       with: { user: true, ...(adminLike ? { bids: true } : {}) },
     });
-    return ids.map((id) => withRelations.find((t) => t.id === id)!);
+    return rows.map((r) => withRelations.find((t) => t.id === r.id)!).filter(Boolean);
   }
 
   async findAllByFilter(
@@ -79,6 +79,8 @@ export class TenderService {
       conditions.push(gte(tender.estimatedValue, filter.minPrice));
     if (filter.maxPrice !== undefined)
       conditions.push(lte(tender.estimatedValue, filter.maxPrice));
+    if (filter.status !== undefined)
+      conditions.push(eq(tender.status, filter.status));
 
     const where = conditions.length ? and(...conditions) : undefined;
 
@@ -104,22 +106,24 @@ export class TenderService {
       .limit(limit)
       .offset(offset);
 
-    const ids = rows.map((r) => r.id);
-    if (ids.length === 0)
+    if (rows.length === 0)
       return { data: [], total: Number(total), page, limit };
 
+    const queryWhere = user.role === UserRole.ADMIN ? { createdBy: user.uid } : undefined;
+
     const withRelations = await db.query.tender.findMany({
-      where: { id: { in: ids } },
-      // Admins (ADMIN + SUPER_ADMIN) get bids; vendors/public get tenders only
+      where: queryWhere as any,
       with: { user: true, ...(adminLike ? { bids: true } : {}) },
     });
-    const data = ids.map((id) => withRelations.find((t) => t.id === id)!);
+    const data = rows.map((r) => withRelations.find((t) => t.id === r.id)!).filter(Boolean);
 
     return { data, total: Number(total), page, limit };
   }
 
   async findOne(id: number, user?: JwtPayload) {
-    const existing = await db.query.tender.findFirst({ where: { id } });
+    const existing = await db.query.tender.findFirst({
+      where: { id } as any,
+    });
     if (!existing) return null;
 
     const canSeeBids =
@@ -127,7 +131,7 @@ export class TenderService {
       (user?.role === UserRole.ADMIN && existing.createdBy === user?.uid);
 
     return await db.query.tender.findFirst({
-      where: { id },
+      where: { id } as any,
       with: { user: true, ...(canSeeBids ? { bids: true } : {}) },
     });
   }

@@ -28,7 +28,9 @@ export const tenderApi = baseApi.injectEndpoints({
           dispatch(
             tenderApi.util.updateQueryData("getTender", id, () => updated),
           );
-        } catch {}
+        } catch (error) {
+          console.error("Failed to update tender:", error);
+        }
       },
     }),
     deleteTender: builder.mutation<void, number>({

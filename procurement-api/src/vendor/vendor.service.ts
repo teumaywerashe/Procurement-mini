@@ -119,12 +119,13 @@ export class VendorService {
 
     // Fetch with relations for returned IDs only
     const data = await db.query.vendor.findMany({
-      where: { id: { in: ids } },
       with: { bids: true, user: true },
     });
 
     // Re-order to match sorted order
-    const ordered = ids.map((id) => data.find((v) => v.id === id)!);
+    const ordered = ids
+      .map((id) => data.find((v) => v.id === id)!)
+      .filter(Boolean);
 
     return { data: ordered, total: Number(total), page, limit };
   }
@@ -133,7 +134,7 @@ export class VendorService {
       throw new BadRequestException('Vendor ID is required');
     }
     const existingVendor = await db.query.vendor.findFirst({
-      where: { id },
+      where: { id } as any,
       with: { bids: true, user: true },
     });
     if (!existingVendor) {
@@ -153,7 +154,7 @@ export class VendorService {
       throw new BadRequestException('Owner ID is required');
     }
     const existingVendor = await db.query.vendor.findFirst({
-      where: { ownerId },
+      where: { ownerId } as any,
       with: {
         bids: true,
         user: true,
@@ -173,7 +174,9 @@ export class VendorService {
     if (!id) {
       throw new BadRequestException('Vendor ID is required');
     }
-    const existingVendor = await db.query.vendor.findFirst({ where: { id } });
+    const existingVendor = await db.query.vendor.findFirst({
+      where: { id } as any,
+    });
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
     }
@@ -197,7 +200,9 @@ export class VendorService {
     if (!id) {
       throw new BadRequestException('Vendor ID is required');
     }
-    const existingVendor = await db.query.vendor.findFirst({ where: { id } });
+    const existingVendor = await db.query.vendor.findFirst({
+      where: { id } as any,
+    });
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
     }

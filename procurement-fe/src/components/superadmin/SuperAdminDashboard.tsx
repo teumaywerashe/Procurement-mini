@@ -240,19 +240,10 @@ export default function SuperAdminDashboard({
             >
               Admin Management ({totalAdmins})
             </Tabs.Tab> 
-             {/* <Tabs.Tab
-              value="vendors"
-              leftSection={<IconBuildingStore size={16} />}
-            >
-              Vendors List ({vendors.length})
-            </Tabs.Tab> */}
            
             <Tabs.Tab value="users" leftSection={<IconUsers size={16} />}>
               Logged-in / System Users ({users.length})
             </Tabs.Tab>
-            {/* <Tabs.Tab value="tenders" leftSection={<IconFileText size={16} />}>
-              Tenders List ({tenders.length})
-            </Tabs.Tab> */}
           </Tabs.List>
 
           {/* TAB 1: VENDORS LIST */}

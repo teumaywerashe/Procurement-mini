@@ -21,4 +21,9 @@ export class TenderFilterDto extends CollectionQueryDto {
   @Type(() => Number)
   @IsNumber()
   maxPrice?: number;
+
+  @ApiPropertyOptional({ example: 'published' })
+  @IsOptional()
+  @IsString()
+  status?: string;
 }

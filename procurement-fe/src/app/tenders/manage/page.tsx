@@ -156,10 +156,10 @@ function ManageTendersContent() {
       <div className="flex flex-1 w-full overflow-hidden">
         <ManageLeftSidebar
           tenders={tenders}
-          statusFilter={statusFilter}
+          statusFilter={(query.status as TenderStatus) ?? ""}
           onStatusChange={(s) => {
             setStatusFilter(s);
-            setQuery({ q: s || undefined });
+            setQuery({ status: s || undefined });
           }}
         />
 

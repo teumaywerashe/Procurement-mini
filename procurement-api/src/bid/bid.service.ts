@@ -77,7 +77,7 @@ export class BidService {
       });
     }
     const adminTenders = await db.query.tender.findMany({
-      where: { createdBy: user.uid },
+      where: { createdBy: user.uid } as any,
       with: {
         bids: {
           with: { vendor: true },
@@ -100,14 +100,14 @@ export class BidService {
       throw new NotFoundException(`Vendor with owner ID ${uid} not found`);
     }
     return await db.query.bid.findMany({
-      where: { vendorId: existingVendor.id },
+      where: { vendorId: existingVendor.id } as any,
       with: { tender: true, vendor: true },
     });
   }
 
   async findByTenderId(tenderId: number, user: JwtPayload) {
     const ownedTender = await db.query.tender.findFirst({
-      where: { id: tenderId },
+      where: { id: tenderId } as any,
     });
     if (!ownedTender) {
       throw new NotFoundException(`Tender ${tenderId} not found`);
@@ -122,14 +122,14 @@ export class BidService {
       );
     }
     return await db.query.bid.findMany({
-      where: { tenderId },
+      where: { tenderId } as any,
       with: { tender: true, vendor: true },
     });
   }
 
   async findOne(id: number, user: JwtPayload) {
     const bidById = await db.query.bid.findFirst({
-      where: { id },
+      where: { id } as any,
       with: { tender: true, vendor: true },
     });
     if (!bidById) {
@@ -167,7 +167,7 @@ export class BidService {
 
     if (user.role === UserRole.ADMIN) {
       const ownedTender = await db.query.tender.findFirst({
-        where: { id: foundBid.tenderId },
+        where: { id: foundBid.tenderId } as any,
       });
       if (!ownedTender || ownedTender.createdBy !== user.uid) {
         throw new ForbiddenException(
@@ -207,7 +207,7 @@ export class BidService {
         throw new NotFoundException(`Bid with ID ${id} not found`);
       }
       const ownedTender = await db.query.tender.findFirst({
-        where: { id: foundBid.tenderId },
+        where: { id: foundBid.tenderId } as any,
       });
       if (!ownedTender || ownedTender.createdBy !== user.uid) {
         throw new ForbiddenException(

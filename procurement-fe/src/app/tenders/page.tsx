@@ -55,7 +55,7 @@ const COLUMNS: DataTableColumn<Tender>[] = [
     accessor: "estimatedValue",
     title: "Value",
     sortable: true,
-    render: (t) => `$${Number(t.estimatedValue).toLocaleString()}`,
+    render: (t) => `${Number(t.estimatedValue).toLocaleString()}`,
   },
   {
     accessor: "closingDate",
@@ -91,27 +91,47 @@ function TendersPageContent() {
   });
   const { data: result, isLoading, isError } = useGetTendersQuery(query);
 
+  const filteredData = (result?.data ?? []).filter((t) => {
+    // Status filter
+    if (query.status === "closing") {
+      const d = Math.ceil(
+        (new Date(t.closingDate).getTime() - Date.now()) / 86_400_000,
+      );
+      if (d < 0 || d > 7) return false;
+    } else if (query.status) {
+      if (t.status !== query.status) return false;
+    }
+
+    if (query.category) {
+      if (!t.name?.toLowerCase().includes(query.category.toLowerCase())) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  // Compute stats from filtered results
+  const stats = {
+    total: filteredData.length,
+    published: filteredData.filter((t) => t.status === "published").length,
+    closing: filteredData.filter((t) => {
+      const d = Math.ceil(
+        (new Date(t.closingDate).getTime() - Date.now()) / 86_400_000,
+      );
+      return d >= 0 && d <= 7;
+    }).length,
+  };
+
   return (
     <div className="h-screen bg-(--bg-base) text-(--text-primary) flex flex-col overflow-hidden">
       <Navbar />
-      <div className="flex flex-1 w-full overflow-hidden mt-14">
+      <div className="flex flex-1 w-full overflow-hidden">
         <TenderLeftSidebar
-          stats={{
-            total: result?.total ?? 0,
-            published:
-              result?.data.filter((t) => t.status === "published").length ?? 0,
-            closing:
-              result?.data.filter((t) => {
-                const d = Math.ceil(
-                  (new Date(t.closingDate).getTime() - Date.now()) / 86_400_000,
-                );
-                return d >= 0 && d <= 7;
-              }).length ?? 0,
-          }}
-          category=""
-          statusFilter=""
-          onCategoryChange={() => {}}
-          onStatusChange={(s) => setQuery({ q: s || undefined })}
+          stats={stats}
+          category={query.category ?? ""}
+          statusFilter={query.status ?? ""}
+          onCategoryChange={(c) => setQuery({ category: c || undefined })}
+          onStatusChange={(s) => setQuery({ status: s || undefined })}
         />
 
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -143,7 +163,7 @@ function TendersPageContent() {
               <p className="text-xs text-(--text-faint) mt-0.5">
                 {isLoading
                   ? "Loading..."
-                  : `${result?.total ?? 0} result${result?.total !== 1 ? "s" : ""}`}
+                  : `${stats.total} result${stats.total !== 1 ? "s" : ""}`}
               </p>
             </div>
           </div>
@@ -155,7 +175,12 @@ function TendersPageContent() {
               </p>
             ) : (
               <EntityTable<Tender>
-                result={result}
+                result={{
+                  data: filteredData,
+                  total: stats.total,
+                  page: result?.page ?? 1,
+                  limit: result?.limit ?? 10,
+                }}
                 isLoading={isLoading}
                 columns={COLUMNS}
                 query={query}

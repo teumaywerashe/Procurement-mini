@@ -16,6 +16,8 @@ export function useCollectionQuery(opts: Options = {}) {
 
   const [query, setQueryState] = useState<CollectionQuery>({
     q: searchParams.get("q") ?? undefined,
+    status: searchParams.get("status") ?? undefined,
+    category: searchParams.get("category") ?? undefined,
     page: Number(searchParams.get("page") ?? 1),
     limit: Number(searchParams.get("limit") ?? opts.defaultLimit ?? 10),
     sortBy: searchParams.get("sortBy") ?? opts.defaultSortBy ?? "createdAt",
@@ -25,10 +27,29 @@ export function useCollectionQuery(opts: Options = {}) {
       "desc",
   });
 
+  const setQuery = useCallback((patch: Partial<CollectionQuery>) => {
+    setQueryState((prev) => {
+      const next = { ...prev, ...patch };
+      // Reset to page 1 whenever filter/search/sort changes
+      if (
+        patch.q !== undefined ||
+        patch.status !== undefined ||
+        patch.category !== undefined ||
+        patch.sortBy !== undefined ||
+        patch.sortDir !== undefined
+      ) {
+        next.page = 1;
+      }
+      return next;
+    });
+  }, []);
+
   // Sync query state to URL after render — never during
   useEffect(() => {
     const params = new URLSearchParams();
     if (query.q) params.set("q", query.q);
+    if (query.status) params.set("status", query.status);
+    if (query.category) params.set("category", query.category);
     if (query.page && query.page > 1) params.set("page", String(query.page));
     if (query.limit && query.limit !== (opts.defaultLimit ?? 20))
       params.set("limit", String(query.limit));
@@ -40,21 +61,6 @@ export function useCollectionQuery(opts: Options = {}) {
     router.replace(`?${params.toString()}`, { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
-
-  const setQuery = useCallback((patch: Partial<CollectionQuery>) => {
-    setQueryState((prev) => {
-      const next = { ...prev, ...patch };
-      // Reset to page 1 whenever filter/search/sort changes
-      if (
-        patch.q !== undefined ||
-        patch.sortBy !== undefined ||
-        patch.sortDir !== undefined
-      ) {
-        next.page = 1;
-      }
-      return next;
-    });
-  }, []);
 
   return { query, setQuery };
 }

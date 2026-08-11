@@ -30,18 +30,18 @@ export default function TenderBidsSidebar({ userId, isVendor }: Props) {
   const route = useRouter();
   const { data: allBids = [], isLoading: isAllBidsLoading } =
     useGetAllBidsQuery(undefined, { skip: isVendor });
-  console.log(bids);
+  // console.log(bids);
 
   const displayBids = isVendor ? bids.slice(0, 5) : allBids.slice(0, 5);
   const totalCount = isVendor ? bids.length : allBids.length;
   const isLoading = isVendor ? isVendorLoading : isAllBidsLoading;
-  console.log(isVendor, bids, vendor);
+  // console.log(isVendor, bids, vendor);
   return (
     <aside
-      className="hidden xl:flex flex-col shrink-0 border-l border-(--border) bg-(--bg-base) sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto"
+      className="hidden xl:flex flex-col shrink-0 border-l border-(--border) bg-(--bg-base) overflow-y-auto"
       style={{ width: "20%" }}
     >
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 min-h-[calc(100vh-3.5rem)]">
         {/* Header */}
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
