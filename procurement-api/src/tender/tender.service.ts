@@ -16,7 +16,7 @@ import { UserRole } from '../user/enum/userRole.enum';
 import type { CollectionResult } from '../common/dto/collection-result';
 
 function isAdminLike(user?: JwtPayload) {
-  return user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
+  return user?.role === UserRole.ADMIN;
 }
 
 @Injectable()
@@ -127,8 +127,7 @@ export class TenderService {
     if (!existing) return null;
 
     const canSeeBids =
-      user?.role === UserRole.SUPER_ADMIN ||
-      (user?.role === UserRole.ADMIN && existing.createdBy === user?.uid);
+      user?.role === UserRole.ADMIN && existing.createdBy === user?.uid;
 
     return await db.query.tender.findFirst({
       where: { id } as any,

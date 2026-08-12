@@ -86,6 +86,9 @@ function TendersPageContent() {
   const isAdmin = user?.role === "Admin";
   const isVendor = user?.role === "Vendor";
 
+
+  console.log(user,isVendor,isAdmin)
+
   const { query, setQuery } = useCollectionQuery({
     defaultSortBy: "createdAt",
   });
@@ -177,7 +180,7 @@ function TendersPageContent() {
               <EntityTable<Tender>
                 result={{
                   data: filteredData,
-                  total: stats.total,
+                  total:result?.total??0,
                   page: result?.page ?? 1,
                   limit: result?.limit ?? 10,
                 }}
@@ -191,8 +194,8 @@ function TendersPageContent() {
           </div>
         </main>
 
-        <TenderBidsSidebar userId={user?.id ?? 0} isVendor={isVendor} />
-      </div>
+    { isVendor||isAdmin &&   <TenderBidsSidebar userId={user?.id ?? 0} isVendor={isVendor} isAdmin={isAdmin} />
+   }   </div>
     </div>
   );
 }

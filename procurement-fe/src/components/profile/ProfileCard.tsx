@@ -162,7 +162,7 @@ export default function ProfileCard({ user }: { user: User }) {
               </h1>
               <button
                 onClick={() => setEditingName(true)}
-                className="p-1 rounded text-(--text-faint) hover:text-(--text-primary) transition-colors"
+                className="p-1 cursor-pointer rounded text-(--text-faint) hover:text-(--text-primary) transition-colors"
                 title="Edit name"
               >
                 <IconEdit size={14} />

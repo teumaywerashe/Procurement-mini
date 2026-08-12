@@ -37,12 +37,6 @@ export class TenderController {
   ) {
     return this.tenderService.create(createTenderDto, user);
   }
-
-  /**
-   * GET /tender?q=&page=&limit=&sortBy=&sortDir=&minPrice=&maxPrice=
-   * Returns a CollectionResult<Tender> with pagination metadata.
-   * Admins see only their own tenders + bids; vendors see all published tenders.
-   */
   @Get()
   findAll(@Query() filter: TenderFilterDto, @CurrentUser() user: JwtPayload) {
     return this.tenderService.findAllByFilter(filter, user);

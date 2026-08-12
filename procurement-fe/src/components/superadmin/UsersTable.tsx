@@ -8,6 +8,7 @@ import {
   IconShieldCheck,
 } from "@tabler/icons-react";
 import { useUpdateUserRoleMutation } from "@/src/store/api/userApi";
+import { notifications } from "@mantine/notifications";
 
 interface UsersTableProps {
   users: User[];
@@ -28,11 +29,6 @@ export function UsersTable({
 }: UsersTableProps) {
   const [updateUserRole] = useUpdateUserRoleMutation();
   const [updatingId, setUpdatingId] = useState<number | null>(null);
-  const [feedback, setFeedback] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
-
   const filteredUsers = users.filter((u) => {
     const matchesSearch =
       u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
@@ -45,18 +41,18 @@ export function UsersTable({
     if (!newRole || newRole === user.role) return;
 
     setUpdatingId(user.id);
-    setFeedback(null);
     try {
       await updateUserRole({ id: user.id, role: newRole }).unwrap();
-      setFeedback({
-        type: "success",
+      notifications.show({
+        title: "Success",
         message: `Role for user "${user.name}" successfully updated to ${newRole}.`,
+        color: "green",
       });
     } catch (err: unknown) {
-      setFeedback({
-        type: "error",
-        message:
-          err instanceof Error ? err.message : "Failed to update user role",
+      notifications.show({
+        title: "Error",
+        message: err instanceof Error ? err.message : "Failed to update user role",
+        color: "red",
       });
     } finally {
       setUpdatingId(null);
@@ -106,31 +102,7 @@ export function UsersTable({
         </div>
       </div>
 
-      {/* Feedback Alert */}
-      {feedback && (
-        <div
-          className={`mx-4 sm:mx-6 mt-4 p-3 rounded-xl border flex items-center justify-between text-xs font-medium ${
-            feedback.type === "success"
-              ? "bg-emerald-950/70 border-emerald-800 text-emerald-300"
-              : "bg-red-950/70 border-red-800 text-red-300"
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {feedback.type === "success" ? (
-              <IconCheck size={16} />
-            ) : (
-              <IconX size={16} />
-            )}
-            <span>{feedback.message}</span>
-          </div>
-          <button
-            onClick={() => setFeedback(null)}
-            className="text-[11px] text-zinc-400 hover:text-white transition-colors"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
+     
 
       {/* Users Table Content */}
       {usersLoading ? (

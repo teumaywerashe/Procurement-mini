@@ -32,8 +32,8 @@ export class BidController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all bids on my tenders (admin / super_admin)' })
-  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all bids on my tenders (admin)' })
+  @Roles(UserRole.ADMIN)
   findAll(@CurrentUser() user: JwtPayload) {
     return this.bidService.findAll(user);
   }
@@ -45,9 +45,9 @@ export class BidController {
   }
   @Get('tender/:tenderId')
   @ApiOperation({
-    summary: 'Get bids by tender ID (tender owner / super_admin)',
+    summary: 'Get bids by tender ID (tender owner)',
   })
-  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @Roles(UserRole.ADMIN)
   findByTenderId(
     @Param('tenderId') tenderId: string,
     @CurrentUser() user: JwtPayload,
@@ -71,8 +71,8 @@ export class BidController {
   }
 
   @Patch(':id/status')
-  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
-  @ApiOperation({ summary: 'Update bid status by ID (Admin / super_admin)' })
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Update bid status by ID (Admin)' })
   updateBidStatus(
     @Param('id') id: string,
     @Body('status') status: string,

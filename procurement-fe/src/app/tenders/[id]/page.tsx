@@ -34,9 +34,8 @@ export default function TenderDetailPage() {
   const isSuperAdmin = user?.role === "SuperAdmin";
   const isAdmin = user?.role === "Admin";
   const isVendor = user?.role === "Vendor";
-  const canManage =
-    isSuperAdmin ||
-    (isAdmin && (tender?.createdBy === user?.id || (tender as any)?.createdBy === user?.id));
+  const isAdminOwner =
+    isAdmin && (tender?.createdBy === user?.id || (tender as any)?.createdBy === user?.id);
 
   async function handleDelete() {
     try {
@@ -99,7 +98,8 @@ export default function TenderDetailPage() {
         <TenderDetailHeader
           tender={tender}
           closing={closing}
-          isAdmin={canManage}
+          isAdmin={isAdmin}
+          isSuperAdmin={isSuperAdmin}
           onDelete={() => setShowConfirm(true)}
         />
 
@@ -126,7 +126,7 @@ export default function TenderDetailPage() {
         </div>
 
         {isVendor && <VendorBidSection tender={tender} closing={closing} />}
-        {canManage && <AdminBidsSection bids={tender.bids ?? []} />}
+        {isAdminOwner && <AdminBidsSection bids={tender.bids ?? []} />}
       </div>
 
       {showConfirm && (

@@ -70,11 +70,8 @@ export class BidService {
   }
 
   async findAll(user: JwtPayload) {
-    // SUPER_ADMIN sees all bids system-wide
     if (user.role === UserRole.SUPER_ADMIN) {
-      return await db.query.bid.findMany({
-        with: { tender: true, vendor: true },
-      });
+      throw new ForbiddenException('SuperAdmin is not permitted to view bids');
     }
     const adminTenders = await db.query.tender.findMany({
       where: { createdBy: user.uid } as any,
@@ -112,9 +109,8 @@ export class BidService {
     if (!ownedTender) {
       throw new NotFoundException(`Tender ${tenderId} not found`);
     }
-    // SUPER_ADMIN can view bids on any tender; ADMIN can only view bids on their own tenders
     if (
-      user.role !== UserRole.SUPER_ADMIN &&
+      user.role === UserRole.SUPER_ADMIN ||
       ownedTender.createdBy !== user.uid
     ) {
       throw new ForbiddenException(
@@ -136,7 +132,7 @@ export class BidService {
       throw new NotFoundException(`Bid with ID ${id} not found`);
     }
     if (user.role === UserRole.SUPER_ADMIN) {
-      return bidById;
+      throw new ForbiddenException('SuperAdmin is not permitted to view bids');
     }
     if (user.role === UserRole.ADMIN) {
       if (bidById.tender?.createdBy !== user.uid) {

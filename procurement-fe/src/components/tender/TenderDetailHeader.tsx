@@ -16,6 +16,7 @@ interface Props {
   tender: Tender;
   closing: string;
   isAdmin: boolean;
+  isSuperAdmin:boolean;
   onDelete: () => void;
 }
 
@@ -24,6 +25,7 @@ export default function TenderDetailHeader({
   closing,
   isAdmin,
   onDelete,
+  isSuperAdmin
 }: Props) {
   const status =
     TENDER_STATUS_COLORS[tender.status] ?? TENDER_STATUS_COLORS.draft;
@@ -52,14 +54,14 @@ export default function TenderDetailHeader({
             </h1>
             <p className="text-sm text-(--text-subtle) ">{tender.name}</p>
           </div>
-          {isAdmin && (
+          {isAdmin || isSuperAdmin && (
             <div className="flex items-center gap-2 shrink-0">
-              <Link
+             { isAdmin && <Link
                 href={`/tenders/${tender.id}/edit`}
                 className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border border-(--border-strong)  text-(--text-muted)  hover:text-(--text-primary)  transition-colors"
               >
                 <IconEdit size={15} /> Edit
-              </Link>
+              </Link>}
               <button
                 onClick={onDelete}
                 className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg border border-red-800/60 cursor-pointer text-red-400 hover:bg-red-900/20 hover:border-red-600 transition-colors"

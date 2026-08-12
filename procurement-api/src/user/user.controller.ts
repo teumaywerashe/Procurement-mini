@@ -66,7 +66,6 @@ export class UserController {
     @Body() updateProfileDto: UpdateProfileDto,
     @CurrentUser() currentUser: JwtPayload,
   ) {
-    // Users can only update their own profile
     if (String(currentUser.uid) !== id) {
       throw new BadRequestException('You can only update your own profile');
     }
