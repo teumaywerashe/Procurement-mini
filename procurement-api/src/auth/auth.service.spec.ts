@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { db } from '../database/db';
 
 // Mock the db singleton so no real DB connection is needed
 jest.mock('../database/db', () => ({
@@ -10,8 +11,6 @@ jest.mock('../database/db', () => ({
     insert: jest.fn(),
   },
 }));
-
-import { db } from '../database/db';
 
 const mockDb = db as jest.Mocked<typeof db>;
 
