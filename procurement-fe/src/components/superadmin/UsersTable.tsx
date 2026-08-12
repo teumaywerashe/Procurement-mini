@@ -1,24 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { User } from "@/src/types";
+import { Select, Loader } from "@mantine/core";
 import {
-  Select,
-  Group,
-  ActionIcon,
-  Button,
-  Tooltip,
-  Modal,
-  Stack,
-  Text,
-  PasswordInput,
-  TextInput,
-} from "@mantine/core";
-import {
-  IconPlus,
   IconSearch,
-  IconAlertTriangle,
   IconCheck,
   IconX,
+  IconShieldCheck,
 } from "@tabler/icons-react";
+import { useUpdateUserRoleMutation } from "@/src/store/api/userApi";
 
 interface UsersTableProps {
   users: User[];
@@ -37,6 +26,13 @@ export function UsersTable({
   roleFilter,
   setRoleFilter,
 }: UsersTableProps) {
+  const [updateUserRole] = useUpdateUserRoleMutation();
+  const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+
   const filteredUsers = users.filter((u) => {
     const matchesSearch =
       u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
@@ -45,16 +41,43 @@ export function UsersTable({
     return matchesSearch && matchesRole;
   });
 
+  const handleRoleChange = async (user: User, newRole: string | null) => {
+    if (!newRole || newRole === user.role) return;
+
+    setUpdatingId(user.id);
+    setFeedback(null);
+    try {
+      await updateUserRole({ id: user.id, role: newRole }).unwrap();
+      setFeedback({
+        type: "success",
+        message: `Role for user "${user.name}" successfully updated to ${newRole}.`,
+      });
+    } catch (err: unknown) {
+      setFeedback({
+        type: "error",
+        message:
+          err instanceof Error ? err.message : "Failed to update user role",
+      });
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   return (
     <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden shadow-sm">
+      {/* Header & Controls */}
       <div className="p-4 sm:p-6 border-b border-(--border) flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-base font-bold text-(--text-primary)">
-            All Registered System Users
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-bold text-(--text-primary)">
+              All Registered System Users
+            </h2>
+            <span className="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 flex items-center gap-1">
+              <IconShieldCheck size={12} /> SuperAdmin Editable Roles
+            </span>
+          </div>
           <p className="text-xs text-(--text-subtle) mt-0.5">
-            View active system user accounts, their assigned roles, and
-            registered emails.
+            View active user accounts and change their assigned roles directly. Only SuperAdmin can modify user roles.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -83,6 +106,33 @@ export function UsersTable({
         </div>
       </div>
 
+      {/* Feedback Alert */}
+      {feedback && (
+        <div
+          className={`mx-4 sm:mx-6 mt-4 p-3 rounded-xl border flex items-center justify-between text-xs font-medium ${
+            feedback.type === "success"
+              ? "bg-emerald-950/70 border-emerald-800 text-emerald-300"
+              : "bg-red-950/70 border-red-800 text-red-300"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {feedback.type === "success" ? (
+              <IconCheck size={16} />
+            ) : (
+              <IconX size={16} />
+            )}
+            <span>{feedback.message}</span>
+          </div>
+          <button
+            onClick={() => setFeedback(null)}
+            className="text-[11px] text-zinc-400 hover:text-white transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Users Table Content */}
       {usersLoading ? (
         <div className="p-6 space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -104,7 +154,7 @@ export function UsersTable({
                 <th className="px-6 py-3.5">User ID</th>
                 <th className="px-6 py-3.5">Full Name</th>
                 <th className="px-6 py-3.5">Email</th>
-                <th className="px-6 py-3.5">Assigned Role</th>
+                <th className="px-6 py-3.5">Assigned Role (Editable)</th>
                 <th className="px-6 py-3.5">Registered Date</th>
               </tr>
             </thead>
@@ -122,17 +172,52 @@ export function UsersTable({
                   </td>
                   <td className="px-6 py-4 text-(--text-subtle)">{u.email}</td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`px-2.5 py-0.5 text-[11px] font-semibold rounded-full ${
-                        u.role === "SuperAdmin"
-                          ? "bg-red-950/80 text-red-400"
-                          : u.role === "Admin"
-                            ? "bg-indigo-950/80 text-indigo-400"
-                            : "bg-emerald-950/80 text-emerald-400"
-                      }`}
-                    >
-                      {u.role}
-                    </span>
+                    {updatingId === u.id ? (
+                      <div className="flex items-center gap-2 text-indigo-400 text-xs font-medium py-1">
+                        <Loader size="xs" color="indigo" />
+                        <span>Updating role...</span>
+                      </div>
+                    ) : (
+                      <Select
+                        size="xs"
+                        value={u.role}
+                        onChange={(v) => handleRoleChange(u, v)}
+                        data={[
+                          { value: "SuperAdmin", label: "SuperAdmin" },
+                          { value: "Admin", label: "Admin" },
+                          { value: "Vendor", label: "Vendor" },
+                        ]}
+                        className="w-36"
+                        variant="filled"
+                        styles={{
+                          input: {
+                            backgroundColor:
+                              u.role === "SuperAdmin"
+                                ? "rgba(127, 29, 29, 0.5)"
+                                : u.role === "Admin"
+                                ? "rgba(49, 46, 129, 0.5)"
+                                : "rgba(6, 78, 59, 0.5)",
+                            color:
+                              u.role === "SuperAdmin"
+                                ? "#f87171"
+                                : u.role === "Admin"
+                                ? "#818cf8"
+                                : "#34d399",
+                            borderColor:
+                              u.role === "SuperAdmin"
+                                ? "rgba(239, 68, 68, 0.3)"
+                                : u.role === "Admin"
+                                ? "rgba(99, 102, 241, 0.3)"
+                                : "rgba(16, 185, 129, 0.3)",
+                            fontWeight: 600,
+                            fontSize: "11px",
+                            borderRadius: "9999px",
+                            paddingLeft: "12px",
+                            paddingRight: "12px",
+                          },
+                        }}
+                      />
+                    )}
                   </td>
                   <td className="px-6 py-4 text-(--text-faint)">
                     {new Date(u.createdAt).toLocaleDateString()}

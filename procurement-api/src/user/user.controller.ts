@@ -20,9 +20,11 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtPayload } from '../auth/decorators/types';
 import { UserRole } from './enum/userRole.enum';
 import { AdminOrOwnerGuard } from '../auth/guards/adminOrOwner.guard';
+import { IsSuperAdminGuard } from '../auth/guards/isSuperAdmin.guard';
+import { IsSuperAdmin } from '../auth/decorators/isSuperAdmin.decorator';
 
 @ApiTags('Users')
-@UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwnerGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, AdminOrOwnerGuard, IsSuperAdminGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -73,6 +75,7 @@ export class UserController {
   }
 
   @Patch(':id/role')
+  @IsSuperAdmin()
   @Roles(UserRole.SUPER_ADMIN)
   @ApiOperation({
     summary: 'Update user role (super_admin only)',
@@ -94,6 +97,7 @@ export class UserController {
   }
 
   @Post(':id/role')
+  @IsSuperAdmin()
   @Roles(UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Set user role (super_admin only)' })
   async setRole(@Param('id') id: string, @Body() dto: UpdateRoleDto) {

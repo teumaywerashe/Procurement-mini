@@ -5,6 +5,7 @@ import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { IsSuperAdminGuard } from './guards/isSuperAdmin.guard';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '../.env' });
 
@@ -22,7 +23,7 @@ dotenv.config({ path: '../.env' });
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard, RolesGuard],
-  exports: [JwtModule, JwtAuthGuard, RolesGuard],
+  providers: [AuthService, JwtAuthGuard, RolesGuard, IsSuperAdminGuard],
+  exports: [JwtModule, JwtAuthGuard, RolesGuard, IsSuperAdminGuard],
 })
 export class AuthModule {}
