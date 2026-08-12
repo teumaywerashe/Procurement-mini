@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable prettier/prettier */
 import { Test, TestingModule } from '@nestjs/testing';
+import { db } from '../database/db';
+
 import {
   ConflictException,
   ForbiddenException,
@@ -11,20 +13,24 @@ import { VendorService } from './vendor.service';
 import { UserRole } from '../user/enum/userRole.enum';
 import type { JwtPayload } from '../auth/decorators/types';
 
-const mockDb = {
-  select: jest.fn(),
-  insert: jest.fn(),
-  update: jest.fn(),
-  delete: jest.fn(),
-  query: {
-    vendor: {
-      findFirst: jest.fn(),
-      findMany: jest.fn(),
+jest.mock('../database/db', () => ({
+  db: {
+    select: jest.fn(),
+    insert: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    transaction: jest.fn((cb) => cb(mockDb)),
+    query: {
+      vendor: {
+        findFirst: jest.fn(),
+        findMany: jest.fn(),
+      },
     },
   },
-};
+}));
 
-jest.mock('../database/db', () => ({ db: mockDb }));
+const mockDb = db as any;
+
 
 const adminUser: JwtPayload = {
   uid: 1,

@@ -1,8 +1,5 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { TenderService } from './tender.service';
-// import { ForbiddenException, NotFoundException } from '@nestjs/common';
-// import { UserRole } from '../user/enum/userRole.enum';
-// import type { JwtPayload } from '../auth/decorators/types';
+import { Test, TestingModule } from '@nestjs/testing';
+import { TenderService } from './tender.service';
 
 jest.mock('../database/db', () => ({
   db: {
@@ -18,3 +15,19 @@ jest.mock('../database/db', () => ({
     },
   },
 }));
+
+describe('TenderService', () => {
+  let service: TenderService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [TenderService],
+    }).compile();
+
+    service = module.get<TenderService>(TenderService);
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+});
