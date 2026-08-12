@@ -1,98 +1,158 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# ProcureHub Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS REST API for the ProcureHub procurement management platform, powered by Drizzle ORM and PostgreSQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Tech Stack & Architecture
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Framework**: NestJS 11
+- **Database ORM**: Drizzle ORM with PostgreSQL 17 (`pg`)
+- **Authentication**: Passport JWT with HttpOnly cookies & Bearer header support (`@nestjs/jwt`, `@nestjs/passport`)
+- **Validation & Docs**: `class-validator`, `class-transformer`, Swagger / OpenAPI (`@nestjs/swagger`)
+- **Testing**: Jest (`ts-jest`), `@nestjs/testing`
 
-## Project setup
+### Modules Overview
 
-```bash
-$ npm install
+- **AuthModule**: Handles user registration, login, JWT token issue via HttpOnly cookies, and logout.
+- **UserModule**: User management, profile retrieval/update, and SuperAdmin role assignments.
+- **VendorModule**: Vendor organization profiles, owner registration, and vendor discovery.
+- **TenderModule**: Tender lifecycle management (draft, published, closed, awarded, cancelled) with filtering & pagination.
+- **BidModule**: Proposal submissions, bid status management (pending, accepted, rejected), and vendor bid tracking.
+- **DatabaseModule**: Drizzle database connection and schema definitions.
+
+---
+
+## Setup & Running
+
+### Prerequisites
+
+- Node.js 20+
+- PostgreSQL database (or Docker Compose setup)
+
+### Environment Variables
+
+Create a `.env` file in `procurement-api/`:
+
+```env
+PORT=3000
+JWT_SECRET=your_jwt_secret_key
+DATABASE_URL=postgresql://user:password@localhost:5432/procurement
+FRONTEND_URL=http://localhost:3001
 ```
 
-## Compile and run the project
+### Installation & Run Commands
 
 ```bash
-# development
-$ npm run start
+# Install dependencies
+npm install
 
-# watch mode
-$ npm run start:dev
+# Run database migrations
+npm run "db migrate"
 
-# production mode
-$ npm run start:prod
+# Development mode (watch mode)
+npm run start:dev
+
+# Production build & start
+npm run build
+npm run start:prod
 ```
 
-## Run tests
+---
+
+## Role-Based Access Control (RBAC)
+
+The API enforces granular role-based access control via custom guards (`JwtAuthGuard`, `RolesGuard`, `AdminOrOwnerGuard`, `IsSuperAdminGuard`).
+
+| Role | Access & Boundaries |
+| --- | --- |
+| **SuperAdmin** | Full administrative rights, user role management (`/user/:id/role`), user creation & deletion. Isolated from bid submission features to ensure data integrity. |
+| **Admin** | Create, update, and manage tenders. View bids submitted to owned tenders, manage vendor details, and evaluate bids. |
+| **Vendor** | Manage vendor organization profile, browse published tenders, submit bids on open tenders, and view own submitted bid statuses. |
+
+---
+
+## Testing & Mocking Strategy
+
+Unit tests are written using Jest and NestJS `@nestjs/testing` utilities.
 
 ```bash
-# unit tests
-$ npm run test
+# Run unit tests
+npm test
 
-# e2e tests
-$ npm run test:e2e
+# Run tests in watch mode
+npm run test:watch
 
-# test coverage
-$ npm run test:cov
+# Generate code coverage
+npm run test:cov
 ```
 
-## Deployment
+### Spec File Mocking Patterns
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+1. **Controller Unit Tests (`*.controller.spec.ts`)**:
+   - `Test.createTestingModule` instantiates controllers in isolation.
+   - Standardized guard dependency resolution by providing `{ provide: JwtService, useValue: { verify: jest.fn() } }`.
+   - Controller services are injected using mock provider objects (e.g., `{ provide: VendorService, useValue: mockVendorService }`).
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+2. **Service Unit Tests (`*.service.spec.ts`)**:
+   - Drizzle database operations (`db.select`, `db.insert`, `db.update`, `db.delete`, `db.query`) are mocked using `jest.mock('../database/db')`.
+   - Transactional calls inside services are handled via `transaction: jest.fn((cb) => cb(mockDb))`.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+---
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## API Endpoints Reference
 
-## Resources
+Base URL: `http://localhost:3000`
 
-Check out a few resources that may come in handy when working with NestJS:
+### Auth
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Method | Endpoint | Access | Description |
+| --- | --- | --- | --- |
+| POST | `/auth/register` | Public | Register a new user account |
+| POST | `/auth/login` | Public | Login and receive HTTP-only JWT cookie |
+| POST | `/auth/logout` | Authenticated | Logout and clear session cookie |
 
-## Support
+### Users
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| Method | Endpoint | Access | Description |
+| --- | --- | --- | --- |
+| GET | `/user/me` | Authenticated | Get current authenticated user profile |
+| GET | `/user` | SuperAdmin, Admin | List all user accounts |
+| POST | `/user` | SuperAdmin | Create new user/admin account |
+| GET | `/user/:id` | SuperAdmin, Admin | Get user by ID |
+| PATCH | `/user/:id/profile` | Owner, Admin, SuperAdmin | Update profile details |
+| PATCH | `/user/:id/role` | SuperAdmin | Update user role |
+| POST | `/user/:id/role` | SuperAdmin | Set user role |
+| DELETE | `/user/:id` | SuperAdmin | Delete user account |
 
-## Stay in touch
+### Vendors
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+| Method | Endpoint | Access | Description |
+| --- | --- | --- | --- |
+| POST | `/vendor` | Authenticated | Register a vendor profile |
+| GET | `/vendor` | SuperAdmin, Admin | List all vendors (with pagination & search) |
+| GET | `/vendor/me` | Vendor | Get vendor profile of current user |
+| GET | `/vendor/:id` | SuperAdmin, Owner | Get vendor by ID |
+| PATCH | `/vendor/:id` | SuperAdmin, Owner | Update vendor details |
+| DELETE | `/vendor/:id` | SuperAdmin, Owner | Delete vendor profile |
 
-## License
+### Tenders
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Method | Endpoint | Access | Description |
+| --- | --- | --- | --- |
+| GET | `/tender` | Public / Authenticated | Search & filter tenders (status, price, title) |
+| GET | `/tender/:id` | Public / Authenticated | Get tender details |
+| POST | `/tender` | Admin, SuperAdmin | Create a new tender |
+| PATCH | `/tender/:id` | Admin (Owner), SuperAdmin | Update tender |
+| DELETE | `/tender/:id` | Admin (Owner), SuperAdmin | Delete tender |
+
+### Bids
+
+| Method | Endpoint | Access | Description |
+| --- | --- | --- | --- |
+| GET | `/bid` | Admin | List bids |
+| GET | `/bid/tender/:tenderId` | Admin | View bids submitted for a tender |
+| GET | `/bid/my-bids` | Vendor | View vendor's own bids |
+| GET | `/bid/:id` | Admin, Vendor (Owner) | Get bid details |
+| POST | `/bid` | Vendor | Submit a bid for an open tender |
+| PATCH | `/bid/:id` | Admin (Tender Owner) | Update bid status (accept/reject) |

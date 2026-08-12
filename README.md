@@ -172,17 +172,22 @@ All protected routes require a JWT cookie set at login.
 
 ### Users
 
-| Method | Endpoint    | Access | Description         |
-| ------ | ----------- | ------ | ------------------- |
-| GET    | `/user/me`  | Auth   | Get current user    |
-| PATCH  | `/user/:id` | Auth   | Update user profile |
+| Method | Endpoint | Access | Description |
+| --- | --- | --- | --- |
+| GET | `/user/me` | Auth | Get current user profile |
+| GET | `/user` | SuperAdmin, Admin | List all users |
+| POST | `/user` | SuperAdmin | Create new user or admin account |
+| GET | `/user/:id` | SuperAdmin, Admin | Get single user by ID |
+| PATCH | `/user/:id/profile` | Auth | Update own profile |
+| PATCH | `/user/:id/role` | SuperAdmin | Change user role (super_admin only) |
+| DELETE | `/user/:id` | SuperAdmin | Delete user account |
 
 ---
 
 ## Database Schema
 
 ```
-users         id, name, email, role (admin|vendor), password, created_at
+users         id, name, email, role (super_admin|admin|vendor), password, created_at
 tender        id, title, name, description, status, closing_date, reference_number, estimated_value, created_by, created_at
 bid           id, vendor_id, tender_id, amount, bid_status, reference_number, submitted_at
 vendor        id, name, email, owner_id, registration_number, phone_number, created_at
@@ -212,6 +217,19 @@ Bid statuses: `pending`, `accepted`, `rejected`
 | `/vendors`         | Admin  | Vendor list with analytics                   |
 | `/vendors/:id`     | Admin  | Single vendor profile                        |
 | `/profile`         | All    | View and edit your profile                   |
+
+---
+
+## Testing
+
+Backend unit tests are configured with Jest and NestJS `@nestjs/testing` (`Test.createTestingModule`).
+
+```bash
+cd procurement-api
+npm test
+```
+
+Unit test suites isolate controllers and services by mocking guards (`JwtAuthGuard`, `JwtService`) and Drizzle database operations (`db.transaction`, `select`, `insert`, `update`, `delete`).
 
 ---
 
@@ -251,10 +269,16 @@ npm run docker:build   # Rebuild images
 
 ## Roles
 
+**SuperAdmin**
+
+- Manage user accounts and assign user roles (`super_admin`, `admin`, `vendor`)
+- Full administrative overview with strict data isolation (restricted from submitting bids)
+- Delete users, edit roles, and oversee system operation
+
 **Admin**
 
 - Create, edit, delete, and manage tenders
-- View all bids across all tenders
+- View bids submitted for owned tenders
 - Manage vendor accounts
 - Award or reject bids
 
@@ -263,7 +287,7 @@ npm run docker:build   # Rebuild images
 - Browse published tenders
 - Submit bids on open tenders
 - Track own bid statuses
-- View company profile
+- View and update vendor company profile
 
 ---
 
