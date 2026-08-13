@@ -24,6 +24,8 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { logIn } from "@/src/store/auth/authSlice";
 
+import { setAuthCookie } from "@/src/utilis/cookie";
+
 export default function RegistrationPage() {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -70,6 +72,10 @@ export default function RegistrationPage() {
         email: values.email,
         password: values.password,
       }).unwrap();
+      const token = result.accessToken || result.access_token;
+      if (token) {
+        setAuthCookie(token);
+      }
       dispatch(logIn(result.user));
       router.push("/tenders");
     } catch (error: unknown) {

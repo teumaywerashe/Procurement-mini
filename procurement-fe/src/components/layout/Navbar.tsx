@@ -18,6 +18,8 @@ import type { RootState } from "@/src/store/store";
 import { useTheme } from "@/src/components/ThemeProvider";
 import { Button } from "@mantine/core";
 
+import { clearAuthCookie } from "@/src/utilis/cookie";
+
 export default function Navbar() {
   const { isLoggedIn, user } = useSelector((state: RootState) => state.auth);
   const isAdmin = user?.role === "Admin";
@@ -48,6 +50,7 @@ export default function Navbar() {
 
   async function handleLogout() {
     await logoutApi();
+    clearAuthCookie();
     dispatch(logOut());
     router.push("/");
     setMenuOpen(false);

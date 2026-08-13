@@ -6,6 +6,7 @@ import {
 } from "@reduxjs/toolkit/query";
 
 import { logOut } from "./authSlice";
+import { clearAuthCookie } from "@/src/utilis/cookie";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_URL,
@@ -20,6 +21,7 @@ export const baseQueryWithAuth: BaseQueryFn<
   const result = await baseQuery(args, api, extraOptions);
 
   if (result.error?.status === 401) {
+    clearAuthCookie();
     api.dispatch(logOut());
   }
 

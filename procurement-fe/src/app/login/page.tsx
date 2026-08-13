@@ -25,6 +25,8 @@ import { AuthResponse } from "@/src/types";
 import { getErrorMessage } from "@/src/utilis/getErrorMessage";
 import { loginSchema } from "@/src/lib/schemas";
 
+import { setAuthCookie } from "@/src/utilis/cookie";
+
 export default function LoginPage() {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -48,6 +50,10 @@ export default function LoginPage() {
     try {
       const result: AuthResponse = await loginUser(values).unwrap();
       console.log("login result",result);
+      const token = result.accessToken || result.access_token;
+      if (token) {
+        setAuthCookie(token);
+      }
       dispatch(logIn(result.user));
       if (result.user?.role === "SuperAdmin") {
         router.push("/dashboard");
@@ -169,7 +175,7 @@ export default function LoginPage() {
 
           <Text ta="center" size="sm" mt="lg" c="dimmed">
             Don&apos;t have an account?{" "}
-            <Anchor component={Link} href="/registration" size="sm">
+            <Anchor component={Link} href="/registration" size="sm" style={{ pointerEvents: isLoading ? "none" : "auto", opacity: isLoading ? 0.5 : 1 }}>
               Create one
             </Anchor>
           </Text>
