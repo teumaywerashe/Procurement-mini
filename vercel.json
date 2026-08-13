@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd procurement-fe && npm run build",
-  "outputDirectory": "procurement-fe/.next",
-  "installCommand": "npm install"
-}
