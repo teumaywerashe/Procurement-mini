@@ -12,7 +12,7 @@ function decodeJwtPayload(
   }
 }
 
-const AUTH_ROUTES = ["/dashboard", "/profile","/bids"];
+const AUTH_ROUTES = ["/dashboard", "/profile", "/bids", "/tenders"];
 const SUPER_ADMIN_ROUTES = ["/vendors", "/users"];
 const VENDOR_ROUTES = ["/bids/my"];
 
