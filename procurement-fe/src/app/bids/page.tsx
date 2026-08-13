@@ -60,8 +60,8 @@ export default function AdminBidsPage() {
     try {
       await updateBidStatus({ id: bidId, status: editingStatus }).unwrap();
       notifications.show({
-        title: "Status updated",
-        message: `Bid #${bidId} marked as ${editingStatus}.`,
+        title: `Bid Status updated to ${editingStatus}`,
+        message: `Successfully updated bid status to ${editingStatus}`,
         color: "green",
       });
     } catch {
@@ -113,7 +113,7 @@ export default function AdminBidsPage() {
               onChange={(e) =>
                 setEditingStatus(e.target.value as Bid["bidStatus"])
               }
-              className="text-xs bg-(--bg-elevated) border border-(--border) rounded px-2 py-1 text-(--text-primary) outline-none"
+              className="text-xs cursor-pointer bg-(--bg-elevated) border border-(--border) rounded px-2 py-3 text-(--text-primary) outline-none"
             >
               <option value="pending">Pending</option>
               <option value="accepted">Accepted</option>
@@ -122,13 +122,13 @@ export default function AdminBidsPage() {
             <button
               onClick={() => confirmEdit(b.id)}
               disabled={isUpdating}
-              className="text-xs text-emerald-400 hover:text-emerald-300"
+              className="text-xs cursor-pointer text-emerald-400 hover:text-emerald-300"
             >
               Save
             </button>
             <button
               onClick={() => setEditingId(null)}
-              className="text-xs text-(--text-faint) hover:text-(--text-primary)"
+              className="text-xs cursor-pointer text-(--text-faint) hover:text-(--text-primary)"
             >
               Cancel
             </button>
@@ -140,7 +140,7 @@ export default function AdminBidsPage() {
               setEditingId(b.id);
               setEditingStatus(b.bidStatus);
             }}
-            className={`text-xs font-semibold px-2 py-0.5 rounded-full cursor-pointer ${STATUS_COLORS[b.bidStatus]}`}
+            className={`text-xs font-semibold px-6 py-3 rounded-2xl  cursor-pointer ${STATUS_COLORS[b.bidStatus]}`}
           >
             {b.bidStatus}
           </button>

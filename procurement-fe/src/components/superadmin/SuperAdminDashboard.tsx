@@ -33,6 +33,7 @@ import TendersTable from "./TendersTable";
 import CreateAdminModal from "./modals/CreateAdminModal";
 import EditAdminRoleModal from "./modals/EditAdminRoleModal";
 import DeleteAdminModal from "./modals/DeleteAdminModal";
+import { notifications } from "@mantine/notifications";
 
 interface SuperAdminDashboardProps {
   currentUser: { name?: string; email?: string } | null;
@@ -58,11 +59,6 @@ export default function SuperAdminDashboard({
   const [updateUserRole, { isLoading: isUpdating }] =
     useUpdateUserRoleMutation();
 
-  // Feedback state
-  const [feedback, setFeedback] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
 
   // Search & Filter state
   const [userSearch, setUserSearch] = useState("");
@@ -100,16 +96,18 @@ export default function SuperAdminDashboard({
   const handleCreateAdmin = async (values: typeof createForm.values) => {
     try {
       await createUser(values).unwrap();
-      setFeedback({
-        type: "success",
+      notifications.show({
+        title: "Admin created",
         message: `Admin account "${values.name}" created successfully!`,
+        color:"green"
       });
       createForm.reset();
       setCreateModalOpen(false);
-    } catch (err: unknown) {
-      setFeedback({
-        type: "error",
-        message: err instanceof Error ? err.message : "Failed to create admin",
+    } catch (err: any) {
+      notifications.show({
+        title: "Error",
+        message: err?.data?.message || "Failed to create admin",
+        color:"red"
       });
     }
   };
@@ -118,15 +116,17 @@ export default function SuperAdminDashboard({
     if (!editingAdmin) return;
     try {
       await updateUserRole({ id: editingAdmin.id, role: values.role }).unwrap();
-      setFeedback({
-        type: "success",
+      notifications.show({
+          title: "Admin role updated",
         message: `Admin account "${editingAdmin.name}" role updated to ${values.role}`,
+        color:"green"
       });
       setEditingAdmin(null);
-    } catch (err: unknown) {
-      setFeedback({
-        type: "error",
-        message: err instanceof Error ? err.message : "Failed to update role",
+    } catch (err: any) {
+      notifications.show({
+        title: "Error",
+        message: err?.data?.message || "Failed to update role",
+        color:"red"
       });
     }
   };
@@ -135,15 +135,17 @@ export default function SuperAdminDashboard({
     if (!deletingAdmin) return;
     try {
       await deleteUser(deletingAdmin.id).unwrap();
-      setFeedback({
-        type: "success",
+      notifications.show({
+        title: "Admin deleted",
         message: `Admin "${deletingAdmin.name}" has been deleted.`,
+        color:"green"
       });
       setDeletingAdmin(null);
-    } catch (err: unknown) {
-      setFeedback({
-        type: "error",
-        message: err instanceof Error ? err.message : "Failed to delete admin",
+    } catch (err: any) {
+        notifications.show({
+        title: "Error",
+        message: err?.data?.message || "Failed to delete admin",
+        color:"red"
       });
     }
   };
@@ -194,31 +196,7 @@ export default function SuperAdminDashboard({
           </Button>
         </div>
 
-        {/* Feedback Alert */}
-        {feedback && (
-          <div
-            className={`flex items-center justify-between p-4 rounded-xl border ${
-              feedback.type === "success"
-                ? "bg-emerald-950/60 border-emerald-800 text-emerald-300"
-                : "bg-red-950/60 border-red-800 text-red-300"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              {feedback.type === "success" ? (
-                <IconCheck size={20} />
-              ) : (
-                <IconX size={20} />
-              )}
-              <p className="text-sm font-medium">{feedback.message}</p>
-            </div>
-            <button
-              onClick={() => setFeedback(null)}
-              className="text-xs text-zinc-400 hover:text-white transition-colors"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
+    
 
         {/* Stat Cards */}
         <StatCards

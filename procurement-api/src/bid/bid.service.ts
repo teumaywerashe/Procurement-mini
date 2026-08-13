@@ -34,7 +34,8 @@ export class BidService {
     if (user.role !== UserRole.VENDOR) {
       throw new ForbiddenException('Only vendors are allowed to create bids');
     }
-    if (existingTender.status !== 'open') {
+    // console.log(existingTender);
+    if (existingTender.status !== 'published') {
       throw new ForbiddenException(
         'You cannot create a bid for a tender that is not open',
       );

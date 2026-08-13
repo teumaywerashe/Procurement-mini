@@ -49,7 +49,7 @@ export default function LoginPage() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       const result: AuthResponse = await loginUser(values).unwrap();
-      console.log("login result",result);
+      // console.log("login result",result);
       const token = result.accessToken || result.access_token;
       if (token) {
         setAuthCookie(token);

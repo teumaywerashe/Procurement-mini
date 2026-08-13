@@ -36,6 +36,7 @@ import StatusCard from "@/src/components/cards/StatusCard";
 import { useGetTendersQuery, useDeleteTenderMutation } from "@/src/store/api/tenderApi";
 import { useGetAllBidsQuery, useUpdateBidStatusMutation } from "@/src/store/api/bidApi";
 import type { Tender, Bid } from "@/src/types";
+import { notifications } from "@mantine/notifications";
 
 interface AdminDashboardProps {
   currentUser: { id?: number; name?: string; email?: string } | null;
@@ -69,33 +70,38 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
 
   const [deletingTender, setDeletingTender] = useState<Tender | null>(null);
   const [selectedBid, setSelectedBid] = useState<Bid | null>(null);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+ 
 
   // Handlers
   const handleDeleteTender = async () => {
     if (!deletingTender) return;
     try {
       await deleteTender(deletingTender.id).unwrap();
-      setFeedback({ type: "success", message: `Tender "${deletingTender.title}" deleted successfully.` });
+      notifications.show({ title: "deleted", message: `Tender "${deletingTender.title}" deleted successfully.` });
       setDeletingTender(null);
     } catch (err: any) {
-      setFeedback({ type: "error", message: err?.data?.message || "Failed to delete tender" });
+      notifications.show({ title:"Error", message: err?.data?.message || "Failed to delete tender",color:"red" });
     }
   };
 
   const handleUpdateBidStatus = async (bidId: number, status: "accepted" | "rejected" | "pending") => {
     try {
       await updateBidStatus({ id: bidId, status }).unwrap();
-      setFeedback({
-        type: "success",
-        message: `Bid status updated to "${status.toUpperCase()}".`,
-      });
+        notifications.show({
+              title: `Bid Status updated to ${status}`,
+              message: `Successfully updated bid status to ${status}`,
+              color: "green",
+            });
       if (selectedBid?.id === bidId) {
         setSelectedBid((prev) => (prev ? { ...prev, bidStatus: status } : null));
       }
     } catch (err: any) {
-      setFeedback({ type: "error", message: err?.data?.message || "Failed to update bid status" });
-    }
+     notifications.show({
+            title: "Error",
+            message: err?.data?.message || "Failed to update bid status.",
+            color: "red",
+          }); 
+        }
   };
 
   // Calculations
@@ -159,27 +165,8 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
           </div>
         </div>
 
-        {/* Feedback Alert */}
-        {feedback && (
-          <div
-            className={`flex items-center justify-between p-4 rounded-xl border ${
-              feedback.type === "success"
-                ? "bg-emerald-950/60 border-emerald-800 text-emerald-300"
-                : "bg-red-950/60 border-red-800 text-red-300"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              {feedback.type === "success" ? <IconCheck size={20} /> : <IconX size={20} />}
-              <p className="text-sm font-medium">{feedback.message}</p>
-            </div>
-            <button
-              onClick={() => setFeedback(null)}
-              className="text-xs text-zinc-400 hover:text-white transition-colors"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
+  
+      
 
         {/* Stat Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

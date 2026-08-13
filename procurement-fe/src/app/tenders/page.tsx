@@ -87,7 +87,7 @@ function TendersPageContent() {
   const isVendor = user?.role === "Vendor";
 
 
-  console.log(user,isVendor,isAdmin)
+  // console.log(user,isVendor,isAdmin)
 
   const { query, setQuery } = useCollectionQuery({
     defaultSortBy: "createdAt",

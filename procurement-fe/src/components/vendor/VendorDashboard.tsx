@@ -27,6 +27,7 @@ import PlaceBidModal from "./PlaceBidModal";
 import EditBidModal from "./EditBidModal";
 import DeleteBidModal from "./DeleteBidModal";
 import VendorProfileModal from "./VendorProfileModal";
+import { notifications } from "@mantine/notifications";
 
 interface VendorDashboardProps {
   currentUser: { id?: number; name?: string; email?: string } | null;
@@ -74,10 +75,6 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
   const [vendorEmail, setVendorEmail] = useState("");
   const [vendorPhone, setVendorPhone] = useState("");
 
-  const [feedback, setFeedback] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
 
   // Handlers
   const handleCreateVendorProfile = async (e: React.FormEvent) => {
@@ -89,15 +86,17 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
         email: vendorEmail || undefined,
         phoneNumber: vendorPhone || undefined,
       }).unwrap();
-      setFeedback({
-        type: "success",
-        message: "Vendor profile created successfully!",
+      notifications.show({
+          title: "Vendor profile created successfully!",
+          message:"Vendor profile created successfully!",
+          color:"green"
       });
       setShowVendorModal(false);
     } catch (err: any) {
-      setFeedback({
-        type: "error",
+      notifications.show({
+        title: "Error",
         message: err?.data?.message || "Failed to create vendor profile.",
+        color:"red"
       });
     }
   };
@@ -123,15 +122,17 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
         proposedPrice: Number(bidAmount),
         notes: bidNotes || undefined,
       }).unwrap();
-      setFeedback({
-        type: "success",
+          notifications.show({
+        title: `Bid for "${biddingTender.title}" submitted successfully!`,
         message: `Bid for "${biddingTender.title}" submitted successfully!`,
+        color:"green"
       });
       setBiddingTender(null);
     } catch (err: any) {
-      setFeedback({
-        type: "error",
+      notifications.show({
+        title: "Error",
         message: err?.data?.message || "Failed to submit bid.",
+        color:"red"
       });
     }
   };
@@ -152,12 +153,17 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
         proposedPrice: Number(bidAmount),
         notes: bidNotes || undefined,
       }).unwrap();
-      setFeedback({ type: "success", message: "Bid updated successfully!" });
+      notifications.show({
+        title: "Bid updated successfully!",
+        message:"Bid updated successfully!",
+        color:"green"
+      })
       setEditingBid(null);
     } catch (err: any) {
-      setFeedback({
-        type: "error",
+      notifications.show({
+        title: "Error",
         message: err?.data?.message || "Failed to update bid.",
+        color:"red"
       });
     }
   };
@@ -166,12 +172,17 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
     if (!deletingBid) return;
     try {
       await deleteBid(deletingBid.id).unwrap();
-      setFeedback({ type: "success", message: "Bid deleted successfully." });
+      notifications.show({
+          title: "Bid deleted successfully!",
+          message:"Bid deleted successfully!",
+          color:"green"
+      })
       setDeletingBid(null);
     } catch (err: any) {
-      setFeedback({
-        type: "error",
+      notifications.show({
+        title: "Error",
         message: err?.data?.message || "Failed to delete bid.",
+        color:"red"
       });
     }
   };
@@ -213,11 +224,6 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
           onOpenVendorModal={() => setShowVendorModal(true)}
           onNavigateBids={() => setActiveTab("bids")}
           bidsCount={myBids.length}
-        />
-
-        <VendorFeedbackAlert
-          feedback={feedback}
-          onDismiss={() => setFeedback(null)}
         />
 
         <VendorStats
