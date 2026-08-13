@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/purity */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -17,12 +19,11 @@ import {
 } from "@mantine/core";
 import {
   IconFileText,
-  IconClock,
+ 
   IconPlus,
   IconEdit,
   IconTrash,
   IconSearch,
-  IconChevronRight,
   IconCheck,
   IconX,
   IconAlertTriangle,
@@ -429,7 +430,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                           <td className="px-6 py-4 font-semibold text-emerald-400">
                             ${Number(b.proposedPrice || b.amount || 0).toLocaleString()}
                           </td>
-                          <td className="px-6 py-4">
+                          <td className="px-4 py-2">
                             <Badge
                               color={
                                 b.bidStatus === "accepted"
@@ -444,7 +445,7 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
                             </Badge>
                           </td>
                           <td className="px-6 py-4 text-(--text-faint)">
-                            {b.createdAt ? new Date(b.createdAt).toLocaleDateString() : "—"}
+                            {b.submittedAt ? new Date(b.submittedAt).toLocaleDateString() : "—"}
                           </td>
                           <td className="px-6 py-4 text-right">
                             <Group justify="flex-end" gap="xs">

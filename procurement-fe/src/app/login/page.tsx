@@ -160,7 +160,7 @@ export default function LoginPage() {
                 Forgot password?
               </Anchor>
 
-              <Button type="submit" fullWidth loading={isLoading} mt="xs">
+              <Button className="hover:bg-sky-600" type="submit" variant="ouline" fullWidth loading={isLoading} mt="xs">
                 Sign in
               </Button>
             </Stack>

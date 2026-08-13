@@ -19,11 +19,15 @@ export default function SubmittedBidsTable({
   onOpenEditBid,
   onConfirmDeleteBid,
 }: SubmittedBidsTableProps) {
+  console.log(filteredBids);
   if (bidsLoading) {
     return (
       <div className="p-6 space-y-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-12 bg-(--bg-elevated) rounded-lg animate-pulse" />
+          <div
+            key={i}
+            className="h-12 bg-(--bg-elevated) rounded-lg animate-pulse"
+          />
         ))}
       </div>
     );
@@ -52,7 +56,10 @@ export default function SubmittedBidsTable({
         </thead>
         <tbody className="divide-y divide-(--border-subtle)">
           {filteredBids.map((b: Bid) => (
-            <tr key={b.id} className="hover:bg-(--bg-elevated) transition-colors">
+            <tr
+              key={b.id}
+              className="hover:bg-(--bg-elevated) transition-colors"
+            >
               <td className="px-6 py-4 font-mono text-(--text-faint)">
                 {b.referenceNumber || `#BID-${b.id}`}
               </td>
@@ -79,9 +86,7 @@ export default function SubmittedBidsTable({
               <td className="px-6 py-4 text-(--text-faint)">
                 {b.submittedAt
                   ? new Date(b.submittedAt).toLocaleDateString()
-                  : b.createdAt
-                    ? new Date(b.createdAt).toLocaleDateString()
-                    : "—"}
+                 : "—"}
               </td>
               <td className="px-6 py-4 text-right">
                 <Group justify="flex-end" gap="xs">
@@ -93,12 +98,20 @@ export default function SubmittedBidsTable({
                     </Link>
                   </Tooltip>
                   <Tooltip label="Edit My Bid">
-                    <ActionIcon variant="subtle" color="blue" onClick={() => onOpenEditBid(b)}>
+                    <ActionIcon
+                      variant="subtle"
+                      color="blue"
+                      onClick={() => onOpenEditBid(b)}
+                    >
                       <IconEdit size={16} />
                     </ActionIcon>
                   </Tooltip>
                   <Tooltip label="Delete My Bid">
-                    <ActionIcon variant="subtle" color="red" onClick={() => onConfirmDeleteBid(b)}>
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      onClick={() => onConfirmDeleteBid(b)}
+                    >
                       <IconTrash size={16} />
                     </ActionIcon>
                   </Tooltip>

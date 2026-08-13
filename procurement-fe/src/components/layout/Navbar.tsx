@@ -16,23 +16,20 @@ import { useLogoutMutation } from "@/src/store/api/userApi";
 import { logOut } from "@/src/store/auth/authSlice";
 import type { RootState } from "@/src/store/store";
 import { useTheme } from "@/src/components/ThemeProvider";
+import { Button } from "@mantine/core";
 
 export default function Navbar() {
   const { isLoggedIn, user } = useSelector((state: RootState) => state.auth);
   const isAdmin = user?.role === "Admin";
   const isVendor = user?.role === "Vendor";
   const isSuperAdmin = user?.role === "SuperAdmin";
+  const route = useRouter();
 
   const navLinks = isLoggedIn
     ? [
         { label: "Dashboard", href: "/dashboard" },
         { label: "Tenders", href: "/tenders" },
-        ...(isSuperAdmin
-          ? [
-              { label: "Vendors", href: "/vendors" },
-             
-            ]
-          : []),
+        ...(isSuperAdmin ? [{ label: "Vendors", href: "/vendors" }] : []),
         ...(isVendor ? [{ label: "My Bids", href: "/bids/my" }] : []),
         ...(isAdmin
           ? [
@@ -172,8 +169,9 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link
-                  href="/login"
+                <Button
+                  variant="outline"
+                  onClick={() => route.push("/login")}
                   className={`text-sm text-(--text-subtle) hover:text-(--text-primary) px-3 py-1.5 rounded-md transition-colors ${
                     pathname === "/login"
                       ? "bg-black/10 dark:bg-white/10 font-semibold text-(--text-primary)"
@@ -181,13 +179,15 @@ export default function Navbar() {
                   }`}
                 >
                   Log in
-                </Link>
-                <Link
-                  href="/registration"
+                </Button>
+                <Button
+                  
+                  variant="filled"
+                  onClick={() => route.push("/registration")}
                   className="text-sm font-semibold bg-[#9fef00] hover:bg-[#8cd900] text-[#14120e] px-4 py-1.5 rounded-full transition-colors"
                 >
                   Sign up
-                </Link>
+                </Button>
               </>
             )}
           </div>
@@ -239,12 +239,13 @@ export default function Navbar() {
                 </p>
               </div>
             </Link>
-            <button
+            <Button
+            variant="outline"
               onClick={handleLogout}
-              className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-900/20 transition-colors"
+              className="w-full cursor-pointer flex items-center px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-900/20 transition-colors"
             >
               Logout
-            </button>
+            </Button>
           </nav>
         </div>
       )}

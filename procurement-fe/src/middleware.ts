@@ -14,7 +14,7 @@ function decodeJwtPayload(
 
 const AUTH_ROUTES = ["/dashboard", "/profile"];
 
-const ADMIN_ROUTES = ["/tenders/manage", "/tenders/create"];
+const ADMIN_ROUTES = ["/tenders/manage", "bids/:","/tenders/create"];
 
 const SUPER_ADMIN_ROUTES = ["/vendors", "/users"];
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { User } from "@/src/types";
 import {
@@ -48,24 +49,10 @@ export function AdminManagement({
   usersLoading,
   userSearch,
   setUserSearch,
-  totalAdmins,
+
   onAddAdmin,
   onEditRole,
   onDeleteAdmin,
-  createModalOpen,
-  setCreateModalOpen,
-  editingAdmin,
-  setEditingAdmin,
-  deletingAdmin,
-  setDeletingAdmin,
-  createForm,
-  editForm,
-  handleCreateAdmin,
-  handleEditAdminRole,
-  handleDeleteAdmin,
-  isCreating,
-  isUpdating,
-  isDeleting,
 }: AdminManagementProps) {
   return (
     <div className="space-y-4">
@@ -114,7 +101,7 @@ export function AdminManagement({
           </div>
         ) : admins.length === 0 ? (
           <div className="p-12 text-center text-sm text-(--text-subtle)">
-            No Admin accounts found. Click "Add Admin" to create one.
+            No Admin accounts found. Click Add Admin to create one.
           </div>
         ) : (
           <div className="overflow-x-auto">
