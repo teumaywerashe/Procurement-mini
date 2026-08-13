@@ -12,12 +12,8 @@ function decodeJwtPayload(
   }
 }
 
-const AUTH_ROUTES = ["/dashboard", "/profile"];
-
-const ADMIN_ROUTES = ["/tenders/manage", "bids/:","/tenders/create"];
-
+const AUTH_ROUTES = ["/dashboard", "/profile","/bids"];
 const SUPER_ADMIN_ROUTES = ["/vendors", "/users"];
-
 const VENDOR_ROUTES = ["/bids/my"];
 
 export function middleware(req: NextRequest) {
@@ -25,10 +21,6 @@ export function middleware(req: NextRequest) {
 
   const token = req.cookies.get("access_token")?.value;
   const payload = token ? decodeJwtPayload(token) : null;
-
-  // payload ={uid,name,email,role}
-
-  // Check if token is expired
   const isTokenExpired =
     payload && payload.exp ? payload.exp * 1000 < Date.now() : false;
   const isLoggedIn = !!payload?.uid && !isTokenExpired;
@@ -38,6 +30,7 @@ export function middleware(req: NextRequest) {
   const isSuperAdmin = role === "SuperAdmin";
   const isVendor = role === "Vendor";
 
+  // 1. SuperAdmin only routes (/vendors, /users)
   const isSuperAdminRoute = SUPER_ADMIN_ROUTES.some((route) =>
     pathname.startsWith(route),
   );
@@ -46,31 +39,13 @@ export function middleware(req: NextRequest) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
-
     if (!isSuperAdmin) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
-
     return NextResponse.next();
   }
 
-  const isAdminRoute =
-    ADMIN_ROUTES.some((route) => pathname.startsWith(route)) ||
-    pathname === "/bids" ||
-    /^\/tenders\/[^/]+\/edit$/.test(pathname);
-
-  if (isAdminRoute) {
-    if (!isLoggedIn) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-
-    if (!isAdmin) {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
-
-    return NextResponse.next();
-  }
-
+  // 2. Vendor only routes (/bids/my)
   const isVendorRoute = VENDOR_ROUTES.some((route) =>
     pathname.startsWith(route),
   );
@@ -79,15 +54,33 @@ export function middleware(req: NextRequest) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
-
     if (!isVendor) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
-
     return NextResponse.next();
   }
 
-  const isProtected = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  // 3. Admin / SuperAdmin only routes (/tenders/manage, /tenders/create, /tenders/[id]/edit, /bids)
+  const isAdminRoute =
+    pathname.startsWith("/tenders/manage") ||
+    pathname.startsWith("/tenders/create") ||
+    pathname === "/bids" ||
+    /^\/tenders\/[^/]+\/edit$/.test(pathname);
+
+  if (isAdminRoute) {
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+    return NextResponse.next();
+  }
+
+  // 4. Authenticated routes (/dashboard, /profile, /bids/[id], etc.)
+  const isProtected =
+    AUTH_ROUTES.some((route) => pathname.startsWith(route)) ||
+    /^\/bids\/[^/]+$/.test(pathname);
 
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL("/login", req.url);
@@ -95,12 +88,14 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // 5. Redirect logged in users away from auth pages (/login, /registration, /)
   if (
     isLoggedIn &&
     (pathname === "/" || pathname === "/login" || pathname === "/registration")
   ) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
+
   return NextResponse.next();
 }
 

@@ -194,8 +194,7 @@ function TendersPageContent() {
           </div>
         </main>
 
-    { isVendor||isAdmin &&   <TenderBidsSidebar userId={user?.id ?? 0} isVendor={isVendor} isAdmin={isAdmin} />
-   }   </div>
+    { (isVendor || isAdmin) && <TenderBidsSidebar userId={user?.id ?? 0} isVendor={isVendor} isAdmin={isAdmin} /> }   </div>
     </div>
   );
 }

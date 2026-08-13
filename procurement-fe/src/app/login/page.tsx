@@ -47,6 +47,7 @@ export default function LoginPage() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       const result: AuthResponse = await loginUser(values).unwrap();
+      console.log("login result",result);
       dispatch(logIn(result.user));
       if (result.user?.role === "SuperAdmin") {
         router.push("/dashboard");

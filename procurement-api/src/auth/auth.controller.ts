@@ -15,8 +15,8 @@ import type { Response } from 'express';
 const COOKIE_NAME = 'access_token';
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  sameSite: 'lax' as const,
-  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'none' as const,
+  secure:true,
   maxAge: 60 * 60 * 1000,
   path: '/',
 };
