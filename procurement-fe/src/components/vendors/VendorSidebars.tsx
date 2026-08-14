@@ -42,10 +42,10 @@ export function VendorLeftSidebar({ vendors, sortBy, search, onSortChange, onSea
             <div className="h-px bg-(--border)" />
             <div>
               <p className="text-[10px] font-semibold text-(--text-faint) uppercase tracking-wider px-2 mb-2">Filter A–Z</p>
-              <div className="flex flex-wrap gap-1 px-2">
-                <button onClick={() => onSearchChange("")} className={`px-2 py-1 rounded text-xs font-medium transition-colors ${search === "" ? "bg-indigo-600/20 text-indigo-300" : "text-(--text-faint) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5"}`}>All</button>
+              <div className="grid grid-cols-3  gap-1 px-2">
+                <button onClick={() => onSearchChange("")} className={`px-2 py-1 cursor-pointer rounded text-xs font-medium transition-colors ${search === "" ? "bg-indigo-600/20 text-indigo-300" : "text-(--text-faint) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5"}`}>All</button>
                 {letters.map((l) => (
-                  <button key={l} onClick={() => onSearchChange(l)} className={`px-2 py-1 rounded text-xs font-medium transition-colors ${search === l ? "bg-indigo-600/20 text-indigo-300" : "text-(--text-faint) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5"}`}>{l}</button>
+                  <button key={l} onClick={() => onSearchChange(l)} className={`px-2 py-1 cursor-pointer rounded text-xs font-medium transition-colors ${search === l ? "bg-indigo-600/20 text-indigo-300" : "text-(--text-faint) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5"}`}>{l}</button>
                 ))}
               </div>
             </div>

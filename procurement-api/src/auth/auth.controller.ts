@@ -16,7 +16,7 @@ const COOKIE_NAME = 'access_token';
 const COOKIE_OPTIONS = {
   httpOnly: true,
   sameSite: 'none' as const,
-  secure:true,
+  secure: true,
   maxAge: 60 * 60 * 1000,
   path: '/',
 };

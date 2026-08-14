@@ -270,7 +270,8 @@ export default function BidDetailPage() {
                     </button>
                     <button
                       onClick={() => setEditingStatus(null)}
-                      className="px-3 py-1.5 rounded-lg border border-(--border-strong) text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors"
+                      disabled={isUpdating}
+                      className={`px-3 py-1.5 rounded-lg border  border-(--border-strong) text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors`}
                     >
                       Cancel
                     </button>
