@@ -26,8 +26,7 @@ export function VendorLeftSidebar({ vendors, sortBy, search, onSortChange, onSea
             {([
               { label: "Newest first", value: "newest" as const, icon: <IconSortDescending size={14} /> },
               { label: "Oldest first", value: "oldest" as const, icon: <IconSortAscending size={14} /> },
-              { label: "Name (A–Z)",   value: "name"   as const, icon: <IconBuilding size={14} /> },
-            ]).map((opt) => (
+              ]).map((opt) => (
               <button key={opt.value} onClick={() => onSortChange(opt.value)}
                 className={`w-full flex cursor-pointer items-center gap-2.5 px-2 py-2 rounded-md text-xs transition-colors ${sortBy === opt.value ? "bg-indigo-600/20 text-indigo-300" : "text-(--text-subtle) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5"}`}>
                 <span className={sortBy === opt.value ? "text-indigo-400" : "text-(--text-faint)"}>{opt.icon}</span>

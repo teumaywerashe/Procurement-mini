@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   BadRequestException,
@@ -150,6 +151,7 @@ export class BidService {
   }
 
   async update(id: number, updateBidDto: UpdateBidDto, user: JwtPayload) {
+    // console.log(UpdateBidDto);
     if (!id) {
       throw new BadRequestException('Bid ID is required for update');
     }

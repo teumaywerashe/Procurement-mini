@@ -12,6 +12,7 @@
         "start:dev": "nest start --watch",
         "start:debug": "nest start --debug --watch",
         "start:prod": "nest start --prod",
+        "studio": "drizzle-kit studio",
         "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
         "test": "jest",
         "db migrate": "drizzle-kit migrate",

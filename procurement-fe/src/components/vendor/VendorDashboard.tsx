@@ -19,7 +19,6 @@ import {
 import type { Tender, Bid } from "@/src/types";
 
 import VendorHeader from "./VendorHeader";
-import VendorFeedbackAlert from "./VendorFeedbackAlert";
 import VendorStats from "./VendorStats";
 import OpenTendersTab from "./OpenTendersTab";
 import SubmittedBidsTab from "./SubmittedBidsTab";
@@ -75,7 +74,6 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
   const [vendorEmail, setVendorEmail] = useState("");
   const [vendorPhone, setVendorPhone] = useState("");
 
-
   // Handlers
   const handleCreateVendorProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,16 +85,16 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
         phoneNumber: vendorPhone || undefined,
       }).unwrap();
       notifications.show({
-          title: "Vendor profile created successfully!",
-          message:"Vendor profile created successfully!",
-          color:"green"
+        title: "Vendor profile created successfully!",
+        message: "Vendor profile created successfully!",
+        color: "green",
       });
       setShowVendorModal(false);
     } catch (err: any) {
       notifications.show({
         title: "Error",
         message: err?.data?.message || "Failed to create vendor profile.",
-        color:"red"
+        color: "red",
       });
     }
   };
@@ -122,17 +120,17 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
         proposedPrice: Number(bidAmount),
         notes: bidNotes || undefined,
       }).unwrap();
-          notifications.show({
+      notifications.show({
         title: `Bid for "${biddingTender.title}" submitted successfully!`,
         message: `Bid for "${biddingTender.title}" submitted successfully!`,
-        color:"green"
+        color: "green",
       });
       setBiddingTender(null);
     } catch (err: any) {
       notifications.show({
         title: "Error",
         message: err?.data?.message || "Failed to submit bid.",
-        color:"red"
+        color: "red",
       });
     }
   };
@@ -149,21 +147,22 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
     try {
       await updateBid({
         id: editingBid.id,
+        bidStatus: editingBid.bidStatus,
         amount: Number(bidAmount),
         proposedPrice: Number(bidAmount),
         notes: bidNotes || undefined,
       }).unwrap();
       notifications.show({
         title: "Bid updated successfully!",
-        message:"Bid updated successfully!",
-        color:"green"
-      })
+        message: "Bid updated successfully!",
+        color: "green",
+      });
       setEditingBid(null);
     } catch (err: any) {
       notifications.show({
         title: "Error",
-        message: err?.data?.message || "Failed to update bid.",
-        color:"red"
+        message:  "Failed to update bid.",
+        color: "red",
       });
     }
   };
@@ -173,16 +172,16 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
     try {
       await deleteBid(deletingBid.id).unwrap();
       notifications.show({
-          title: "Bid deleted successfully!",
-          message:"Bid deleted successfully!",
-          color:"green"
-      })
+        title: "Bid deleted successfully!",
+        message: "Bid deleted successfully!",
+        color: "green",
+      });
       setDeletingBid(null);
     } catch (err: any) {
       notifications.show({
         title: "Error",
         message: err?.data?.message || "Failed to delete bid.",
-        color:"red"
+        color: "red",
       });
     }
   };

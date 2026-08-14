@@ -23,7 +23,7 @@ export const bidApi = baseApi.injectEndpoints({
       query: (body) => ({ url: "/bid", method: "POST", body }),
       invalidatesTags: ["Bid"],
     }),
-    updateBid: builder.mutation<Bid, { id: number; amount?: number; proposedPrice?: number; proposal?: string; notes?: string }>({
+    updateBid: builder.mutation<Bid, { id: number; amount?: number; proposedPrice?: number; proposal?: string; notes?: string; bidStatus?: string }>({
       query: ({ id, ...body }) => ({
         url: `/bid/${id}`,
         method: "PATCH",
