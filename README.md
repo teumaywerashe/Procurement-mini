@@ -239,6 +239,7 @@ Unit test suites isolate controllers and services by mocking guards (`JwtAuthGua
 
 ```bash
 npm run start:dev      # Development with watch mode
+npm run studio         # Run drizzle-kit studio
 npm run start:prod     # Production
 npm run build          # Compile TypeScript
 npm run test           # Unit tests
