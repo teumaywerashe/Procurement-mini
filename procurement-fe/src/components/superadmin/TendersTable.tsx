@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Tender } from "@/src/types";
-import { IconSearch, IconChevronRight } from "@tabler/icons-react";
+import { Button } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { IconSearch, IconChevronRight, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
+import { useDeleteTenderMutation } from "@/src/store/api/tenderApi";
 
 interface TendersTableProps {
   tenders: Tender[];
@@ -16,11 +19,38 @@ export function TendersTable({
   tenderSearch,
   setTenderSearch,
 }: TendersTableProps) {
+  const [deleteTender] = useDeleteTenderMutation();
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const filteredTenders = tenders.filter(
     (t) =>
       t.title.toLowerCase().includes(tenderSearch.toLowerCase()) ||
       t.referenceNumber.toLowerCase().includes(tenderSearch.toLowerCase()),
   );
+
+  const handleDeleteTender = async (tender: Tender) => {
+    const confirmed = window.confirm(
+      `Delete tender "${tender.title}"? This action cannot be undone.`,
+    );
+    if (!confirmed) return;
+
+    setDeletingId(tender.id);
+    try {
+      await deleteTender(tender.id).unwrap();
+      notifications.show({
+        title: "Tender deleted",
+        message: `Tender "${tender.title}" was deleted successfully.`,
+        color: "green",
+      });
+    } catch (err: unknown) {
+      notifications.show({
+        title: "Error",
+        message: err instanceof Error ? err.message : "Failed to delete tender",
+        color: "red",
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden shadow-sm">
@@ -104,12 +134,24 @@ export function TendersTable({
                     ${Number(tender.estimatedValue || 0).toLocaleString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Link
-                      href={`/tenders/${tender.id}`}
-                      className="text-xs text-indigo-400 hover:text-indigo-300 font-medium inline-flex items-center gap-1"
-                    >
-                      Details <IconChevronRight size={13} />
-                    </Link>
+                    <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/tenders/${tender.id}`}
+                        className="text-xs text-indigo-400 hover:text-indigo-300 font-medium inline-flex items-center gap-1"
+                      >
+                        Details <IconChevronRight size={13} />
+                      </Link>
+                      <Button
+                        size="compact-xs"
+                        color="red"
+                        variant="light"
+                        leftSection={<IconTrash size={12} />}
+                        loading={deletingId === tender.id}
+                        onClick={() => handleDeleteTender(tender)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}

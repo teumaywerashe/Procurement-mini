@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { User } from "@/src/types";
-import { Select, Loader } from "@mantine/core";
+import { Button, Select, Loader } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import {
   IconSearch,
-  IconCheck,
-  IconX,
+  
   IconShieldCheck,
+  IconTrash,
 } from "@tabler/icons-react";
-import { useUpdateUserRoleMutation } from "@/src/store/api/userApi";
-import { notifications } from "@mantine/notifications";
+import {
+  useDeleteUserMutation,
+  useUpdateUserRoleMutation,
+} from "@/src/store/api/userApi";
 
 interface UsersTableProps {
   users: User[];
@@ -28,7 +31,9 @@ export function UsersTable({
   setRoleFilter,
 }: UsersTableProps) {
   const [updateUserRole] = useUpdateUserRoleMutation();
+  const [deleteUser] = useDeleteUserMutation();
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const filteredUsers = users.filter((u) => {
     const matchesSearch =
       u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
@@ -51,11 +56,37 @@ export function UsersTable({
     } catch (err: unknown) {
       notifications.show({
         title: "Error",
-        message: err instanceof Error ? err.message : "Failed to update user role",
+        message:
+          err instanceof Error ? err.message : "Failed to update user role",
         color: "red",
       });
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleDeleteUser = async (user: User) => {
+    const confirmed = window.confirm(
+      `Delete user "${user.name}"? This action cannot be undone.`,
+    );
+    if (!confirmed) return;
+
+    setDeletingId(user.id);
+    try {
+      await deleteUser(user.id).unwrap();
+      notifications.show({
+        title: "User deleted",
+        message: `User "${user.name}" was deleted successfully.`,
+        color: "green",
+      });
+    } catch (err: unknown) {
+      notifications.show({
+        title: "Error",
+        message: err instanceof Error ? err.message : "Failed to delete user",
+        color: "red",
+      });
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -73,7 +104,8 @@ export function UsersTable({
             </span>
           </div>
           <p className="text-xs text-(--text-subtle) mt-0.5">
-            View active user accounts and change their assigned roles directly. Only SuperAdmin can modify user roles.
+            View active user accounts and change their assigned roles directly.
+            Only SuperAdmin can modify user roles.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -102,8 +134,6 @@ export function UsersTable({
         </div>
       </div>
 
-     
-
       {/* Users Table Content */}
       {usersLoading ? (
         <div className="p-6 space-y-3">
@@ -128,6 +158,7 @@ export function UsersTable({
                 <th className="px-6 py-3.5">Email</th>
                 <th className="px-6 py-3.5">Assigned Role (Editable)</th>
                 <th className="px-6 py-3.5">Registered Date</th>
+                <th className="px-6 py-3.5 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-(--border-subtle)">
@@ -167,20 +198,20 @@ export function UsersTable({
                               u.role === "SuperAdmin"
                                 ? "rgba(127, 29, 29, 0.5)"
                                 : u.role === "Admin"
-                                ? "rgba(49, 46, 129, 0.5)"
-                                : "rgba(6, 78, 59, 0.5)",
+                                  ? "rgba(49, 46, 129, 0.5)"
+                                  : "rgba(6, 78, 59, 0.5)",
                             color:
                               u.role === "SuperAdmin"
                                 ? "#f87171"
                                 : u.role === "Admin"
-                                ? "#818cf8"
-                                : "#34d399",
+                                  ? "#818cf8"
+                                  : "#34d399",
                             borderColor:
                               u.role === "SuperAdmin"
                                 ? "rgba(239, 68, 68, 0.3)"
                                 : u.role === "Admin"
-                                ? "rgba(99, 102, 241, 0.3)"
-                                : "rgba(16, 185, 129, 0.3)",
+                                  ? "rgba(99, 102, 241, 0.3)"
+                                  : "rgba(16, 185, 129, 0.3)",
                             fontWeight: 600,
                             fontSize: "11px",
                             borderRadius: "9999px",
@@ -193,6 +224,18 @@ export function UsersTable({
                   </td>
                   <td className="px-6 py-4 text-(--text-faint)">
                     {new Date(u.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <Button
+                      size="compact-xs"
+                      color="red"
+                      variant="light"
+                      leftSection={<IconTrash size={12} />}
+                      loading={deletingId === u.id}
+                      onClick={() => handleDeleteUser(u)}
+                    >
+                      Delete
+                    </Button>
                   </td>
                 </tr>
               ))}

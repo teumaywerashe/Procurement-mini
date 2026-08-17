@@ -35,6 +35,16 @@ export const vendorApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Vendor"],
     }),
+    deleteVendor: builder.mutation<
+      { success: boolean; message: string },
+      number
+    >({
+      query: (id) => ({
+        url: `/vendor/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Vendor"],
+    }),
   }),
 });
 
@@ -44,4 +54,5 @@ export const {
   useGetMyVendorQuery,
   useCreateVendorMutation,
   useUpdateVendorMutation,
+  useDeleteVendorMutation,
 } = vendorApi;

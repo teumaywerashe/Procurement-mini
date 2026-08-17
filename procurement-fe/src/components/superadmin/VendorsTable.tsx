@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Vendor } from "@/src/types";
-import { IconSearch, IconChevronRight } from "@tabler/icons-react";
+import { Button } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { IconSearch, IconChevronRight, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
+import { useDeleteVendorMutation } from "@/src/store/api/vendorApi";
 
 interface VendorsTableProps {
   vendors: Vendor[];
@@ -16,11 +19,40 @@ export function VendorsTable({
   vendorSearch,
   setVendorSearch,
 }: VendorsTableProps) {
+  const [deleteVendor] = useDeleteVendorMutation();
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const filteredVendors = vendors.filter(
     (v) =>
       v.name.toLowerCase().includes(vendorSearch.toLowerCase()) ||
       (v.email && v.email.toLowerCase().includes(vendorSearch.toLowerCase())),
   );
+
+  const handleDeleteVendor = async (vendor: Vendor) => {
+    const confirmed = window.confirm(
+      `Delete vendor "${vendor.name}"? This action cannot be undone.`,
+    );
+    if (!confirmed) return;
+
+    setDeletingId(vendor.id);
+    try {
+      await deleteVendor(vendor.id).unwrap();
+      notifications.show({
+        title: "Vendor deleted",
+        message: `Vendor "${vendor.name}" was deleted successfully.`,
+        color: "green",
+      });
+    } catch (err: unknown) {
+      notifications.show({
+        title: "Error",
+        message:
+          (err as { data?: { message?: string } })?.data?.message ||
+          "Failed to delete vendor",
+        color: "red",
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden shadow-sm">
@@ -99,12 +131,24 @@ export function VendorsTable({
                     {new Date(vendor.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Link
-                      href={`/vendors`}
-                      className="text-xs text-indigo-400 hover:text-indigo-300 font-medium inline-flex items-center gap-1"
-                    >
-                      View Detail <IconChevronRight size={13} />
-                    </Link>
+                    <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/vendors/${vendor.id}`}
+                        className="text-xs text-indigo-400 hover:text-indigo-300 font-medium inline-flex items-center gap-1"
+                      >
+                        View Detail <IconChevronRight size={13} />
+                      </Link>
+                      <Button
+                        size="compact-xs"
+                        color="red"
+                        variant="light"
+                        leftSection={<IconTrash size={12} />}
+                        loading={deletingId === vendor.id}
+                        onClick={() => handleDeleteVendor(vendor)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
