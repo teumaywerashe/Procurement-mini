@@ -37,13 +37,13 @@ import { useGetTendersQuery, useDeleteTenderMutation } from "@/src/store/api/ten
 import { useGetAllBidsQuery, useUpdateBidStatusMutation } from "@/src/store/api/bidApi";
 import type { Tender, Bid } from "@/src/types";
 import { notifications } from "@mantine/notifications";
+import LoadingSpan from "@/src/utilis/LoadingSpan";
 
 interface AdminDashboardProps {
   currentUser: { id?: number; name?: string; email?: string } | null;
 }
 
 export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
-  // Queries
   const { data: tendersResult, isLoading: tendersLoading } = useGetTendersQuery({ limit: 100 });
   const rawTenders = tendersResult?.data ?? [];
   const myTenders = rawTenders.filter(
@@ -56,11 +56,9 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
     return b.tender.createdBy === currentUser?.id || (b.tender as any).createdBy === currentUser?.id;
   });
 
-  // Mutations
   const [deleteTender, { isLoading: isDeletingTender }] = useDeleteTenderMutation();
   const [updateBidStatus, { isLoading: isUpdatingBid }] = useUpdateBidStatusMutation();
 
-  // State
   const [activeTab, setActiveTab] = useState<string | null>("tenders");
   const [tenderSearch, setTenderSearch] = useState("");
   const [tenderStatusFilter, setTenderStatusFilter] = useState("ALL");
@@ -72,7 +70,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   const [selectedBid, setSelectedBid] = useState<Bid | null>(null);
  
 
-  // Handlers
   const handleDeleteTender = async () => {
     if (!deletingTender) return;
     try {
@@ -104,7 +101,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
         }
   };
 
-  // Calculations
   const now = Date.now();
   const activeTenders = myTenders.filter(
     (t) => t.status === "published" && new Date(t.closingDate).getTime() > now
@@ -112,7 +108,6 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
   const pendingBids = myBids.filter((b) => b.bidStatus === "pending");
   const acceptedBids = myBids.filter((b) => b.bidStatus === "accepted");
 
-  // Filters
   const filteredTenders = myTenders.filter((t) => {
     const matchesSearch =
       t.title.toLowerCase().includes(tenderSearch.toLowerCase()) ||
@@ -173,28 +168,28 @@ export default function AdminDashboard({ currentUser }: AdminDashboardProps) {
           <StatusCard
             icon={<IconFileText size={20} className="text-indigo-400" />}
             label="My Total Tenders"
-            value={tendersLoading ? "—" : myTenders.length}
+            value={tendersLoading ? <LoadingSpan /> : myTenders.length}
             sub="Created by you"
             color="bg-indigo-950/60"
           />
           <StatusCard
             icon={<IconTrendingUp size={20} className="text-emerald-400" />}
             label="Active Tenders"
-            value={tendersLoading ? "—" : activeTenders.length}
+            value={tendersLoading ? <LoadingSpan /> : activeTenders.length}
             sub="Currently receiving bids"
             color="bg-emerald-950/60"
           />
           <StatusCard
             icon={<IconGavel size={20} className="text-purple-400" />}
             label="Total Bids Received"
-            value={bidsLoading ? "—" : myBids.length}
+            value={bidsLoading ? <LoadingSpan /> : myBids.length}
             sub="Across your tenders"
             color="bg-purple-950/60"
           />
           <StatusCard
             icon={<IconChecklist size={20} className="text-amber-400" />}
             label="Pending Review"
-            value={bidsLoading ? "—" : pendingBids.length}
+            value={bidsLoading ? <LoadingSpan /> : pendingBids.length}
             sub="Awaiting your decision"
             color="bg-amber-950/60"
           />

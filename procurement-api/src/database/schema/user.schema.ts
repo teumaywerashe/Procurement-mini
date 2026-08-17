@@ -1,6 +1,5 @@
 import { pgTable, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { UserRole } from '../../user/enum/userRole.enum';
-// import { UserRole } from '../../user/enum/userRole.enum';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),

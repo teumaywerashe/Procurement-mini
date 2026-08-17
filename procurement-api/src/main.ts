@@ -7,12 +7,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './filters/exception-filters';
 
 import cookieParser from 'cookie-parser';
-// import { seed } from './database/seed';
 dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // await seed();
 
   app.use(cookieParser());
 

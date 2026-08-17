@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Modal, Text, Stack, NumberInput, Textarea, Group, Button } from "@mantine/core";
+import { Modal, Text, Stack, NumberInput, Group, Button } from "@mantine/core";
 import { IconCurrencyDollar } from "@tabler/icons-react";
 import type { Bid } from "@/src/types";
 
@@ -11,8 +11,6 @@ interface EditBidModalProps {
   onSubmit: (e: React.FormEvent) => void;
   bidAmount: number | string;
   onBidAmountChange: (val: number | string) => void;
-  bidNotes: string;
-  onBidNotesChange: (val: string) => void;
   isUpdatingBid: boolean;
 }
 
@@ -22,8 +20,6 @@ export default function EditBidModal({
   onSubmit,
   bidAmount,
   onBidAmountChange,
-  bidNotes,
-  onBidNotesChange,
   isUpdatingBid,
 }: EditBidModalProps) {
   return (
@@ -54,13 +50,7 @@ export default function EditBidModal({
             leftSection={<IconCurrencyDollar size={16} />}
           />
 
-          <Textarea
-            label="Updated Proposal Notes"
-            placeholder="Update proposal details..."
-            rows={3}
-            value={bidNotes}
-            onChange={(e) => onBidNotesChange(e.target.value)}
-          />
+        
 
           <Group justify="flex-end" mt="md">
             <Button variant="default" onClick={onClose}>

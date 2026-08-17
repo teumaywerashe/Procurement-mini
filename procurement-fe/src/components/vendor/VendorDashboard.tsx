@@ -33,12 +33,10 @@ interface VendorDashboardProps {
 }
 
 export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
-  // Vendor Profile
   const { data: myVendor } = useGetMyVendorQuery(undefined);
   const [createVendor, { isLoading: isCreatingVendor }] =
     useCreateVendorMutation();
 
-  // Queries
   const { data: tendersResult, isLoading: tendersLoading } = useGetTendersQuery(
     { limit: 100 },
   );
@@ -49,32 +47,27 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
     { skip: !myVendor?.id },
   );
 
-  // Mutations
   const [createBid, { isLoading: isCreatingBid }] = useCreateBidMutation();
   const [updateBid, { isLoading: isUpdatingBid }] = useUpdateBidMutation();
   const [deleteBid, { isLoading: isDeletingBid }] = useDeleteBidMutation();
 
-  // State
   const [activeTab, setActiveTab] = useState<string | null>("tenders");
   const [tenderSearch, setTenderSearch] = useState("");
   const [bidSearch, setBidSearch] = useState("");
   const [bidStatusFilter, setBidStatusFilter] = useState("ALL");
 
-  // Modals
   const [biddingTender, setBiddingTender] = useState<Tender | null>(null);
   const [editingBid, setEditingBid] = useState<Bid | null>(null);
   const [deletingBid, setDeletingBid] = useState<Bid | null>(null);
   const [showVendorModal, setShowVendorModal] = useState(false);
 
-  // Forms
   const [bidAmount, setBidAmount] = useState<number | string>("");
-  const [bidNotes, setBidNotes] = useState("");
+  
   const [vendorName, setVendorName] = useState("");
   const [vendorRegNo, setVendorRegNo] = useState("");
   const [vendorEmail, setVendorEmail] = useState("");
   const [vendorPhone, setVendorPhone] = useState("");
 
-  // Handlers
   const handleCreateVendorProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -106,7 +99,6 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
     }
     setBiddingTender(tender);
     setBidAmount(tender.estimatedValue ? Number(tender.estimatedValue) : "");
-    setBidNotes("");
   };
 
   const handleSubmitNewBid = async (e: React.FormEvent) => {
@@ -118,7 +110,6 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
         vendorId: myVendor.id,
         amount: Number(bidAmount),
         proposedPrice: Number(bidAmount),
-        notes: bidNotes || undefined,
       }).unwrap();
       notifications.show({
         title: `Bid for "${biddingTender.title}" submitted successfully!`,
@@ -138,7 +129,6 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
   const handleOpenEditBid = (bid: Bid) => {
     setEditingBid(bid);
     setBidAmount(bid.amount || bid.proposedPrice || "");
-    setBidNotes(bid.notes || bid.proposal || "");
   };
 
   const handleUpdateBid = async (e: React.FormEvent) => {
@@ -150,7 +140,6 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
         bidStatus: editingBid.bidStatus,
         amount: Number(bidAmount),
         proposedPrice: Number(bidAmount),
-        notes: bidNotes || undefined,
       }).unwrap();
       notifications.show({
         title: "Bid updated successfully!",
@@ -161,7 +150,7 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
     } catch (err: any) {
       notifications.show({
         title: "Error",
-        message:  "Failed to update bid.",
+        message: "Failed to update bid.",
         color: "red",
       });
     }
@@ -186,7 +175,6 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
     }
   };
 
-  // Calculations
   const now = Date.now();
   const publishedTenders = allTenders.filter(
     (t) => t.status === "published" && new Date(t.closingDate).getTime() > now,
@@ -282,8 +270,6 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
           onSubmit={handleSubmitNewBid}
           bidAmount={bidAmount}
           onBidAmountChange={setBidAmount}
-          bidNotes={bidNotes}
-          onBidNotesChange={setBidNotes}
           isCreatingBid={isCreatingBid}
         />
 
@@ -293,8 +279,6 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
           onSubmit={handleUpdateBid}
           bidAmount={bidAmount}
           onBidAmountChange={setBidAmount}
-          bidNotes={bidNotes}
-          onBidNotesChange={setBidNotes}
           isUpdatingBid={isUpdatingBid}
         />
 

@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// authentication validators
 export const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -18,12 +17,10 @@ export const registerSchema = z
     message: "Passwords do not match",
   });
 
-// User / Profile
 export const updateUserSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name is too long"),
 });
 
-// Tender 
 export const tenderStatusEnum = z.enum([
   "draft",
   "published",
@@ -53,7 +50,6 @@ export const tenderSchema = z.object({
 
 export type TenderFormValues = z.infer<typeof tenderSchema>;
 
-// Vendor 
 export const vendorSchema = z.object({
   name: z.string().min(2, "Company name must be at least 2 characters"),
   registrationNumber: z
@@ -69,7 +65,6 @@ export const vendorSchema = z.object({
 
 export type VendorFormValues = z.infer<typeof vendorSchema>;
 
-//  Bid 
 export const bidSchema = z.object({
   amount: z
     .string()

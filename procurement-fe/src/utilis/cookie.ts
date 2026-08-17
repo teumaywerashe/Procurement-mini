@@ -1,6 +1,5 @@
 export function setAuthCookie(token: string) {
   if (typeof document !== "undefined") {
-    // 1 hour max-age matching JWT expiration
     document.cookie = `access_token=${token}; path=/; max-age=3600; SameSite=Lax; Secure`;
   }
 }

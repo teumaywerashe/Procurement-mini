@@ -32,10 +32,10 @@ import {
   BID_STATUS_STYLES,
   TENDER_STATUS_COLORS,
 } from "@/src/components/shared/constants";
+import { Button } from "@mantine/core";
 
 const STATUS_OPTIONS = ["pending", "accepted", "rejected"] as const;
 
-//  Info row
 function InfoRow({
   icon,
   label,
@@ -58,7 +58,6 @@ function InfoRow({
   );
 }
 
-//  Delete confirm modal
 function DeleteModal({
   onConfirm,
   onCancel,
@@ -90,20 +89,20 @@ function DeleteModal({
           >
             Cancel
           </button>
-          <button
+          <Button
             onClick={onConfirm}
             disabled={isDeleting}
+            loading={isDeleting}
             className="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-sm font-medium text-white transition-colors disabled:opacity-50"
           >
-            {isDeleting ? "Deleting…" : "Delete bid"}
-          </button>
+            Delete bid
+          </Button>
         </div>
       </div>
     </div>
   );
 }
 
-//  Main page
 export default function BidDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -124,7 +123,6 @@ export default function BidDetailPage() {
   const [updateBidStatus, { isLoading: isUpdating }] =
     useUpdateBidStatusMutation();
   const [deleteBid, { isLoading: isDeleting }] = useDeleteBidMutation();
-  //  console.log(id,bid)
   const isOwnBid = isVendor && myVendor?.id === bid?.vendorId;
 
   async function handleStatusSave() {
@@ -165,7 +163,6 @@ export default function BidDetailPage() {
     }
   }
 
-  //  Loading
   if (isLoading) {
     return (
       <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
@@ -180,7 +177,6 @@ export default function BidDetailPage() {
     );
   }
 
-  //  Error
   if (isError || !bid) {
     return (
       <div className="min-h-screen bg-(--bg-base) text-(--text-primary) flex flex-col">
@@ -260,14 +256,15 @@ export default function BidDetailPage() {
                         </option>
                       ))}
                     </select>
-                    <button
+                    <Button
                       onClick={handleStatusSave}
                       disabled={isUpdating}
+                      loading={isUpdating}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm font-medium text-white transition-colors disabled:opacity-50"
                     >
                       <IconCheck size={14} />
-                      {isUpdating ? "Saving…" : "Save"}
-                    </button>
+                      Save
+                    </Button>
                     <button
                       onClick={() => setEditingStatus(null)}
                       disabled={isUpdating}
@@ -296,12 +293,14 @@ export default function BidDetailPage() {
                       </button>
                     )}
                     {isOwnBid && (
-                      <button
+                      <Button
+                        disabled={isDeleting}
+                        loading={isDeleting}
                         onClick={() => setShowDelete(true)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-800/60 text-sm text-red-400 hover:bg-red-900/20 hover:border-red-600 transition-colors"
                       >
                         <IconTrash size={14} /> Delete
-                      </button>
+                      </Button>
                     )}
                   </>
                 )}

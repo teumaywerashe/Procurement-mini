@@ -57,6 +57,7 @@ export default function AdminBidTableRow({
       </button>
       <button
         onClick={onCancel}
+        disabled={isUpdating}
         className="p-1.5 cursor-pointer rounded-md border border-(--border-strong) text-(--text-subtle) hover:text-(--text-primary) transition-colors"
         title="Cancel"
       >
@@ -73,7 +74,6 @@ export default function AdminBidTableRow({
       </span>
       <button
         onClick={() => onEdit(bid)}
-        
         className="p-1 cursor-pointer rounded text-(--text-faint) hover:text-indigo-400 hover:bg-indigo-950/40 transition-colors"
         title="Edit status"
       >

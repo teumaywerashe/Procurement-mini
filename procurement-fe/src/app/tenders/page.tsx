@@ -87,7 +87,6 @@ function TendersPageContent() {
   const isVendor = user?.role === "Vendor";
 
 
-  // console.log(user,isVendor,isAdmin)
 
   const { query, setQuery } = useCollectionQuery({
     defaultSortBy: "createdAt",
@@ -95,7 +94,6 @@ function TendersPageContent() {
   const { data: result, isLoading, isError } = useGetTendersQuery(query);
 
   const filteredData = (result?.data ?? []).filter((t) => {
-    // Status filter
     if (query.status === "closing") {
       const d = Math.ceil(
         (new Date(t.closingDate).getTime() - Date.now()) / 86_400_000,
@@ -113,7 +111,6 @@ function TendersPageContent() {
     return true;
   });
 
-  // Compute stats from filtered results
   const stats = {
     total: filteredData.length,
     published: filteredData.filter((t) => t.status === "published").length,

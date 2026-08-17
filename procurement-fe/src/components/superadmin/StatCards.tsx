@@ -6,6 +6,7 @@ import {
   IconFileText,
 } from "@tabler/icons-react";
 import StatusCard from "@/src/components/cards/StatusCard";
+import LoadingSpan from "@/src/utilis/LoadingSpan";
 
 interface StatCardsProps {
   vendorsCount: number;
@@ -31,28 +32,28 @@ export function StatCards({
       <StatusCard
         icon={<IconBuildingStore size={20} className="text-emerald-400" />}
         label="Registered Vendors"
-        value={vendorsLoading ? "—" : vendorsCount}
+        value={vendorsLoading ? <LoadingSpan /> : vendorsCount}
         sub="Active vendors list"
         color="bg-emerald-950/60"
       />
       <StatusCard
         icon={<IconShieldCheck size={20} className="text-indigo-400" />}
         label="System Admins"
-        value={usersLoading ? "—" : totalAdmins}
+        value={usersLoading ? <LoadingSpan /> : totalAdmins}
         sub="Platform administrators"
         color="bg-indigo-950/60"
       />
       <StatusCard
         icon={<IconUsers size={20} className="text-purple-400" />}
         label="Total Logged-in Users"
-        value={usersLoading ? "—" : usersCount}
+        value={usersLoading ? <LoadingSpan /> : usersCount}
         sub="Registered accounts"
         color="bg-purple-950/60"
       />
       <StatusCard
         icon={<IconFileText size={20} className="text-amber-400" />}
         label="System Tenders"
-        value={tendersLoading ? "—" : tendersCount}
+        value={tendersLoading ? <LoadingSpan /> : tendersCount}
         sub="Procurement tenders"
         color="bg-amber-950/60"
       />

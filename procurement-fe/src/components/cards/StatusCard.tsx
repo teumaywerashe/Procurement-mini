@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 
 function StatusCard({
@@ -9,7 +10,7 @@ function StatusCard({
 }: {
   icon: React.ReactNode;
   label: string;
-  value: string | number;
+  value: string | number | React.ReactNode | any;
   sub?: string;
   color: string;
 }) {
@@ -22,8 +23,10 @@ function StatusCard({
           {icon}
         </div>
       </div>
-      <p className="text-2xl font-bold text-(--text-primary) tabular-nums">{value}</p>
-      <p className="text-xs text-(--text-muted) mt-0.5">{label}</p>
+      <div className="text-2xl font-bold text-(--text-primary) tabular-nums">
+        {value}
+      </div>
+      <span className="mt-0.5 block text-xs text-(--text-muted)">{label}</span>
       {sub && <p className="text-[11px] text-(--text-subtle) mt-1">{sub}</p>}
     </div>
   );

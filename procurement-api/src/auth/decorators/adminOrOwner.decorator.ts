@@ -1,5 +1,3 @@
-// common/decorators/admin-or-owner.decorator.ts
-
 import { SetMetadata } from '@nestjs/common';
 
 export const ADMIN_OR_OWNER_KEY = 'adminOrOwner';

@@ -11,6 +11,7 @@ import {
   IconTrendingUp,
 } from "@tabler/icons-react";
 import StatusCard from "@/src/components/cards/StatusCard";
+import LoadingSpan from "@/src/utilis/LoadingSpan";
 
 interface MainDashboardContentProps {
   user: { name?: string; role?: string } | null;
@@ -65,14 +66,14 @@ function MainDashboardContent({
           <StatusCard
             icon={<IconFileText size={18} className="text-indigo-400" />}
             label="Total Tenders"
-            value={tendersLoading ? "—" : tenders.length}
+            value={tendersLoading ? <LoadingSpan/> : tenders.length}
             sub={`${published.length} active`}
             color="bg-indigo-950/60"
           />
           <StatusCard
             icon={<IconClock size={18} className="text-orange-400" />}
             label="Closing Soon"
-            value={tendersLoading ? "—" : closingSoon.length}
+            value={tendersLoading ? <LoadingSpan/> : closingSoon.length}
             sub="Within 7 days"
             color="bg-orange-950/60"
           />
@@ -80,14 +81,14 @@ function MainDashboardContent({
             <StatusCard
               icon={<IconUsers size={18} className="text-emerald-400" />}
               label="Registered Vendors"
-              value={vendorsLoading ? "—" : vendors.length}
+              value={vendorsLoading ? <LoadingSpan/> : vendors.length}
               color="bg-emerald-950/60"
             />
           ) : (
             <StatusCard
               icon={<IconGavel size={18} className="text-yellow-400" />}
               label={`${isAdmin ? "Bids" : "My Bids"}`}
-              value={bidsLoading ? "—" : myBids.length}
+              value={bidsLoading ? <LoadingSpan/> : myBids.length}
               sub={`${pendingBids.length} pending`}
               color="bg-yellow-950/60"
             />

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Modal, Button, Stack, Text, Select, Group } from "@mantine/core";
 import { User } from "@/src/types";

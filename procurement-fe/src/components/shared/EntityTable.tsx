@@ -57,7 +57,7 @@ export function EntityTable<T extends Record<string, any>>({
           sortDir: s.direction,
         })
       }
-      // Only show empty-state area when truly empty
+      
       minHeight={rows.length === 0 ? 100 : 0}
       noRecordsText="No records found"
       onRowClick={onRowClick ? ({ record }) => onRowClick(record) : undefined}

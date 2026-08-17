@@ -45,7 +45,7 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
-  const [logoutApi] = useLogoutMutation();
+  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
   const [menuOpen, setMenuOpen] = useState(false);
 
   async function handleLogout() {
@@ -112,7 +112,7 @@ export default function Navbar() {
             {/* Theme toggle — always visible */}
             <button
               onClick={toggle}
-              className="p-2 text-(--text-subtle) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors"
+              className="p-2 cursor-pointer text-(--text-subtle) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors"
               title={
                 theme === "dark"
                   ? "Switch to light mode"
@@ -154,12 +154,15 @@ export default function Navbar() {
                       className="text-(--text-faint)"
                     />
                   </Link>
-                  <button
+                  <Button
+                    variant="outline"
+                    size="xs"
                     onClick={handleLogout}
+                    loading={isLoggingOut}
                     className="hidden sm:flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg border border-(--border-strong) cursor-pointer text-(--text-muted) hover:bg-red-900/20 hover:border-red-600 transition-colors"
                   >
                     Logout
-                  </button>
+                  </Button>
                 </div>
 
                 <button
@@ -184,7 +187,6 @@ export default function Navbar() {
                   Log in
                 </Button>
                 <Button
-                  
                   variant="filled"
                   onClick={() => route.push("/registration")}
                   className="text-sm font-semibold bg-[#9fef00] hover:bg-[#8cd900] text-[#14120e] px-4 py-1.5 rounded-full transition-colors"
@@ -243,7 +245,7 @@ export default function Navbar() {
               </div>
             </Link>
             <Button
-            variant="outline"
+              variant="outline"
               onClick={handleLogout}
               className="w-full cursor-pointer flex items-center px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-900/20 transition-colors"
             >

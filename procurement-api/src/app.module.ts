@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-// import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -8,18 +7,10 @@ import { UserModule } from './user/user.module';
 import { VendorModule } from './vendor/vendor.module';
 import { TenderModule } from './tender/tender.module';
 import { BidModule } from './bid/bid.module';
-// import { SuperAdminSeed } from './database/seed';
 dotenv.config({ path: '../.env' });
 
 @Module({
-  imports: [
-    AuthModule,
-    UserModule,
-    VendorModule,
-    TenderModule,
-    BidModule,
-    // SuperAdminSeed,
-  ],
+  imports: [AuthModule, UserModule, VendorModule, TenderModule, BidModule],
   controllers: [AppController],
   providers: [AppService],
 })

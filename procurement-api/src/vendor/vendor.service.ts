@@ -34,7 +34,6 @@ export class VendorService {
         }
       }
 
-      // Check for existing registration number
       const [existingVendor] = await tx
         .select()
         .from(vendor)
@@ -48,7 +47,6 @@ export class VendorService {
         );
       }
 
-      // Check if user already owns a vendor
       const [userOwneVendor] = await tx
         .select()
         .from(vendor)
@@ -60,7 +58,6 @@ export class VendorService {
         );
       }
 
-      // Create the vendor
       const [newVendor] = await tx
         .insert(vendor)
         .values({ ...createVendorDto, ownerId: user.uid })
@@ -84,7 +81,6 @@ export class VendorService {
     const sortCol = SORTABLE[query.sortBy ?? 'createdAt'] ?? vendor.createdAt;
     const orderFn = (query.sortDir ?? 'desc') === 'asc' ? asc : desc;
 
-    // Build base query
     let base = db.select().from(vendor).$dynamic();
     if (query.q) {
       base = base.where(
@@ -95,7 +91,6 @@ export class VendorService {
       );
     }
 
-    // Count
     const countQuery = db.select({ value: count() }).from(vendor);
     if (query.q) {
       countQuery.where(
@@ -107,7 +102,6 @@ export class VendorService {
     }
     const [{ value: total }] = await countQuery;
 
-    // Rows
     const rows = await base
       .orderBy(orderFn(sortCol))
       .limit(limit)
@@ -117,12 +111,10 @@ export class VendorService {
     if (ids.length === 0)
       return { data: [], total: Number(total), page, limit };
 
-    // Fetch with relations for returned IDs only
     const data = await db.query.vendor.findMany({
       with: { bids: true, user: true },
     });
 
-    // Re-order to match sorted order
     const ordered = ids
       .map((id) => data.find((v) => v.id === id)!)
       .filter(Boolean);
@@ -140,7 +132,6 @@ export class VendorService {
     if (!existingVendor) {
       throw new NotFoundException('Vendor not found');
     }
-    // Vendors can only view their own profile; super admin can view any
     if (
       user.role !== UserRole.SUPER_ADMIN &&
       existingVendor.ownerId !== user.uid

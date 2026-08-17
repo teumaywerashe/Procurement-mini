@@ -33,7 +33,6 @@ export default function AdminBidsPage() {
   const [updateBidStatus, { isLoading: isUpdating }] =
     useUpdateBidStatusMutation();
 
-  // Client-side filter + paginate (bid endpoint not yet paginated server-side)
   const filtered = bids.filter((b) => {
     const matchCat = categoryFilter
       ? b.tender?.name?.toLowerCase() === categoryFilter.toLowerCase()
@@ -119,20 +118,26 @@ export default function AdminBidsPage() {
               <option value="accepted">Accepted</option>
               <option value="rejected">Rejected</option>
             </select>
-           {!isUpdating? <button
-              onClick={() => confirmEdit(b.id)}
-              disabled={isUpdating}
-              className="text-xs cursor-pointer text-emerald-400 hover:text-emerald-300"
-            >
-              Save
-            </button>: 
+            {!isUpdating ? (
+              <button
+                onClick={() => confirmEdit(b.id)}
+                disabled={isUpdating}
+                className="text-xs cursor-pointer text-emerald-400 hover:text-emerald-300"
+              >
+                Save
+              </button>
+            ) : (
+              <button
+                disabled={isUpdating}
+                className="text-xs cursor-pointer text-emerald-400 hover:text-emerald-300"
+              >
+                {isUpdating && (
+                  <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                )}
+              </button>
+            )}
             <button
               disabled={isUpdating}
-              className="text-xs cursor-pointer text-emerald-400 hover:text-emerald-300"
-            >
-              {isUpdating &&<div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>}
-            </button>}
-            <button
               onClick={() => setEditingId(null)}
               className="text-xs cursor-pointer text-(--text-faint) hover:text-(--text-primary)"
             >

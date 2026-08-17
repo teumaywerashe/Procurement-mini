@@ -18,7 +18,6 @@ import { notifications } from "@mantine/notifications";
 import { updateUserSchema } from "@/src/lib/schemas";
 
 import type { User } from "@/src/types";
-// import {User} from '../../app/src/types/index'
 
 function InfoRow({
   icon,

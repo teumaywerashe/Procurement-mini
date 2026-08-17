@@ -25,18 +25,14 @@ export default function TenderBidsSidebar({ userId, isVendor,isAdmin }: Props) {
     { skip: !isVendor },
   );
 
-  // const { data: bids = [], isLoading: isVendorLoading } =
-  //   useGetBidsByVendorQuery(undefined, { skip: !isVendor || !vendor?.id });
   const bids = vendor?.bids ?? [];
   const route = useRouter();
   const { data: allBids = [], isLoading: isAllBidsLoading } =
     useGetAllBidsQuery(undefined, { skip: isVendor });
-  // console.log(bids);
 
   const displayBids = isVendor ? bids.slice(0, 5) : allBids.slice(0, 5);
   const totalCount = isVendor ? bids.length : allBids.length;
   const isLoading = isVendor ? isVendorLoading : isAllBidsLoading;
-  // console.log(isVendor, bids, vendor);
   return (
     <aside
       className="hidden xl:flex flex-col shrink-0 border-l border-(--border) bg-(--bg-base) overflow-y-auto"

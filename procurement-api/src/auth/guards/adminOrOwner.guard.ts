@@ -28,12 +28,10 @@ export class AdminOrOwnerGuard implements CanActivate {
     const user = request.user;
     const userId = request.params.id;
 
-    // SUPER_ADMIN and ADMIN can access any resource
     if (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN) {
       return true;
     }
 
-    // Owner can access their own resource
     if (String(user.uid) === userId) return true;
 
     throw new ForbiddenException('You are not allowed to perform this action.');

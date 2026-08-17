@@ -11,8 +11,6 @@ interface PlaceBidModalProps {
   onSubmit: (e: React.FormEvent) => void;
   bidAmount: number | string;
   onBidAmountChange: (val: number | string) => void;
-  bidNotes: string;
-  onBidNotesChange: (val: string) => void;
   isCreatingBid: boolean;
 }
 
@@ -22,8 +20,6 @@ export default function PlaceBidModal({
   onSubmit,
   bidAmount,
   onBidAmountChange,
-  bidNotes,
-  onBidNotesChange,
   isCreatingBid,
 }: PlaceBidModalProps) {
   return (
@@ -51,13 +47,6 @@ export default function PlaceBidModal({
             leftSection={<IconCurrencyDollar size={16} />}
           />
 
-          <Textarea
-            label="Proposal Notes / Pitch (Optional)"
-            placeholder="Detail your capability, timeline, or scope specifications..."
-            rows={3}
-            value={bidNotes}
-            onChange={(e) => onBidNotesChange(e.target.value)}
-          />
 
           <Group justify="flex-end" mt="md">
             <Button variant="default" onClick={onClose}>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -66,7 +67,7 @@ export class UserService {
     return result.map(omitPassword);
   }
 
-  async update(id: string, updateUserDto: any) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     const userId = parseInt(id, 10);
     if (isNaN(userId)) {
       throw new BadRequestException('Invalid user ID');
@@ -80,12 +81,9 @@ export class UserService {
       throw new BadRequestException('User not found');
     }
 
-    // Prevent email updates
     if (updateUserDto.email !== undefined) {
       throw new BadRequestException('Email cannot be updated');
     }
-
-    // Hash password if provided
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }

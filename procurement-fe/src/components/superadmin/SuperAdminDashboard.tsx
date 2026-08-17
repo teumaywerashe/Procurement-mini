@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -22,14 +23,12 @@ import { useGetVendorsQuery } from "@/src/store/api/vendorApi";
 import { useGetTendersQuery } from "@/src/store/api/tenderApi";
 import type { User } from "@/src/types";
 
-// New Components
 import StatCards from "./StatCards";
 import AdminManagement from "./AdminManagement";
 import UsersTable from "./UsersTable";
 import VendorsTable from "./VendorsTable";
 import TendersTable from "./TendersTable";
 
-// Modals
 import CreateAdminModal from "./modals/CreateAdminModal";
 import EditAdminRoleModal from "./modals/EditAdminRoleModal";
 import DeleteAdminModal from "./modals/DeleteAdminModal";
@@ -42,7 +41,6 @@ interface SuperAdminDashboardProps {
 export default function SuperAdminDashboard({
   currentUser,
 }: SuperAdminDashboardProps) {
-  // Queries
   const { data: users = [], isLoading: usersLoading } = useGetUsersQuery();
   const { data: vendorsResult, isLoading: vendorsLoading } = useGetVendorsQuery(
     { limit: 100 },
@@ -53,20 +51,17 @@ export default function SuperAdminDashboard({
   );
   const tenders = tendersResult?.data ?? [];
 
-  // Mutations
   const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
   const [updateUserRole, { isLoading: isUpdating }] =
     useUpdateUserRoleMutation();
 
 
-  // Search & Filter state
   const [userSearch, setUserSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
   const [vendorSearch, setVendorSearch] = useState("");
   const [tenderSearch, setTenderSearch] = useState("");
 
-  // Create Admin Form
   const createForm = useForm({
     initialValues: { name: "", email: "", password: "", role: "Admin" },
     validate: {
@@ -79,7 +74,6 @@ export default function SuperAdminDashboard({
     },
   });
 
-  // Edit Admin Form - Role Only
   const editForm = useForm({
     initialValues: { role: "Admin" },
     validate: {
@@ -87,12 +81,10 @@ export default function SuperAdminDashboard({
     },
   });
 
-  // Modal state
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<User | null>(null);
   const [deletingAdmin, setDeletingAdmin] = useState<User | null>(null);
 
-  // Handlers
   const handleCreateAdmin = async (values: typeof createForm.values) => {
     try {
       await createUser(values).unwrap();
@@ -150,7 +142,6 @@ export default function SuperAdminDashboard({
     }
   };
 
-  // Filtered lists
   const adminsList = users.filter(
     (u) =>
       u.role === "Admin" &&

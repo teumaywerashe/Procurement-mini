@@ -30,7 +30,6 @@ export function useCollectionQuery(opts: Options = {}) {
   const setQuery = useCallback((patch: Partial<CollectionQuery>) => {
     setQueryState((prev) => {
       const next = { ...prev, ...patch };
-      // Reset to page 1 whenever filter/search/sort changes
       if (
         patch.q !== undefined ||
         patch.status !== undefined ||
@@ -44,7 +43,6 @@ export function useCollectionQuery(opts: Options = {}) {
     });
   }, []);
 
-  // Sync query state to URL after render — never during
   useEffect(() => {
     const params = new URLSearchParams();
     if (query.q) params.set("q", query.q);
@@ -59,7 +57,6 @@ export function useCollectionQuery(opts: Options = {}) {
       params.set("sortDir", query.sortDir);
 
     router.replace(`?${params.toString()}`, { scroll: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   return { query, setQuery };

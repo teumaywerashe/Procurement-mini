@@ -69,7 +69,7 @@ export class TenderService {
     const offset = (page - 1) * limit;
 
     const conditions: SQL[] = [];
-    // ADMIN scoped to their own; SUPER_ADMIN sees all
+    
     if (user.role === UserRole.ADMIN) {
       conditions.push(eq(tender.createdBy, user.uid));
     }

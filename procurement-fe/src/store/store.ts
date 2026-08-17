@@ -18,9 +18,6 @@ const authPersistConfig = {
   storage,
 };
 
-// Redux Persist saves Redux state so it survives a page refresh
-// with out persist, the user would be logged out on page refresh
-// but with persist, the user will remain logged in until they log out or the token expires
 
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),

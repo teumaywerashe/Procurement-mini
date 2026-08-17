@@ -3,6 +3,8 @@
 import React from "react";
 import { Badge, Button } from "@mantine/core";
 import { IconBuilding, IconGavel } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
+
 
 interface VendorHeaderProps {
   currentUser: { id?: number; name?: string; email?: string } | null;
@@ -16,9 +18,10 @@ export default function VendorHeader({
   currentUser,
   myVendor,
   onOpenVendorModal,
-  onNavigateBids,
+  
   bidsCount,
 }: VendorHeaderProps) {
+  const router = useRouter();
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-linear-to-r from-emerald-950/70 via-indigo-950/50 to-(--bg-surface) p-6 rounded-2xl border border-emerald-900/40 shadow-xl">
       <div>
@@ -60,7 +63,7 @@ export default function VendorHeader({
           variant="outline"
           color="emerald"
           radius="md"
-          onClick={onNavigateBids}
+          onClick={()=>{router.push("/bids/my")}}
           leftSection={<IconGavel size={16} />}
         >
           My Bids ({bidsCount})

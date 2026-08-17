@@ -30,7 +30,6 @@ export function middleware(req: NextRequest) {
   const isSuperAdmin = role === "SuperAdmin";
   const isVendor = role === "Vendor";
 
-  // 1. SuperAdmin only routes (/vendors, /users)
   const isSuperAdminRoute = SUPER_ADMIN_ROUTES.some((route) =>
     pathname.startsWith(route),
   );
@@ -45,7 +44,6 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Vendor only routes (/bids/my)
   const isVendorRoute = VENDOR_ROUTES.some((route) =>
     pathname.startsWith(route),
   );
@@ -60,7 +58,6 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // 3. Admin / SuperAdmin only routes (/tenders/manage, /tenders/create, /tenders/[id]/edit, /bids)
   const isAdminRoute =
     pathname.startsWith("/tenders/manage") ||
     pathname.startsWith("/tenders/create") ||
@@ -77,7 +74,6 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // 4. Authenticated routes (/dashboard, /profile, /bids/[id], etc.)
   const isProtected =
     AUTH_ROUTES.some((route) => pathname.startsWith(route)) ||
     /^\/bids\/[^/]+$/.test(pathname);
@@ -88,7 +84,6 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 5. Redirect logged in users away from auth pages (/login, /registration, /)
   if (
     isLoggedIn &&
     (pathname === "/" || pathname === "/login" || pathname === "/registration")
