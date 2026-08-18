@@ -38,7 +38,7 @@ function InfoRow({
 export function BidStatsAndInfo({ bid }: { bid: any }) {
   const tender = bid.tender;
   const tenderStyle = tender
-    ? (TENDER_STATUS_COLORS[tender.status] ?? TENDER_STATUS_COLORS.draft)
+    ? (TENDER_STATUS_COLORS[tender.status as keyof typeof TENDER_STATUS_COLORS] ?? TENDER_STATUS_COLORS.draft)
     : null;
 
   return (

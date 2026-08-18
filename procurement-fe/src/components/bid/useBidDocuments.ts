@@ -4,6 +4,7 @@ import { notifications } from "@mantine/notifications";
 import {
   useUploadBidDocumentMutation,
   useGetBidDocumentsQuery,
+  useDownloadDocumentQuery,
 } from "@/src/store/api/bidApi";
 import { useDeleteDocumentMutation } from "@/src/store/api/tenderApi";
 
@@ -35,7 +36,10 @@ export function useBidDocuments(bidId: number, canViewBidDocuments: boolean) {
 
   const handleDownload = async (docId: number) => {
     try {
+
+
       setDownloadingDocId(docId);
+     
       const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const res = await fetch(`${apiBase}/documents/${docId}/url`, {
         credentials: "include",

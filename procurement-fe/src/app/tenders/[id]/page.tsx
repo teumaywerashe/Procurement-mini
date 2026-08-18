@@ -286,7 +286,7 @@ export default function TenderDetailPage() {
                           disabled={downloadingDocId === doc.id}
                           onClick={() => handleDownloadDocument(doc.id)}
                         >
-                          Download
+                          View File
                         </Button>
                         {isAdminOwner && (
                           <Button
