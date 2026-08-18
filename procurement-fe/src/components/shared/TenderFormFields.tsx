@@ -30,21 +30,7 @@ export default function TenderFormFields({
 }: Props) {
   return (
     <>
-      <div>
-        <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
-          File <span className="text-red-400">*</span>
-        </label>
-        <input
-          type="file"
-          name="title"
-          value={form.title}
-          onChange={onChange}
-          required
-          placeholder="e.g. Construction of New Office Building"
-          className={errors.title ? INPUT_ERR : INPUT_CLS}
-        />
-        <FieldError msg={errors.title} />
-      </div>
+     
       <div>
         <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
           Title <span className="text-red-400">*</span>

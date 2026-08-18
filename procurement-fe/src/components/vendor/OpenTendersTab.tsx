@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button, Group, Badge } from "@mantine/core";
 import { IconSearch, IconEye, IconEdit, IconGavel } from "@tabler/icons-react";
 import type { Tender, Bid } from "@/src/types";
+import { useRouter } from "next/navigation";
 
 interface OpenTendersTabProps {
   tendersLoading: boolean;
@@ -25,6 +26,7 @@ export default function OpenTendersTab({
   onOpenPlaceBid,
   onOpenEditBid,
 }: OpenTendersTabProps) {
+  const router = useRouter();
   return (
     <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden shadow-sm">
       <div className="p-4 sm:p-6 border-b border-(--border) flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -75,8 +77,8 @@ export default function OpenTendersTab({
               {filteredTenders.map((t: Tender) => {
                 const existingBid = myBids.find((b) => b.tenderId === t.id);
                 return (
-                  <tr key={t.id} className="hover:bg-(--bg-elevated) transition-colors">
-                    <td className="px-6 py-4 font-mono text-(--text-faint)">
+                  <tr  key={t.id} className="hover:bg-(--bg-elevated) cursor-pointer transition-colors">
+                    <td onClick={()=>router.push(`/tenders/${t.id}`)} className="px-6 py-4 font-mono text-(--text-faint) hover:text-blue-500">
                       {t.referenceNumber}
                     </td>
                     <td className="px-6 py-4 font-semibold text-(--text-primary)">

@@ -54,7 +54,7 @@ export class TenderService {
 
     const withRelations = await db.query.tender.findMany({
       where: queryWhere as any,
-      with: { user: true, ...(adminLike ? { bids: true } : {}) },
+      with: { user: true, ...(adminLike ? { bids: true, documents: true } : {}) },
     });
     return rows.map((r) => withRelations.find((t) => t.id === r.id)!).filter(Boolean);
   }
@@ -114,7 +114,7 @@ export class TenderService {
 
     const withRelations = await db.query.tender.findMany({
       where: queryWhere as any,
-      with: { user: true, ...(adminLike ? { bids: true } : {}) },
+      with: { user: true, ...(adminLike ? { bids: true, documents: true } : {}) },
     });
     const data = rows.map((r) => withRelations.find((t) => t.id === r.id)!).filter(Boolean);
 
@@ -132,7 +132,11 @@ export class TenderService {
 
     return await db.query.tender.findFirst({
       where: { id } as any,
-      with: { user: true, ...(canSeeBids ? { bids: true } : {}) },
+      with: { 
+        user: true, 
+        ...(canSeeBids ? { bids: true } : {}),
+        ...(canSeeBids ? { documents: true } : {}) 
+      },
     });
   }
 

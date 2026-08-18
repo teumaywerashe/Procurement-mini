@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "./baseApi";
 import type { Bid } from "@/src/types";
 
@@ -43,6 +44,25 @@ export const bidApi = baseApi.injectEndpoints({
       query: (id) => ({ url: `/bid/${id}`, method: "DELETE" }),
       invalidatesTags: ["Bid"],
     }),
+    uploadBidDocument: builder.mutation<any, { bidId: number; file: File }>({
+      query: ({ bidId, file }) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        return {
+          url: `/documents/bid/${bidId}`,
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        };
+      },
+      invalidatesTags: ["Bid"],
+    }),
+    getBidDocuments: builder.query<any[], number>({
+      query: (bidId) => `/documents/bid/${bidId}`,
+      providesTags: ["Bid"],
+    }),
   }),
 });
 
@@ -55,4 +75,6 @@ export const {
   useUpdateBidMutation,
   useUpdateBidStatusMutation,
   useDeleteBidMutation,
+  useUploadBidDocumentMutation,
+  useGetBidDocumentsQuery,
 } = bidApi;

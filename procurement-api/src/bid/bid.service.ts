@@ -6,6 +6,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateBidDto } from './dto/create-bid.dto';
@@ -13,7 +14,7 @@ import { UpdateBidDto } from './dto/update-bid.dto';
 import { bid } from '../database/schema/bid.schema';
 import { db } from '../database/db';
 import type { JwtPayload } from '../auth/decorators/types';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { vendor } from '../database/schema/vendor.schema';
 import { tender } from '../database/schema/tender.schema';
 import { UserRole } from '../user/enum/userRole.enum';
@@ -21,8 +22,18 @@ import { bidStatus } from './enum/bidStatus.enum';
 import { RabbitMQService } from '../messaging/messaging.service';
 
 @Injectable()
-export class BidService {
+export class BidService implements OnModuleInit {
   constructor(private readonly rabbitMQService: RabbitMQService) {}
+
+  async onModuleInit() {
+    try {
+      await db.execute(
+        sql`ALTER TABLE "bid" ALTER COLUMN "amount" TYPE numeric(12, 2) USING "amount"::numeric;`,
+      );
+    } catch (err) {
+      console.warn('Could not auto-migrate bid amount column:', err);
+    }
+  }
 
   async create(createBidDto: CreateBidDto, user: JwtPayload) {
     const [existingTender] = await db
@@ -119,7 +130,7 @@ export class BidService {
     }
     return await db.query.bid.findMany({
       where: { vendorId: existingVendor.id } as any,
-      with: { tender: true, vendor: true },
+      with: { tender: true, vendor: true, documents: true },
     });
   }
 
@@ -140,14 +151,14 @@ export class BidService {
     }
     return await db.query.bid.findMany({
       where: { tenderId } as any,
-      with: { tender: true, vendor: true },
+      with: { tender: true, vendor: true, documents: true },
     });
   }
 
   async findOne(id: number, user: JwtPayload) {
     const bidById = await db.query.bid.findFirst({
       where: { id } as any,
-      with: { tender: true, vendor: true },
+      with: { tender: true, vendor: true, documents: true },
     });
     if (!bidById) {
       throw new NotFoundException(`Bid with ID ${id} not found`);

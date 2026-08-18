@@ -11,6 +11,7 @@ import {
   useCreateBidMutation,
   useUpdateBidMutation,
   useDeleteBidMutation,
+  useUploadBidDocumentMutation,
 } from "@/src/store/api/bidApi";
 import {
   useGetMyVendorQuery,
@@ -50,6 +51,7 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
   const [createBid, { isLoading: isCreatingBid }] = useCreateBidMutation();
   const [updateBid, { isLoading: isUpdatingBid }] = useUpdateBidMutation();
   const [deleteBid, { isLoading: isDeletingBid }] = useDeleteBidMutation();
+  const [uploadBidDocument] = useUploadBidDocumentMutation();
 
   const [activeTab, setActiveTab] = useState<string | null>("tenders");
   const [tenderSearch, setTenderSearch] = useState("");
@@ -62,6 +64,7 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
   const [showVendorModal, setShowVendorModal] = useState(false);
 
   const [bidAmount, setBidAmount] = useState<number | string>("");
+  const [uploadedBidDocument, setUploadedBidDocument] = useState<File | null>(null);
   
   const [vendorName, setVendorName] = useState("");
   const [vendorRegNo, setVendorRegNo] = useState("");
@@ -105,18 +108,32 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
     e.preventDefault();
     if (!biddingTender || !myVendor) return;
     try {
-      await createBid({
+      const result = await createBid({
         tenderId: biddingTender.id,
         vendorId: myVendor.id,
         amount: Number(bidAmount),
         proposedPrice: Number(bidAmount),
       }).unwrap();
+
+      // Upload document if provided
+      if (uploadedBidDocument) {
+        try {
+          await uploadBidDocument({
+            bidId: result.id,
+            file: uploadedBidDocument,
+          }).unwrap();
+        } catch (uploadError) {
+          console.error("Failed to upload document:", uploadError);
+        }
+      }
+
       notifications.show({
         title: `Bid for "${biddingTender.title}" submitted successfully!`,
         message: `Bid for "${biddingTender.title}" submitted successfully!`,
         color: "green",
       });
       setBiddingTender(null);
+      setUploadedBidDocument(null);
     } catch (err: any) {
       notifications.show({
         title: "Error",
@@ -266,11 +283,16 @@ export default function VendorDashboard({ currentUser }: VendorDashboardProps) {
 
         <PlaceBidModal
           biddingTender={biddingTender}
-          onClose={() => setBiddingTender(null)}
+          onClose={() => {
+            setBiddingTender(null);
+            setUploadedBidDocument(null);
+          }}
           onSubmit={handleSubmitNewBid}
           bidAmount={bidAmount}
           onBidAmountChange={setBidAmount}
           isCreatingBid={isCreatingBid}
+          uploadedDocument={uploadedBidDocument}
+          setUploadedDocument={setUploadedBidDocument}
         />
 
         <EditBidModal

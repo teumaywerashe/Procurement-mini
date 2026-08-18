@@ -95,3 +95,44 @@ export interface FormState {
   closingDate: string;
   estimatedValue: string;
 }
+
+export interface Document {
+  id: number;
+  fileName: string;
+  objectKey: string;
+  mimeType: string;
+  fileSize: number;
+  tenderId?: number;
+  bidId?: number;
+  uploadedBy: number;
+  uploadedByUser?: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+}
+
+export interface UploadDocumentDto {
+  file: File;
+  tenderId?: number;
+  bidId?: number;
+}
+
+export interface DocumentResponse {
+  id: number;
+  fileName: string;
+  objectKey: string;
+  mimeType: string;
+  fileSize: number;
+  tenderId?: number;
+  bidId?: number;
+  uploadedBy: number;
+  uploadedByUser?: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+  presignedUrl?: string;
+}

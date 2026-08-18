@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { IconGavel, IconCurrencyDollar, IconCheck } from "@tabler/icons-react";
+import { IconGavel, IconCurrencyDollar, IconFileText, IconCheck } from "@tabler/icons-react";
+import { FileInput } from "@mantine/core";
 import { useGetMyVendorQuery, useCreateVendorMutation } from "@/src/store/api/vendorApi";
-import { useGetBidsByVendorQuery, useCreateBidMutation } from "@/src/store/api/bidApi";
+import { useGetBidsByVendorQuery, useCreateBidMutation, useUploadBidDocumentMutation } from "@/src/store/api/bidApi";
 import { notifications } from "@mantine/notifications";
 import type { Tender } from "@/src/types";
 import { vendorSchema, bidSchema } from "@/src/lib/schemas";
@@ -28,8 +30,10 @@ export default function VendorBidSection({ tender, closing }: Props) {
 
   const [bidAmount, setBidAmount]   = useState("");
   const [bidAmountError, setBidAmountError] = useState<string | null>(null);
+  const [uploadedDocument, setUploadedDocument] = useState<File | null>(null);
   const [showBidForm, setShowBidForm] = useState(false);
   const [createBid, { isLoading: isSubmitting }] = useCreateBidMutation();
+  const [uploadBidDocument] = useUploadBidDocumentMutation();
 
   async function handleSubmitBid(e: React.FormEvent) {
     e.preventDefault();
@@ -46,9 +50,17 @@ export default function VendorBidSection({ tender, closing }: Props) {
     setBidAmountError(null);
 
     try {
-      await createBid({ tenderId: tender.id, vendorId: vendor.id, amount: Number(parsed.data.amount) }).unwrap();
+      const result = await createBid({ tenderId: tender.id, vendorId: vendor.id, amount: Number(parsed.data.amount) }).unwrap();
+      if (uploadedDocument) {
+        try {
+          await uploadBidDocument({ bidId: result.id, file: uploadedDocument }).unwrap();
+        } catch (uploadError) {
+          console.error("Failed to upload bid document:", uploadError);
+        }
+      }
       notifications.show({ title: "Bid Submitted", message: "Your bid has been submitted successfully.", color: "green" });
       setBidAmount("");
+      setUploadedDocument(null);
       setShowBidForm(false);
     } catch (error: any) {
       const errorMessage = error?.data?.message || error?.message || "Failed to submit bid.";
@@ -134,18 +146,30 @@ export default function VendorBidSection({ tender, closing }: Props) {
             <div><p className="text-sm font-medium text-(--text-subtle)">Bidding not available</p><p className="text-xs text-(--text-faint) mt-0.5">This tender is {tender.status} and is not accepting bids.</p></div>
           </div>
         ) : showBidForm ? (
-          <form onSubmit={handleSubmitBid}>
-            <h2 className="text-sm font-semibold text-(--text-primary) mb-4">Submit Your Bid</h2>
-            <div className="flex items-center gap-3">
+          <form onSubmit={handleSubmitBid} className="space-y-4">
+            <h2 className="text-sm font-semibold text-(--text-primary)">Submit Your Bid</h2>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className={`flex-1 flex items-center bg-(--bg-input) border rounded-lg px-3 py-2.5 gap-2 focus-within:border-indigo-500 transition-colors ${bidAmountError ? "border-red-500" : "border-(--border-strong)"}`}>
                 <IconCurrencyDollar size={15} className="text-(--text-faint) shrink-0" />
                 <input type="number" value={bidAmount} onChange={(e) => { setBidAmount(e.target.value); setBidAmountError(null); }} placeholder="Enter bid amount" min={1} step="0.01" required autoFocus
                   className="bg-transparent text-sm text-(--text-primary) placeholder-(--text-faint) outline-none flex-1" />
               </div>
-              <button type="submit" disabled={isSubmitting || !bidAmount} className="px-5 py-2.5 cursor-pointer rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50">{isSubmitting ? "Submitting..." : "Submit Bid"}</button>
-              <button type="button" onClick={() => { setShowBidForm(false); setBidAmountError(null); }} className="px-4 py-2.5 rounded-lg border border-(--border-strong) text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors">Cancel</button>
+              <div className="flex items-center gap-2">
+                <button type="submit" disabled={isSubmitting || !bidAmount} className="px-5 py-2.5 cursor-pointer rounded-lg bg-indigo-600 hover:bg-indigo-500 text-sm font-medium text-white transition-colors disabled:opacity-50">{isSubmitting ? "Submitting..." : "Submit Bid"}</button>
+                <button type="button" onClick={() => { setShowBidForm(false); setBidAmountError(null); setUploadedDocument(null); }} className="px-4 py-2.5 rounded-lg border border-(--border-strong) text-sm text-(--text-subtle) hover:text-(--text-primary) transition-colors">Cancel</button>
+              </div>
             </div>
-            {bidAmountError && <p className="text-xs text-red-400 mt-2">{bidAmountError}</p>}
+            {bidAmountError && <p className="text-xs text-red-400">{bidAmountError}</p>}
+
+            <div>
+              <FileInput
+                label="Supporting Proposal Document (Optional)"
+                placeholder="Attach bid document (.pdf, .doc, .docx, .xls, .xlsx)"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.csv"
+                leftSection={<IconFileText size={18} />}
+                onChange={(file) => setUploadedDocument(file)}
+              />
+            </div>
           </form>
         ) : (
           <div className="flex items-center justify-between">

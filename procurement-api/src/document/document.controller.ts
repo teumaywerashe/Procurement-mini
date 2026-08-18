@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
   Controller,
   Post,
@@ -86,8 +83,10 @@ export class DocumentController {
   }
 
   @Get('tender/:tenderId')
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-  @ApiOperation({ summary: 'Get all documents for a tender' })
+  @Public()
+  @ApiOperation({
+    summary: 'Get all documents for a tender (public for published tenders)',
+  })
   getTenderDocuments(
     @Param('tenderId') tenderId: string,
     @CurrentUser() user: JwtPayload,
@@ -96,8 +95,11 @@ export class DocumentController {
   }
 
   @Get('bid/:bidId')
-  @Roles(UserRole.VENDOR)
-  @ApiOperation({ summary: 'Get all documents for a bid' })
+  @Roles(UserRole.VENDOR, UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiOperation({
+    summary:
+      'Get all documents for a bid (accessible to bid owner vendor and tender owner admin)',
+  })
   getBidDocuments(
     @Param('bidId') bidId: string,
     @CurrentUser() user: JwtPayload,

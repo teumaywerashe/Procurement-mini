@@ -1,4 +1,5 @@
 import {
+  decimal,
   integer,
   pgTable,
   serial,
@@ -17,7 +18,11 @@ export const bid = pgTable(
       .notNull()
       .references(() => vendor.id, { onDelete: 'cascade' }),
     bidStatus: varchar().default('pending'),
-    amount: integer('amount').notNull(),
+    amount: decimal('amount', {
+      precision: 12,
+      scale: 2,
+      mode: 'number',
+    }).notNull(),
     tenderId: integer('tender_id')
       .notNull()
       .references(() => tender.id, { onDelete: 'cascade' }),

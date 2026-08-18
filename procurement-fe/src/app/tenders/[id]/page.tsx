@@ -8,9 +8,14 @@ import Navbar from "@/src/components/layout/Navbar";
 import {
   useGetTenderQuery,
   useDeleteTenderMutation,
+  useUploadTenderDocumentMutation,
+  useGetTenderDocumentsQuery,
+  useDeleteDocumentMutation,
 } from "@/src/store/api/tenderApi";
 import { useSelector } from "react-redux";
 import { notifications } from "@mantine/notifications";
+import { FileInput, Button, Text, Stack, Group } from "@mantine/core";
+import { IconFileText } from "@tabler/icons-react";
 import type { RootState } from "@/src/store/store";
 import {
   IconArrowLeft,
@@ -36,7 +41,93 @@ export default function TenderDetailPage() {
   const isAdmin = user?.role === "Admin";
   const isVendor = user?.role === "Vendor";
   const isAdminOwner =
-    isAdmin && (tender?.createdBy === user?.id || (tender as any)?.createdBy === user?.id);
+    isAdmin &&
+    (tender?.createdBy === user?.id || (tender as any)?.createdBy === user?.id);
+  const isPublishedTender = tender?.status === "published";
+
+  // Document upload (Admin only)
+  const [uploadDocument, { isLoading: isUploadingDocument }] =
+    useUploadTenderDocumentMutation();
+
+  // Fetch documents - admin owners can upload, everyone can view (if tender is public or they have access)
+  const [downloadingDocId, setDownloadingDocId] = useState<number | null>(null);
+  const {
+    data: documents,
+    refetch: refetchDocuments,
+    isLoading: isDocumentsLoading,
+  } = useGetTenderDocumentsQuery(Number(id), {
+    skip: !isAdminOwner && !isPublishedTender,
+  });
+  const [deleteDocument] = useDeleteDocumentMutation();
+
+  const handleDocumentUpload = async (file?: File) => {
+    if (!file || !tender) return;
+
+    try {
+      await uploadDocument({
+        tenderId: tender.id,
+        file,
+      }).unwrap();
+      notifications.show({
+        title: "Success",
+        message: "Document uploaded successfully",
+        color: "green",
+      });
+      refetchDocuments();
+    } catch (error: any) {
+      notifications.show({
+        title: "Error",
+        message: error?.data?.message || "Failed to upload document",
+        color: "red",
+      });
+    }
+  };
+
+  const handleDownloadDocument = async (docId: number) => {
+    try {
+      setDownloadingDocId(docId);
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const res = await fetch(`${apiBase}/documents/${docId}/url`, {
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        window.open(data.url, "_blank");
+      } else {
+        notifications.show({
+          title: "Error",
+          message: data.message || "Failed to get download URL",
+          color: "red",
+        });
+      }
+    } catch {
+      notifications.show({
+        title: "Error",
+        message: "Failed to download document",
+        color: "red",
+      });
+    } finally {
+      setDownloadingDocId(null);
+    }
+  };
+
+  const handleDeleteDocument = async (docId: number) => {
+    try {
+      await deleteDocument(docId).unwrap();
+      notifications.show({
+        title: "Success",
+        message: "Document deleted successfully",
+        color: "green",
+      });
+      refetchDocuments();
+    } catch {
+      notifications.show({
+        title: "Error",
+        message: "Failed to delete document",
+        color: "red",
+      });
+    }
+  };
 
   async function handleDelete() {
     try {
@@ -127,6 +218,93 @@ export default function TenderDetailPage() {
         </div>
 
         {isVendor && <VendorBidSection tender={tender} closing={closing} />}
+
+        {/* Document Upload Section (Admin owner only) */}
+        {(documents && documents.length > 0) || isAdminOwner ? (
+          <div className="mt-6">
+            <Text size="sm" fw={500} mb="sm">
+              Tender Documents
+            </Text>
+            <Stack gap="md">
+              {isAdminOwner && (
+                <FileInput
+                  label="Upload Document"
+                  placeholder="Select a document to upload"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+                  leftSection={<IconFileText size={18} />}
+                  disabled={isUploadingDocument}
+                  onChange={(file) => {
+                    if (file) handleDocumentUpload(file);
+                  }}
+                />
+              )}
+
+              {documents && documents.length > 0 && (
+                <div className="space-y-3">
+                  {documents.map((doc: any) => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center justify-between p-4 bg-(--bg-surface) border border-(--border) rounded-xl"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-(--bg-elevated) flex items-center justify-center text-xl shrink-0">
+                          {doc.mimeType.includes("pdf")
+                            ? "📄"
+                            : doc.mimeType.includes("word")
+                              ? "📝"
+                              : "📊"}
+                        </div>
+                        <Stack gap="2" className="min-w-0">
+                          <Text fw={500} className="truncate max-w-[200px]">
+                            {doc.fileName}
+                          </Text>
+                          <Text size="xs" c="dimmed">
+                            {doc.fileSize < 1024
+                              ? `${doc.fileSize} B`
+                              : doc.fileSize < 1024 * 1024
+                                ? `${(doc.fileSize / 1024).toFixed(1)} KB`
+                                : `${(doc.fileSize / (1024 * 1024)).toFixed(1)} MB`}
+                            {doc.uploadedByUser && (
+                              <>
+                                {" "}
+                                •{" "}
+                                {doc.uploadedByUser.name ||
+                                  `User #${doc.uploadedBy}`}
+                              </>
+                            )}
+                          </Text>
+                        </Stack>
+                      </div>
+                      <Group gap="xs">
+                        <Button
+                          size="xs"
+                          variant="default"
+                          loading={downloadingDocId === doc.id}
+                          disabled={downloadingDocId === doc.id}
+                          onClick={() => handleDownloadDocument(doc.id)}
+                        >
+                          Download
+                        </Button>
+                        {isAdminOwner && (
+                          <Button
+                            size="xs"
+                            color="red"
+                            variant="default"
+                            onClick={() => handleDeleteDocument(doc.id)}
+                            disabled={isUploadingDocument}
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </Group>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Stack>
+          </div>
+        ) : null}
+      
         {isAdminOwner && <AdminBidsSection bids={tender.bids ?? []} />}
       </div>
 

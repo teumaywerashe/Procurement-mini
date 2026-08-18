@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -10,9 +11,13 @@ import {
   useGetBidByIdQuery,
   useUpdateBidStatusMutation,
   useDeleteBidMutation,
+  useUploadBidDocumentMutation,
+  useGetBidDocumentsQuery,
 } from "@/src/store/api/bidApi";
 import { useGetMyVendorQuery } from "@/src/store/api/vendorApi";
+import { useDeleteDocumentMutation } from "@/src/store/api/tenderApi";
 import { notifications } from "@mantine/notifications";
+import { FileInput, Text, Stack, Button, Group } from "@mantine/core";
 import {
   IconArrowLeft,
   IconGavel,
@@ -32,7 +37,6 @@ import {
   BID_STATUS_STYLES,
   TENDER_STATUS_COLORS,
 } from "@/src/components/shared/constants";
-import { Button } from "@mantine/core";
 
 const STATUS_OPTIONS = ["pending", "accepted", "rejected"] as const;
 
@@ -117,7 +121,11 @@ export default function BidDetailPage() {
   >(null);
   const [showDelete, setShowDelete] = useState(false);
 
-  const { data: bid, isLoading, isError } = useGetBidByIdQuery(bidId, {
+  const {
+    data: bid,
+    isLoading,
+    isError,
+  } = useGetBidByIdQuery(bidId, {
     skip: !hasValidBidId,
   });
   const { data: myVendor } = useGetMyVendorQuery(undefined, {
@@ -128,6 +136,95 @@ export default function BidDetailPage() {
     useUpdateBidStatusMutation();
   const [deleteBid, { isLoading: isDeleting }] = useDeleteBidMutation();
   const isOwnBid = isVendor && myVendor?.id === bid?.vendorId;
+  const isTenderAdminOwner =
+    isAdmin &&
+    (bid?.tender?.createdBy === user?.id ||
+      (bid?.tender as any)?.createdBy === user?.id);
+  const canViewBidDocuments = isOwnBid || isTenderAdminOwner;
+
+  // Document upload & download
+  const [downloadingDocId, setDownloadingDocId] = useState<number | null>(null);
+  const [deleteDocument] = useDeleteDocumentMutation();
+  const [uploadBidDocument, { isLoading: isUploadingDocument }] =
+    useUploadBidDocumentMutation();
+  const { data: bidDocuments, refetch: refetchBidDocuments } =
+    useGetBidDocumentsQuery(bidId, {
+      skip: !canViewBidDocuments,
+    });
+
+  const handleBidDocumentUpload = async (file: File) => {
+    if (!file) return;
+
+    try {
+      await uploadBidDocument({
+        bidId,
+        file,
+      }).unwrap();
+      notifications.show({
+        title: "Success",
+        message: "Document uploaded successfully",
+        color: "green",
+      });
+      refetchBidDocuments();
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to upload document";
+      notifications.show({
+        title: "Error",
+        message: errorMessage,
+        color: "red",
+      });
+    }
+  };
+
+  const handleDownloadDocument = async (docId: number) => {
+    try {
+      setDownloadingDocId(docId);
+      const apiBase =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const res = await fetch(`${apiBase}/documents/${docId}/url`, {
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        window.open(data.url, "_blank");
+      } else {
+        notifications.show({
+          title: "Error",
+          message: data.message || "Failed to get download URL",
+          color: "red",
+        });
+      }
+    } catch {
+      notifications.show({
+        title: "Error",
+        message: "Failed to download document",
+        color: "red",
+      });
+    } finally {
+      setDownloadingDocId(null);
+    }
+  };
+
+  const handleDeleteDocument = async (docId: number) => {
+    try {
+      await deleteDocument(docId).unwrap();
+      notifications.show({
+        title: "Success",
+        message: "Document deleted successfully",
+        color: "green",
+      });
+      refetchBidDocuments();
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to delete document";
+      notifications.show({
+        title: "Error",
+        message: errorMessage,
+        color: "red",
+      });
+    }
+  };
 
   async function handleStatusSave() {
     if (!editingStatus || !bid) return;
@@ -320,7 +417,7 @@ export default function BidDetailPage() {
                   <IconCurrencyDollar size={15} className="text-emerald-400" />
                 ),
                 label: "Bid Amount",
-                value: `$${Number(bid.amount).toLocaleString()}`,
+                value: `${Number(bid.amount).toLocaleString()}`,
                 highlight: true,
               },
               {
@@ -415,10 +512,114 @@ export default function BidDetailPage() {
             )}
           </div>
         </div>
+        {/* Document Section (Vendor owner can upload/delete; Admin owner can view/download) */}
+        {canViewBidDocuments && (
+          <div className="mt-6">
+            <Text size="sm" fw={500} mb="sm">
+              Bid Documents
+            </Text>
+            <Stack gap="md">
+              {isOwnBid && bid.bidStatus === "pending" && (
+                <FileInput
+                  label="Upload Document"
+                  placeholder="Select a document to upload"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+                  leftSection={<IconFileText size={18} />}
+                  disabled={isUploadingDocument}
+                  onChange={(file) => {
+                    if (file) handleBidDocumentUpload(file);
+                  }}
+                />
+              )}
 
+              {bidDocuments && bidDocuments.length > 0 ? (
+                <div className="space-y-3">
+                  {bidDocuments.map(
+                    (doc: {
+                      id: number;
+                      fileName: string;
+                      mimeType: string;
+                      fileSize: number;
+                    }) => (
+                      <div
+                        key={doc.id}
+                        className="flex items-center justify-between p-4 bg-(--bg-surface) border border-(--border) rounded-xl"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-lg bg-(--bg-elevated) flex items-center justify-center text-xl shrink-0">
+                            {doc.mimeType.includes("pdf")
+                              ? "📄"
+                              : doc.mimeType.includes("word")
+                                ? "📝"
+                                : "📊"}
+                          </div>
+                          <Stack gap="2" className="min-w-0">
+                            <Text fw={500} className="truncate max-w-50">
+                              {doc.fileName}
+                            </Text>
+                            <Text size="xs" c="dimmed">
+                              {doc.fileSize < 1024
+                                ? `${doc.fileSize} B`
+                                : doc.fileSize < 1024 * 1024
+                                  ? `${(doc.fileSize / 1024).toFixed(1)} KB`
+                                  : `${(doc.fileSize / (1024 * 1024)).toFixed(
+                                      1,
+                                    )} MB`}
+                            </Text>
+                          </Stack>
+                        </div>
+                        <Group gap="xs">
+                          <Button
+                            size="xs"
+                            variant="default"
+                            loading={downloadingDocId === doc.id}
+                            disabled={downloadingDocId === doc.id}
+                            onClick={() => handleDownloadDocument(doc.id)}
+                          >
+                            Download
+                          </Button>
+                          {isOwnBid && (
+                            <Button
+                              size="xs"
+                              color="red"
+                              variant="default"
+                              onClick={() => handleDeleteDocument(doc.id)}
+                              disabled={isUploadingDocument}
+                            >
+                              Delete
+                            </Button>
+                          )}
+                        </Group>
+                      </div>
+                    ),
+                  )}
+                </div>
+              ) : (
+                !isOwnBid && (
+                  <Text size="xs" c="dimmed">
+                    No documents attached to this bid.
+                  </Text>
+                )
+              )}
+            </Stack>
+          </div>
+        )}
+
+        {/*  Vendor-only notice  */}
+        {isVendor && !isOwnBid && bid.bidStatus === "pending" && (
+          <div className="bg-yellow-950/30 border border-yellow-800/40 rounded-xl px-5 py-4 flex items-start gap-3">
+            <IconAlertTriangle
+              size={16}
+              className="text-yellow-400 shrink-0 mt-0.5"
+            />
+            <p className="text-xs text-yellow-400">
+              You can only delete bids that belong to your vendor account.
+            </p>
+          </div>
+        )}
         {/*  Tender description card  */}
         {tender?.description && (
-          <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden mb-4">
+          <div className="bg-(--bg-surface) mt-10 border border-(--border) rounded-2xl overflow-hidden mb-4">
             <div className="px-6 sm:px-8 py-4 border-b border-(--border)">
               <h2 className="text-sm font-semibold text-(--text-muted)">
                 Tender Description
@@ -429,19 +630,6 @@ export default function BidDetailPage() {
                 {tender.description}
               </p>
             </div>
-          </div>
-        )}
-
-        {/*  Vendor-only notice  */}
-        {isVendor && !isOwnBid && bid && (
-          <div className="bg-yellow-950/30 border border-yellow-800/40 rounded-xl px-5 py-4 flex items-start gap-3">
-            <IconAlertTriangle
-              size={16}
-              className="text-yellow-400 shrink-0 mt-0.5"
-            />
-            <p className="text-xs text-yellow-400">
-              You can only delete bids that belong to your vendor account.
-            </p>
           </div>
         )}
       </div>
