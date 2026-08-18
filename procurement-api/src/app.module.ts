@@ -8,6 +8,7 @@ import { VendorModule } from './vendor/vendor.module';
 import { TenderModule } from './tender/tender.module';
 import { BidModule } from './bid/bid.module';
 import { NotifiactionModule } from './notifiaction/notifiaction.module';
+import { MessagingModule } from './messaging/messaging.module';
 dotenv.config({ path: '../.env' });
 
 @Module({
@@ -18,6 +19,7 @@ dotenv.config({ path: '../.env' });
     TenderModule,
     BidModule,
     NotifiactionModule,
+    MessagingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

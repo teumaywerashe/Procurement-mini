@@ -73,7 +73,6 @@ services:
     stdin_open: true
     tty: true
 
-
   pgadmin:
     image: dpage/pgadmin4:9.6
     container_name: procurement-pgadmin
@@ -93,6 +92,30 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: procurement-rabbitmq
+    hostname: rabbitmq
+    restart: unless-stopped
+
+    environment:
+      RABBITMQ_DEFAULT_USER: procurement
+      RABBITMQ_DEFAULT_PASS: procurement_password
+      RABBITMQ_DEFAULT_VHOST: procurement
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+    interval: 10s
+    timeout: 5s
+    retries: 5
 volumes:
   postgres_data:
   pgadmin_data:
+  rabbitmq_data:

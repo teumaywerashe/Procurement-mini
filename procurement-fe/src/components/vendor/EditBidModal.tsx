@@ -4,6 +4,8 @@ import React from "react";
 import { Modal, Text, Stack, NumberInput, Group, Button } from "@mantine/core";
 import { IconCurrencyDollar } from "@tabler/icons-react";
 import type { Bid } from "@/src/types";
+import { useDeleteBidMutation } from "@/src/store/api/bidApi";
+import { notifications } from "@mantine/notifications";
 
 interface EditBidModalProps {
   editingBid: Bid | null;
@@ -22,6 +24,7 @@ export default function EditBidModal({
   onBidAmountChange,
   isUpdatingBid,
 }: EditBidModalProps) {
+  const [deleteBid, { isLoading: isDeletingBid }] = useDeleteBidMutation();
   return (
     <Modal
       opened={!!editingBid}
@@ -37,7 +40,8 @@ export default function EditBidModal({
       <form onSubmit={onSubmit}>
         <Stack gap="md">
           <Text size="xs" c="dimmed">
-            Tender: {editingBid?.tender?.title || `Tender #${editingBid?.tenderId}`}
+            Tender:{" "}
+            {editingBid?.tender?.title || `Tender #${editingBid?.tenderId}`}
           </Text>
 
           <NumberInput
@@ -50,11 +54,24 @@ export default function EditBidModal({
             leftSection={<IconCurrencyDollar size={16} />}
           />
 
-        
-
           <Group justify="flex-end" mt="md">
             <Button variant="default" onClick={onClose}>
               Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                deleteBid(editingBid?.id as number);
+
+                notifications.show({
+                  title: "Bid Deleted",color: "red",
+                  message: "Bid deleted successfully",
+                });
+                onClose();
+              }}
+              color="red"
+              loading={isDeletingBid}
+            >
+              discard
             </Button>
             <Button color="indigo" type="submit" loading={isUpdatingBid}>
               Save Changes

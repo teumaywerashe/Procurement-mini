@@ -1,7 +1,7 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "58546e9d-2894-405e-a6ef-6e380ae412b4",
+  "id": "353743b4-34c9-48ab-bc96-f596bde591de",
   "prevIds": [
     "f867f2df-35ad-4355-b241-54f45c6f061f"
   ],
@@ -141,7 +141,7 @@
       "table": "notification"
     },
     {
-      "type": "string",
+      "type": "varchar",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
@@ -161,13 +161,13 @@
       "default": "false",
       "generated": null,
       "identity": null,
-      "name": "is_read",
+      "name": "isRead",
       "entityType": "columns",
       "schema": "public",
       "table": "notification"
     },
     {
-      "type": "string",
+      "type": "varchar",
       "typeSchema": null,
       "notNull": true,
       "dimensions": 0,
@@ -187,7 +187,7 @@
       "default": null,
       "generated": null,
       "identity": null,
-      "name": "user_id",
+      "name": "userId",
       "entityType": "columns",
       "schema": "public",
       "table": "notification"
@@ -200,7 +200,7 @@
       "default": "now()",
       "generated": null,
       "identity": null,
-      "name": "created_at",
+      "name": "createdAt",
       "entityType": "columns",
       "schema": "public",
       "table": "notification"

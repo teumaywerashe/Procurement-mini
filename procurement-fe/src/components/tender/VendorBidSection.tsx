@@ -33,7 +33,10 @@ export default function VendorBidSection({ tender, closing }: Props) {
 
   async function handleSubmitBid(e: React.FormEvent) {
     e.preventDefault();
-    if (!vendor?.id) return;
+    if (!vendor?.id) {
+      notifications.show({ title: "Error", message: "Vendor profile not found. Please create a vendor profile first.", color: "red" });
+      return;
+    }
 
     const parsed = bidSchema.safeParse({ amount: bidAmount });
     if (!parsed.success) {
@@ -45,9 +48,11 @@ export default function VendorBidSection({ tender, closing }: Props) {
     try {
       await createBid({ tenderId: tender.id, vendorId: vendor.id, amount: Number(parsed.data.amount) }).unwrap();
       notifications.show({ title: "Bid Submitted", message: "Your bid has been submitted successfully.", color: "green" });
-      setBidAmount(""); setShowBidForm(false);
-    } catch {
-      notifications.show({ title: "Error", message: "Failed to submit bid.", color: "red" });
+      setBidAmount("");
+      setShowBidForm(false);
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || error?.message || "Failed to submit bid.";
+      notifications.show({ title: "Error", message: errorMessage, color: "red" });
     }
   }
 

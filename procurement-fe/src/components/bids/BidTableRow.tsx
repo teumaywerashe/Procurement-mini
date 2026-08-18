@@ -1,15 +1,17 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { IconCurrencyDollar, IconClock } from "@tabler/icons-react";
+import { IconCurrencyDollar, IconClock, IconTrash, IconEdit, IconLoader } from "@tabler/icons-react";
 import { BID_STATUS_STYLES } from "@/src/components/shared/constants";
 import type { Bid } from "@/src/types";
 
 interface Props {
   bid: Bid;
+  deleteBid: (id: number) => void;
+  isBidDeleting: boolean;
 }
 
-export default function BidTableRow({ bid }: Props) {
+export default function BidTableRow({ bid, deleteBid, isBidDeleting }: Props) {
   const s = BID_STATUS_STYLES[bid.bidStatus];
   const tender = bid.tender;
   return (
@@ -41,7 +43,7 @@ export default function BidTableRow({ bid }: Props) {
       </div>
 
       {/* Desktop layout */}
-      <div className="hidden sm:grid grid-cols-[1fr_130px_160px_120px] gap-4 items-center">
+      <div className="hidden sm:grid grid-cols-[1fr_130px_160px_120px_50px] gap-4 items-center">
         <Link href={`/bids/${bid.id}`} className="group min-w-0">
           <p className="text-sm font-medium text-(--text-primary) group-hover:text-indigo-400 transition-colors truncate">
             {tender?.title ?? `Tender #${bid.tenderId}`}
@@ -61,6 +63,13 @@ export default function BidTableRow({ bid }: Props) {
         <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-0.5 rounded-full w-fit ${s.bg} ${s.text}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
           {bid.bidStatus.charAt(0).toUpperCase() + bid.bidStatus.slice(1)}
+        </span>
+        <span className="flex items-center h-8 w-8 justify-between gap-5 hover:bg-(--bg-elevated) transition-colors cursor-pointer">
+         {isBidDeleting ? (
+            <IconLoader className="text-(--text-faint) animate-spin" />
+          ) : (
+            <IconTrash onClick={()=>deleteBid(bid.id)} className="text-(--text-faint) hover:text-red-400" />
+          )}
         </span>
       </div>
     </div>

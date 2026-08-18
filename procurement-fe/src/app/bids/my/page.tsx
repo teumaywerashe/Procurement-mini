@@ -5,7 +5,7 @@ import Link from "next/link";
 import Navbar from "@/src/components/layout/Navbar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/src/store/store";
-import { useGetBidsByVendorQuery } from "@/src/store/api/bidApi";
+import { useDeleteBidMutation, useGetBidsByVendorQuery } from "@/src/store/api/bidApi";
 import { useGetMyVendorQuery } from "@/src/store/api/vendorApi";
 import type { Bid } from "@/src/types";
 import {
@@ -21,6 +21,8 @@ import MyBidsRightSidebar from "@/src/components/bids/MyBidsRightSidebar";
 export default function MyBidsPage() {
   const { user } = useSelector((s: RootState) => s.auth);
   const isVendor = user?.role === "Vendor";
+  const [deleteBid,{isLoading:isBidDeleting}] = useDeleteBidMutation();
+
 
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<Bid["bidStatus"] | "">("");
@@ -78,11 +80,12 @@ export default function MyBidsPage() {
             )}
 
             <div className="bg-(--bg-surface) border border-(--border) rounded-xl overflow-hidden">
-              <div className="hidden sm:grid grid-cols-[1fr_130px_160px_120px] gap-4 px-5 py-3 border-b border-(--border) text-[11px] font-semibold text-(--text-faint) uppercase tracking-wider">
+              <div className="hidden sm:grid grid-cols-[1fr_130px_160px_120px_50px] gap-4 px-5 py-3 border-b border-(--border) text-[11px] font-semibold text-(--text-faint) uppercase tracking-wider">
                 <span>Tender</span>
                 <span>Amount</span>
                 <span>Submitted</span>
                 <span>Status</span>
+                 <span>action</span>
               </div>
 
               {isLoading ? (
@@ -123,6 +126,8 @@ export default function MyBidsPage() {
                   <BidTableRow
                     key={bid.id}
                     bid={bid}
+                    deleteBid={deleteBid}
+                    isBidDeleting={isBidDeleting}
                   />
                 ))
               )}

@@ -7,6 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './filters/exception-filters';
 
 import cookieParser from 'cookie-parser';
+import { Transport } from '@nestjs/microservices';
 dotenv.config();
 
 async function bootstrap() {
@@ -50,6 +51,23 @@ async function bootstrap() {
       },
     },
   );
+  app.connectMicroservice({
+    transport: Transport.RMQ,
+
+    options: {
+      urls: [process.env.RABBITMQ_URL!],
+
+      queue: 'procurement_notifications',
+
+      queueOptions: {
+        durable: true,
+      },
+
+      noAck: false,
+    },
+  });
+
+  await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 5000);
 }
 void bootstrap();

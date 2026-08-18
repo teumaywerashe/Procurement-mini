@@ -12,7 +12,8 @@ import { CreateNotifiactionDto } from './dto/create-notifiaction.dto';
 import { UpdateNotifiactionDto } from './dto/update-notifiaction.dto';
 import type { JwtPayload } from '../auth/decorators/types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Notifications')
 @Controller('notifiaction')
 export class NotifiactionController {
   constructor(private readonly notifiactionService: NotifiactionService) {}

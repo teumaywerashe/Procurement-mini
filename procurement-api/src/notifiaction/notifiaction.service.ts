@@ -1,24 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { CreateNotifiactionDto } from './dto/create-notifiaction.dto';
 import { UpdateNotifiactionDto } from './dto/update-notifiaction.dto';
 import { db } from '../database/db';
 import { desc, eq } from 'drizzle-orm';
 import { notification } from '../database/schema/notification.schema';
-
 @Injectable()
 export class NotifiactionService {
   async create(createNotifiactionDto: CreateNotifiactionDto, userId: number) {
+    const values: typeof notification.$inferInsert = {
+      type: createNotifiactionDto.type ?? 'BID',
+      message: createNotifiactionDto.message ?? '',
+      userId,
+    };
+
     const [newNotification] = await db
       .insert(notification)
-      .values({
-        ...createNotifiactionDto,
-        userId,
-      } as any)
+      .values(values)
       .returning();
     return newNotification;
   }
