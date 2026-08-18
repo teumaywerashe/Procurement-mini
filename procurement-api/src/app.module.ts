@@ -9,6 +9,8 @@ import { TenderModule } from './tender/tender.module';
 import { BidModule } from './bid/bid.module';
 import { NotifiactionModule } from './notifiaction/notifiaction.module';
 import { MessagingModule } from './messaging/messaging.module';
+import { MinioModule } from './minio/minio.module';
+import { DocumentModule } from './document/document.module';
 dotenv.config({ path: '../.env' });
 
 @Module({
@@ -20,6 +22,8 @@ dotenv.config({ path: '../.env' });
     BidModule,
     NotifiactionModule,
     MessagingModule,
+    MinioModule,
+    DocumentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
