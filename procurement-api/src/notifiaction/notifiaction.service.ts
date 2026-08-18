@@ -11,6 +11,8 @@ export class NotifiactionService {
       type: createNotifiactionDto.type ?? 'BID',
       message: createNotifiactionDto.message ?? '',
       userId,
+      tenderId: createNotifiactionDto.tenderId,
+      bidId: createNotifiactionDto.bidId,
     };
 
     const [newNotification] = await db
@@ -24,6 +26,14 @@ export class NotifiactionService {
     return await db
       .select()
       .from(notification)
+      .orderBy(desc(notification.createdAt));
+  }
+
+  async findForUser(userId: number) {
+    return await db
+      .select()
+      .from(notification)
+      .where(eq(notification.userId, userId))
       .orderBy(desc(notification.createdAt));
   }
 

@@ -105,6 +105,8 @@ function DeleteModal({
 
 export default function BidDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const bidId = Number(id);
+  const hasValidBidId = Number.isInteger(bidId) && bidId > 0;
   const router = useRouter();
   const user = useSelector((s: RootState) => s.auth.user);
   const isAdmin = user?.role === "Admin";
@@ -115,7 +117,9 @@ export default function BidDetailPage() {
   >(null);
   const [showDelete, setShowDelete] = useState(false);
 
-  const { data: bid, isLoading, isError } = useGetBidByIdQuery(Number(id));
+  const { data: bid, isLoading, isError } = useGetBidByIdQuery(bidId, {
+    skip: !hasValidBidId,
+  });
   const { data: myVendor } = useGetMyVendorQuery(undefined, {
     skip: !isVendor,
   });

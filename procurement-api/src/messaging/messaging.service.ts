@@ -30,3 +30,20 @@ export class RabbitMQService implements OnModuleInit {
     await this.client.emit(BID_STATUS_UPDATED_EVENT, data).toPromise();
   }
 }
+
+export interface BidSubmittedEvent {
+  bidId: number;
+  tenderId: number;
+  tenderTitle: string;
+  userId: number;
+  message: string;
+}
+
+export interface BidStatusUpdatedEvent {
+  bidId: number;
+  tenderId: number;
+  tenderTitle: string;
+  status: string;
+  userId: number;
+  message: string;
+}

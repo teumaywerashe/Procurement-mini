@@ -18,9 +18,12 @@ import { vendor } from '../database/schema/vendor.schema';
 import { tender } from '../database/schema/tender.schema';
 import { UserRole } from '../user/enum/userRole.enum';
 import { bidStatus } from './enum/bidStatus.enum';
+import { RabbitMQService } from '../messaging/messaging.service';
 
 @Injectable()
 export class BidService {
+  constructor(private readonly rabbitMQService: RabbitMQService) {}
+
   async create(createBidDto: CreateBidDto, user: JwtPayload) {
     const [existingTender] = await db
       .select()
@@ -60,6 +63,22 @@ export class BidService {
           referenceNumber: `RF-BID-${Date.now()}${user.uid}`,
         })
         .returning();
+      console.log('Bid created successfully:', createdBid);
+      await this.rabbitMQService.publishBidSubmitted({
+        bidId: createdBid.id,
+        tenderId: createdBid.tenderId,
+        tenderTitle: existingTender.title,
+        userId: existingVendor.ownerId,
+        message: `Your bid for tender "${existingTender.title}" was submitted successfully.`,
+      });
+      await this.rabbitMQService.publishBidSubmitted({
+        bidId: createdBid.id,
+        tenderId: createdBid.tenderId,
+        tenderTitle: existingTender.title,
+        userId: existingTender.createdBy,
+        message: `You received a new bid for tender "${existingTender.title}".`,
+      });
+      // console.log(result);
       return createdBid;
     } catch (err: any) {
       if (err?.code === '23505') {
@@ -196,15 +215,16 @@ export class BidService {
       throw new BadRequestException('Bid ID is required for update');
     }
 
+    const [foundBid] = await db
+      .select()
+      .from(bid)
+      .where(eq(bid.id, id))
+      .limit(1);
+    if (!foundBid) {
+      throw new NotFoundException(`Bid with ID ${id} not found`);
+    }
+
     if (user.role === UserRole.ADMIN) {
-      const [foundBid] = await db
-        .select()
-        .from(bid)
-        .where(eq(bid.id, id))
-        .limit(1);
-      if (!foundBid) {
-        throw new NotFoundException(`Bid with ID ${id} not found`);
-      }
       const ownedTender = await db.query.tender.findFirst({
         where: { id: foundBid.tenderId } as any,
       });
@@ -220,6 +240,24 @@ export class BidService {
       .set({ bidStatus: status })
       .where(eq(bid.id, id))
       .returning();
+    const [bidVendor] = await db
+      .select()
+      .from(vendor)
+      .where(eq(vendor.id, foundBid.vendorId))
+      .limit(1);
+    const updatedTender = await db.query.tender.findFirst({
+      where: { id: foundBid.tenderId } as any,
+    });
+    if (bidVendor && updatedTender) {
+      await this.rabbitMQService.publishBidStatusUpdated({
+        bidId: updatedBid.id,
+        tenderId: updatedBid.tenderId,
+        tenderTitle: updatedTender.title,
+        status: updatedBid.bidStatus,
+        userId: bidVendor.ownerId,
+        message: `Your bid for tender "${updatedTender.title}" was ${updatedBid.bidStatus}.`,
+      });
+    }
     return updatedBid;
   }
   async remove(id: number, user: JwtPayload) {

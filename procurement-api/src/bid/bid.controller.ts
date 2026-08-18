@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Controller,
   Get,
@@ -5,6 +6,7 @@ import {
   Body,
   Patch,
   Param,
+  ParseIntPipe,
   Delete,
   UseGuards,
 } from '@nestjs/common';
@@ -49,40 +51,40 @@ export class BidController {
   })
   @Roles(UserRole.ADMIN)
   findByTenderId(
-    @Param('tenderId') tenderId: string,
+    @Param('tenderId', ParseIntPipe) tenderId: number,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.bidService.findByTenderId(+tenderId, user);
+    return this.bidService.findByTenderId(tenderId, user);
   }
   @Get(':id')
   @ApiOperation({ summary: 'Get a bid by ID' })
-  findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.bidService.findOne(+id, user);
+  findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+    return this.bidService.findOne(id, user);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a bid by ID (Bid Owner only)' })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateBidDto: UpdateBidDto,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.bidService.update(+id, updateBidDto, user);
+    return this.bidService.update(id, updateBidDto, user);
   }
 
   @Patch(':id/status')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update bid status by ID (Admin)' })
   updateBidStatus(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body('status') status: string,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.bidService.updateStatus(+id, status as bidStatus, user);
+    return this.bidService.updateStatus(id, status as bidStatus, user);
   }
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a bid by ID (Bid Owner only)' })
-  remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
-    return this.bidService.remove(+id, user);
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: JwtPayload) {
+    return this.bidService.remove(id, user);
   }
 }

@@ -35,11 +35,11 @@ export default function LoginPage() {
   const form = useForm({
     initialValues: { email: "", password: "" },
     validate: {
-      email: (v:string) => {
+      email: (v: string) => {
         const result = loginSchema.shape.email.safeParse(v);
         return result.success ? null : result.error.issues[0].message;
       },
-      password: (v:string) => {
+      password: (v: string) => {
         const result = loginSchema.shape.password.safeParse(v);
         return result.success ? null : result.error.issues[0].message;
       },
@@ -54,11 +54,7 @@ export default function LoginPage() {
         setAuthCookie(token);
       }
       dispatch(logIn(result.user));
-      if (result.user?.role === "SuperAdmin") {
-        router.push("/dashboard");
-      } else {
-        router.push("/tenders");
-      }
+      router.push("/dashboard");
     } catch (error: unknown) {
       console.log("error occurred", error);
     }
@@ -166,7 +162,14 @@ export default function LoginPage() {
                 Forgot password?
               </Anchor>
 
-              <Button className="hover:bg-sky-600" type="submit" variant="ouline" fullWidth loading={isLoading} mt="xs">
+              <Button
+                className="hover:bg-sky-600"
+                type="submit"
+                variant="ouline"
+                fullWidth
+                loading={isLoading}
+                mt="xs"
+              >
                 Sign in
               </Button>
             </Stack>
@@ -174,7 +177,15 @@ export default function LoginPage() {
 
           <Text ta="center" size="sm" mt="lg" c="dimmed">
             Don&apos;t have an account?{" "}
-            <Anchor component={Link} href="/registration" size="sm" style={{ pointerEvents: isLoading ? "none" : "auto", opacity: isLoading ? 0.5 : 1 }}>
+            <Anchor
+              component={Link}
+              href="/registration"
+              size="sm"
+              style={{
+                pointerEvents: isLoading ? "none" : "auto",
+                opacity: isLoading ? 0.5 : 1,
+              }}
+            >
               Create one
             </Anchor>
           </Text>

@@ -4,7 +4,11 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
-import { RABBITMQ_SERVICE, RABBITMQ_QUEUE } from './rabbit.constants';
+import {
+  RABBITMQ_SERVICE,
+  RABBITMQ_QUEUE,
+  getRabbitMqUrl,
+} from './rabbit.constants';
 
 import { RabbitMQService } from './messaging.service';
 
@@ -17,7 +21,7 @@ import { RabbitMQService } from './messaging.service';
         transport: Transport.RMQ,
 
         options: {
-          urls: [process.env.RABBITMQ_URL!],
+          urls: [getRabbitMqUrl()],
 
           queue: RABBITMQ_QUEUE,
 
@@ -27,7 +31,10 @@ import { RabbitMQService } from './messaging.service';
 
           persistent: true,
 
-          noAck: false,
+          // This is a publishing client. Nest's reply consumer must use
+          // automatic acknowledgements; the event consumer acks messages
+          // separately in the notification controller.
+          noAck: true,
         },
       },
     ]),

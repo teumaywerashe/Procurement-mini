@@ -77,7 +77,7 @@ export default function RegistrationPage() {
         setAuthCookie(token);
       }
       dispatch(logIn(result.user));
-      router.push("/tenders");
+      router.push("/dashboard");
     } catch (error: unknown) {
       console.log(error);
     }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
+  IconBell,
   IconChevronDown,
   IconShoppingBag,
   IconSun,
@@ -19,6 +20,10 @@ import { useTheme } from "@/src/components/ThemeProvider";
 import { Button } from "@mantine/core";
 
 import { clearAuthCookie } from "@/src/utilis/cookie";
+import {
+  useGetMyNotificationsQuery,
+  useMarkNotificationReadMutation,
+} from "@/src/store/api/notificationApi";
 
 export default function Navbar() {
   const { isLoggedIn, user } = useSelector((state: RootState) => state.auth);
@@ -47,6 +52,17 @@ export default function Navbar() {
   const { theme, toggle } = useTheme();
   const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const { data: notifications = [], isLoading: notificationsLoading } =
+    useGetMyNotificationsQuery(undefined, {
+      skip: !isLoggedIn,
+      pollingInterval: 15000,
+      refetchOnFocus: true,
+    });
+  const [markNotificationRead] = useMarkNotificationReadMutation();
+  const unreadCount = notifications.filter(
+    (notification) => !notification.isRead,
+  ).length;
 
   async function handleLogout() {
     await logoutApi();
@@ -54,6 +70,7 @@ export default function Navbar() {
     dispatch(logOut());
     router.push("/");
     setMenuOpen(false);
+    setNotificationsOpen(false);
   }
 
   const initials = user?.name
@@ -128,6 +145,111 @@ export default function Navbar() {
 
             {isLoggedIn ? (
               <>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setNotificationsOpen((open) => !open)}
+                    className="relative p-2 cursor-pointer text-(--text-subtle) hover:text-(--text-primary) hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-colors"
+                    aria-label="Notifications"
+                    aria-expanded={notificationsOpen}
+                  >
+                    <IconBell size={18} />
+                    {unreadCount > 0 && (
+                      <span className="absolute -right-0.5 -top-0.5 min-w-4 h-4 px-1 rounded-full bg-red-500 text-[9px] leading-4 text-center font-bold text-white">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <div
+                    className={`fixed inset-0 top-14 z-40 bg-black/40 transition-opacity duration-300 md:top-14 ${
+                      notificationsOpen
+                        ? "pointer-events-auto opacity-100"
+                        : "pointer-events-none opacity-0"
+                    }`}
+                    onClick={() => setNotificationsOpen(false)}
+                    aria-hidden="true"
+                  />
+
+                  <aside
+                    className={`fixed right-0 top-0 z-50 flex h-[calc(100vh-3.5rem)] w-[min(24rem,100vw)] flex-col border-l border-(--border) bg-(--bg-base) shadow-2xl transition-transform duration-300 ease-out ${
+                      notificationsOpen ? "translate-x-0" : "translate-x-full"
+                    }`}
+                    aria-label="Notifications panel"
+                  >
+                    <div className="flex items-center justify-between border-b border-(--border) px-4 py-4">
+                      <div>
+                        <p className="text-sm font-semibold text-(--text-primary)">
+                          Notifications
+                        </p>
+                        {unreadCount > 0 && (
+                          <p className="mt-0.5 text-[11px] text-(--text-faint)">
+                            {unreadCount} unread
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setNotificationsOpen(false)}
+                        className="rounded-md cursor-pointer p-2 text-(--text-subtle) transition-colors hover:bg-black/5 hover:text-(--text-primary) dark:hover:bg-white/5"
+                        aria-label="Close notifications"
+                      >
+                        <IconX size={18} />
+                      </button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto">
+                      {notificationsLoading ? (
+                        <p className="px-4 py-8 text-center text-xs text-(--text-faint)">
+                          Loading notifications...
+                        </p>
+                      ) : notifications.length === 0 ? (
+                        <p className="px-4 py-8 text-center text-xs text-(--text-faint)">
+                          You have no notifications.
+                        </p>
+                      ) : (
+                        notifications.map((notification) => (
+                          <button
+                            type="button"
+                            key={notification.id}
+                            onClick={() => {
+                              if (!notification.isRead) {
+                                void markNotificationRead(notification.id);
+                              }
+                              if (isAdmin || isSuperAdmin)
+                                router.push(`/bids/${notification.bidId}`);
+                              else if (isVendor)
+                                router.push(
+                                  `/tenders/${notification.tenderId}`,
+                                );
+                              else router.push("/bids");
+                            }}
+                            className={`block w-full border-b border-(--border) px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-black/5 dark:hover:bg-white/5 ${
+                              notification.isRead
+                                ? "opacity-70"
+                                : "bg-indigo-500/5"
+                            }`}
+                          >
+                            <div className="flex gap-3 cursor-pointer items-start">
+                              <span
+                                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${notification.isRead ? "bg-(--border-strong)" : "bg-indigo-500"}`}
+                              />
+                              <div className="min-w-0">
+                                <p className="text-xs leading-5 text-(--text-primary)">
+                                  {notification.message}
+                                </p>
+                                <p className="mt-1 text-[10px] text-(--text-faint)">
+                                  {new Date(
+                                    notification.createdAt,
+                                  ).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </aside>
+                </div>
                 {/* User avatar — desktop only shows name */}
                 <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-(--border)">
                   <Link

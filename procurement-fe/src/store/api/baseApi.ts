@@ -6,7 +6,7 @@ export const baseApi = createApi({
 
   baseQuery: baseQueryWithAuth,
 
-  tagTypes: ["Tender", "Bid", "User", "Vendor"],
+  tagTypes: ["Tender", "Bid", "User", "Vendor", "Notification"],
 
   endpoints: () => ({}),
 });

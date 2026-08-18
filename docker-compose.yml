@@ -37,9 +37,12 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       PORT: ${PORT}
       FRONTEND_URL: ${FRONTEND_URL}
+      RABBITMQ_URL: amqp://procurement:procurement_password@rabbitmq:5672/procurement
 
     depends_on:
       postgres:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
     volumes:
@@ -112,9 +115,9 @@ services:
 
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-    interval: 10s
-    timeout: 5s
-    retries: 5
+      interval: 10s
+      timeout: 5s
+      retries: 5
 volumes:
   postgres_data:
   pgadmin_data:

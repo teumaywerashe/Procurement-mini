@@ -13,5 +13,7 @@ export const notification = pgTable('notification', {
   isRead: boolean('isRead').default(false).notNull(),
   message: varchar('message').notNull(),
   userId: integer('userId').notNull(),
+  tenderId: integer('tenderId'),
+  bidId: integer('bidId'),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
 });

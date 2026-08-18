@@ -8,6 +8,7 @@ import { HttpExceptionFilter } from './filters/exception-filters';
 
 import cookieParser from 'cookie-parser';
 import { Transport } from '@nestjs/microservices';
+import { getRabbitMqUrl, RABBITMQ_QUEUE } from './messaging/rabbit.constants';
 dotenv.config();
 
 async function bootstrap() {
@@ -55,9 +56,9 @@ async function bootstrap() {
     transport: Transport.RMQ,
 
     options: {
-      urls: [process.env.RABBITMQ_URL!],
+      urls: [getRabbitMqUrl()],
 
-      queue: 'procurement_notifications',
+      queue: RABBITMQ_QUEUE,
 
       queueOptions: {
         durable: true,
