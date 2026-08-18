@@ -4,9 +4,10 @@ import { bid } from './bid.schema';
 import { users } from './user.schema';
 import { tender } from './tender.schema';
 import { document } from './document.schema';
+import { notification } from './notification.schema';
 
 export const relations = defineRelations(
-  { vendor, bid, users, tender, document },
+  { vendor, bid, users, tender, document, notification },
   (helpers) => ({
     bid: {
       vendor: helpers.one.vendor({
@@ -21,6 +22,10 @@ export const relations = defineRelations(
         from: helpers.bid.id,
         to: helpers.document.bidId,
       }),
+      notifications: helpers.many.notification({
+        from: helpers.bid.id,
+        to: helpers.notification.bidId,
+      }),
     },
     tender: {
       user: helpers.one.users({
@@ -34,6 +39,10 @@ export const relations = defineRelations(
       documents: helpers.many.document({
         from: helpers.tender.id,
         to: helpers.document.tenderId,
+      }),
+      notifications: helpers.many.notification({
+        from: helpers.tender.id,
+        to: helpers.notification.tenderId,
       }),
     },
     users: {
@@ -68,6 +77,16 @@ export const relations = defineRelations(
       uploader: helpers.one.users({
         from: helpers.document.uploadedBy,
         to: helpers.users.id,
+      }),
+    },
+    notification: {
+      bid: helpers.one.bid({
+        from: helpers.notification.bidId,
+        to: helpers.bid.id,
+      }),
+      tender: helpers.one.tender({
+        from: helpers.notification.tenderId,
+        to: helpers.tender.id,
       }),
     },
   }),

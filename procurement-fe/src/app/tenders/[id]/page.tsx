@@ -86,7 +86,8 @@ export default function TenderDetailPage() {
   const handleDownloadDocument = async (docId: number) => {
     try {
       setDownloadingDocId(docId);
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const apiBase =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const res = await fetch(`${apiBase}/documents/${docId}/url`, {
         credentials: "include",
       });
@@ -226,20 +227,22 @@ export default function TenderDetailPage() {
               Tender Documents
             </Text>
             <Stack gap="md">
-              {isAdminOwner && (
-                <FileInput
-                  label="Upload Document"
-                  placeholder="Select a document to upload"
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
-                  leftSection={<IconFileText size={18} />}
-                  disabled={isUploadingDocument}
-                  onChange={(file) => {
-                    if (file) handleDocumentUpload(file);
-                  }}
-                />
-              )}
+              {isAdminOwner &&
+                ((tender.status as string) === "draft" ||
+                  (tender.status as string) === "published") && (
+                  <FileInput
+                    label="Upload Document"
+                    placeholder="Select a document to upload"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+                    leftSection={<IconFileText size={18} />}
+                    disabled={isUploadingDocument}
+                    onChange={(file) => {
+                      if (file) handleDocumentUpload(file);
+                    }}
+                  />
+                )}
 
-              {documents && documents.length > 0 && (
+              {documents && documents.length > 0 ? (
                 <div className="space-y-3">
                   {documents.map((doc: any) => (
                     <div
@@ -300,11 +303,15 @@ export default function TenderDetailPage() {
                     </div>
                   ))}
                 </div>
+              ) : (
+                <Text size="sm" c="dimmed">
+                  No documents uploaded.
+                </Text>
               )}
             </Stack>
           </div>
         ) : null}
-      
+
         {isAdminOwner && <AdminBidsSection bids={tender.bids ?? []} />}
       </div>
 

@@ -99,8 +99,8 @@ export default function OpenTendersTab({
                         <Badge color="gray" variant="dot">Not Bidden Yet</Badge>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <Group justify="flex-end" gap="xs">
+                    <td className="px-0 py-4">
+                      <Group justify="flex" gap="xs">
                         <Link href={`/tenders/${t.id}`}>
                           <Button variant="subtle" size="xs" leftSection={<IconEye size={14} />}>
                             View
@@ -111,7 +111,7 @@ export default function OpenTendersTab({
                             variant="light"
                             color="indigo"
                             size="xs"
-                            leftSection={<IconEdit size={14} />}
+                            // leftSection={<IconEdit size={14} />}
                             onClick={() => onOpenEditBid(existingBid)}
                           >
                             Edit Bid
@@ -120,10 +120,10 @@ export default function OpenTendersTab({
                           <Button
                             color="emerald"
                             size="xs"
-                            leftSection={<IconGavel size={14} />}
+                            // leftSection={<IconGavel size={14} />}
                             onClick={() => onOpenPlaceBid(t)}
                           >
-                            Place Bid
+                            Place bid
                           </Button>
                         )}
                       </Group>

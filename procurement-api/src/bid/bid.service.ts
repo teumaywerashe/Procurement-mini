@@ -6,7 +6,6 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-  OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateBidDto } from './dto/create-bid.dto';
@@ -14,7 +13,7 @@ import { UpdateBidDto } from './dto/update-bid.dto';
 import { bid } from '../database/schema/bid.schema';
 import { db } from '../database/db';
 import type { JwtPayload } from '../auth/decorators/types';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { vendor } from '../database/schema/vendor.schema';
 import { tender } from '../database/schema/tender.schema';
 import { UserRole } from '../user/enum/userRole.enum';
@@ -22,18 +21,8 @@ import { bidStatus } from './enum/bidStatus.enum';
 import { RabbitMQService } from '../messaging/messaging.service';
 
 @Injectable()
-export class BidService implements OnModuleInit {
+export class BidService {
   constructor(private readonly rabbitMQService: RabbitMQService) {}
-
-  async onModuleInit() {
-    try {
-      await db.execute(
-        sql`ALTER TABLE "bid" ALTER COLUMN "amount" TYPE numeric(12, 2) USING "amount"::numeric;`,
-      );
-    } catch (err) {
-      console.warn('Could not auto-migrate bid amount column:', err);
-    }
-  }
 
   async create(createBidDto: CreateBidDto, user: JwtPayload) {
     const [existingTender] = await db

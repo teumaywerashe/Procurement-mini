@@ -63,6 +63,9 @@ export const bidApi = baseApi.injectEndpoints({
       query: (bidId) => `/documents/bid/${bidId}`,
       providesTags: ["Bid"],
     }),
+    downloadDocument:builder.query<{ url: string; fileName: string }, number>({
+      query: (docId) => `/documents/${docId}/url`,
+    }),
   }),
 });
 
@@ -77,4 +80,5 @@ export const {
   useDeleteBidMutation,
   useUploadBidDocumentMutation,
   useGetBidDocumentsQuery,
+  useDownloadDocumentQuery,
 } = bidApi;
