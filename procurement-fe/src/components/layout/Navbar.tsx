@@ -215,13 +215,8 @@ export default function Navbar() {
                               if (!notification.isRead) {
                                 void markNotificationRead(notification.id);
                               }
-                              if (isAdmin || isSuperAdmin)
-                                router.push(`/bids/${notification.bidId}`);
-                              else if (isVendor)
-                                router.push(
-                                  `/tenders/${notification.tenderId}`,
-                                );
-                              else router.push("/bids");
+
+                              router.push(`/bids/${notification.bidId}`);
                             }}
                             className={`block w-full border-b border-(--border) px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-black/5 dark:hover:bg-white/5 ${
                               notification.isRead

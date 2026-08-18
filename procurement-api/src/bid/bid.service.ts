@@ -63,7 +63,7 @@ export class BidService {
           referenceNumber: `RF-BID-${Date.now()}${user.uid}`,
         })
         .returning();
-      console.log('Bid created successfully:', createdBid);
+      // console.log('Bid created successfully:', createdBid);
       await this.rabbitMQService.publishBidSubmitted({
         bidId: createdBid.id,
         tenderId: createdBid.tenderId,
@@ -170,7 +170,6 @@ export class BidService {
   }
 
   async update(id: number, updateBidDto: UpdateBidDto, user: JwtPayload) {
-    // console.log(UpdateBidDto);
     if (!id) {
       throw new BadRequestException('Bid ID is required for update');
     }

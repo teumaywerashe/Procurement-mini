@@ -30,10 +30,6 @@ import { RabbitMQService } from './messaging.service';
           },
 
           persistent: true,
-
-          // This is a publishing client. Nest's reply consumer must use
-          // automatic acknowledgements; the event consumer acks messages
-          // separately in the notification controller.
           noAck: true,
         },
       },
