@@ -36,8 +36,6 @@ export class MinioService {
       secretKey,
     });
 
-    this.bucketName = process.env.MINIO_BUCKET || 'procurement-documents';
-
     void this.ensureBucketExists();
   }
 

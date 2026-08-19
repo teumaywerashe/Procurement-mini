@@ -9,8 +9,11 @@ import {
 import { useDeleteDocumentMutation } from "@/src/store/api/tenderApi";
 
 export function useBidDocuments(bidId: number, canViewBidDocuments: boolean) {
+  const [showConfirm,setShowConfirm] = useState(false);
+
   const [downloadingDocId, setDownloadingDocId] = useState<number | null>(null);
-  const [deleteDocument] = useDeleteDocumentMutation();
+  const [deleteDocument, { isLoading: isDeletingDocument }] =
+    useDeleteDocumentMutation();
   const [uploadBidDocument, { isLoading: isUploadingDocument }] =
     useUploadBidDocumentMutation();
   const { data: bidDocuments, refetch: refetchBidDocuments } =
@@ -36,11 +39,10 @@ export function useBidDocuments(bidId: number, canViewBidDocuments: boolean) {
 
   const handleDownload = async (docId: number) => {
     try {
-
-
       setDownloadingDocId(docId);
-     
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+      const apiBase =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
       const res = await fetch(`${apiBase}/documents/${docId}/url`, {
         credentials: "include",
       });
@@ -74,6 +76,7 @@ export function useBidDocuments(bidId: number, canViewBidDocuments: boolean) {
         color: "green",
       });
       refetchBidDocuments();
+      setShowConfirm(false)
     } catch (error: any) {
       notifications.show({
         title: "Error",
@@ -88,6 +91,8 @@ export function useBidDocuments(bidId: number, canViewBidDocuments: boolean) {
     downloadingDocId,
     isUploadingDocument,
     handleUpload,
+    isDeletingDocument,
+    showConfirm,setShowConfirm,
     handleDownload,
     handleDelete,
   };

@@ -7,7 +7,11 @@ import Link from "next/link";
 import Navbar from "@/src/components/layout/Navbar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/src/store/store";
-import { useGetBidByIdQuery, useUpdateBidStatusMutation, useDeleteBidMutation } from "@/src/store/api/bidApi";
+import {
+  useGetBidByIdQuery,
+  useUpdateBidStatusMutation,
+  useDeleteBidMutation,
+} from "@/src/store/api/bidApi";
 import { useGetMyVendorQuery } from "@/src/store/api/vendorApi";
 import { notifications } from "@mantine/notifications";
 import { IconArrowLeft, IconAlertTriangle } from "@tabler/icons-react";
@@ -29,13 +33,25 @@ export default function BidDetailPage() {
   const [editingStatus, setEditingStatus] = useState<any>(null);
   const [showDelete, setShowDelete] = useState(false);
 
-  const { data: bid, isLoading, isError } = useGetBidByIdQuery(bidId, { skip: !Number.isInteger(bidId) || bidId <= 0 });
-  const { data: myVendor } = useGetMyVendorQuery(undefined, { skip: !isVendor });
+  const {
+    data: bid,
+    isLoading,
+    isError,
+  } = useGetBidByIdQuery(bidId, {
+    skip: !Number.isInteger(bidId) || bidId <= 0,
+  });
+  const { data: myVendor } = useGetMyVendorQuery(undefined, {
+    skip: !isVendor,
+  });
 
-  const [updateBidStatus, { isLoading: isUpdating }] = useUpdateBidStatusMutation();
+  const [updateBidStatus, { isLoading: isUpdating }] =
+    useUpdateBidStatusMutation();
   const [deleteBid, { isLoading: isDeleting }] = useDeleteBidMutation();
   const isOwnBid = isVendor && myVendor?.id === bid?.vendorId;
-  const isTenderAdminOwner = isAdmin && (bid?.tender?.createdBy === user?.id || (bid?.tender as any)?.createdBy === user?.id);
+  const isTenderAdminOwner =
+    isAdmin &&
+    (bid?.tender?.createdBy === user?.id ||
+      (bid?.tender as any)?.createdBy === user?.id);
   const canViewBidDocuments = isOwnBid || isTenderAdminOwner;
 
   const docState = useBidDocuments(bidId, canViewBidDocuments);
@@ -44,10 +60,18 @@ export default function BidDetailPage() {
     if (!editingStatus || !bid) return;
     try {
       await updateBidStatus({ id: bid.id, status: editingStatus }).unwrap();
-      notifications.show({ title: "Status updated", message: `Bid marked as ${editingStatus}.`, color: "green" });
+      notifications.show({
+        title: "Status updated",
+        message: `Bid marked as ${editingStatus}.`,
+        color: "green",
+      });
       setEditingStatus(null);
     } catch {
-      notifications.show({ title: "Error", message: "Failed to update status.", color: "red" });
+      notifications.show({
+        title: "Error",
+        message: "Failed to update status.",
+        color: "red",
+      });
     }
   }
 
@@ -55,10 +79,18 @@ export default function BidDetailPage() {
     if (!bid) return;
     try {
       await deleteBid(bid.id).unwrap();
-      notifications.show({ title: "Bid deleted", message: "Your bid has been removed.", color: "green" });
+      notifications.show({
+        title: "Bid deleted",
+        message: "Your bid has been removed.",
+        color: "green",
+      });
       router.push(isVendor ? "/bids/my" : "/bids");
     } catch {
-      notifications.show({ title: "Error", message: "Failed to delete bid.", color: "red" });
+      notifications.show({
+        title: "Error",
+        message: "Failed to delete bid.",
+        color: "red",
+      });
     }
   }
 
@@ -72,6 +104,7 @@ export default function BidDetailPage() {
       </div>
     );
   }
+ 
 
   if (isError || !bid) {
     return (
@@ -79,8 +112,15 @@ export default function BidDetailPage() {
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center gap-4 mt-14">
           <IconAlertTriangle size={40} className="text-red-400" />
-          <p className="text-sm text-red-400">Bid not found or failed to load.</p>
-          <Link href={isVendor ? "/bids/my" : "/bids"} className="text-sm text-indigo-400">← Back to bids</Link>
+          <p className="text-sm text-red-400">
+            Bid not found or failed to load.
+          </p>
+          <Link
+            href={isVendor ? "/bids/my" : "/bids"}
+            className="text-sm text-indigo-400"
+          >
+            ← Back to bids
+          </Link>
         </div>
       </div>
     );
@@ -91,7 +131,10 @@ export default function BidDetailPage() {
       <Navbar />
 
       <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 py-8 mt-14 flex-1">
-        <Link href={isVendor ? "/bids/my" : "/bids"} className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) mb-6">
+        <Link
+          href={isVendor ? "/bids/my" : "/bids"}
+          className="inline-flex items-center gap-1.5 text-sm text-(--text-subtle) hover:text-(--text-primary) mb-6"
+        >
           <IconArrowLeft size={16} /> Back to bids
         </Link>
 
@@ -114,6 +157,9 @@ export default function BidDetailPage() {
           <BidDocumentSection
             bidStatus={bid.bidStatus}
             isOwnBid={isOwnBid}
+            setShowConfirm={docState.setShowConfirm}
+            showConfirm={docState.showConfirm}
+            isDeleting={docState.isDeletingDocument}
             bidDocuments={docState.bidDocuments}
             isUploadingDocument={docState.isUploadingDocument}
             onUploadDocument={docState.handleUpload}

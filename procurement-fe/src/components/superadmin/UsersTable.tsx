@@ -2,12 +2,7 @@ import React, { useState } from "react";
 import { User } from "@/src/types";
 import { Button, Select, Loader } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import {
-  IconSearch,
-  
-  IconShieldCheck,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconSearch, IconShieldCheck, IconTrash } from "@tabler/icons-react";
 import {
   useDeleteUserMutation,
   useUpdateUserRoleMutation,
@@ -31,7 +26,15 @@ export function UsersTable({
   setRoleFilter,
 }: UsersTableProps) {
   const [updateUserRole] = useUpdateUserRoleMutation();
-  const [deleteUser] = useDeleteUserMutation();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deletingUser, setDeletingUser] = useState<User>({
+    name: "",
+    email: "",
+    id: 0,
+    role: "Vendor",
+    createdAt: "",
+  });
+  const [deleteUser, { isLoading }] = useDeleteUserMutation();
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const filteredUsers = users.filter((u) => {
@@ -66,11 +69,6 @@ export function UsersTable({
   };
 
   const handleDeleteUser = async (user: User) => {
-    const confirmed = window.confirm(
-      `Delete user "${user.name}"? This action cannot be undone.`,
-    );
-    if (!confirmed) return;
-
     setDeletingId(user.id);
     try {
       await deleteUser(user.id).unwrap();
@@ -87,9 +85,54 @@ export function UsersTable({
       });
     } finally {
       setDeletingId(null);
+      setShowConfirm(false);
     }
   };
 
+  if (showConfirm) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+        <div className="bg-(--bg-surface) border border-(--border) rounded-2xl p-6 max-w-sm w-full">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-red-900/30 flex items-center justify-center shrink-0">
+              <IconTrash size={18} className="text-red-400" />
+            </div>
+            <h3 className="font-semibold text-(--text-primary) text-base">
+              Delete User?
+            </h3>
+          </div>
+          <p className="text-sm text-(--text-subtle) mb-5 leading-relaxed">
+            This will permanently delete{" "}
+            <span className="text-red-400 font-bold">
+             user {deletingUser.name}
+            </span>
+            . This action cannot be undone.
+          </p>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowConfirm(false)}
+              disabled={isLoading}
+              className="flex-1 py-2.5 cursor-pointer rounded-lg border border-(--border-strong) text-sm text-(--text-muted) hover:text-(--text-primary) transition-colors"
+            >
+              Cancel
+            </button>
+            <Button
+              onClick={() => {
+                handleDeleteUser(deletingUser);
+                // setShowConfirm(false);
+              }}
+              disabled={isLoading}
+              loading={isLoading}
+              color="red"
+              className="flex-1 py-2.5 cursor-pointer rounded-lg bg-red-600 hover:bg-red-700 text-sm font-medium text-white transition-colors disabled:opacity-50"
+            >
+             Delete
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="bg-(--bg-surface) border border-(--border) rounded-2xl overflow-hidden shadow-sm">
       {/* Header & Controls */}
@@ -232,7 +275,10 @@ export function UsersTable({
                       variant="light"
                       leftSection={<IconTrash size={12} />}
                       loading={deletingId === u.id}
-                      onClick={() => handleDeleteUser(u)}
+                      onClick={() => {
+                        setDeletingUser(u);
+                        setShowConfirm(true);
+                      }}
                     >
                       Delete
                     </Button>

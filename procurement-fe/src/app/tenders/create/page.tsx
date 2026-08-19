@@ -5,7 +5,10 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/src/components/layout/Navbar";
-import { useCreateTenderMutation, useUploadTenderDocumentMutation } from "@/src/store/api/tenderApi";
+import {
+  useCreateTenderMutation,
+  useUploadTenderDocumentMutation,
+} from "@/src/store/api/tenderApi";
 import { IconArrowLeft, IconFileText } from "@tabler/icons-react";
 import type { FormState } from "@/src/types";
 import { notifications } from "@mantine/notifications";
@@ -63,7 +66,7 @@ export default function CreateTenderPage() {
     }
 
     setFormErrors({});
-    
+
     // First create the tender
     const createResult = await createTender({
       title: parsed.data.title,
@@ -80,8 +83,8 @@ export default function CreateTenderPage() {
         const msgs = Array.isArray(err?.data?.message)
           ? err.data.message.map(String)
           : typeof err?.data?.message === "string"
-          ? [err.data.message]
-          : ["Failed to create tender."];
+            ? [err.data.message]
+            : ["Failed to create tender."];
         setFormErrors({ _form: msgs[0] });
       }
       return;
@@ -103,7 +106,9 @@ export default function CreateTenderPage() {
       } catch (uploadError: any) {
         notifications.show({
           title: "Warning",
-          message: "Tender created but document upload failed: " + (uploadError?.data?.message || "Unknown error"),
+          message:
+            "Tender created but document upload failed: " +
+            (uploadError?.data?.message || "Unknown error"),
           color: "orange",
         });
       }
@@ -164,7 +169,9 @@ export default function CreateTenderPage() {
               {uploadedDocument && (
                 <div className="mt-2 text-xs text-emerald-400 bg-emerald-900/20 border border-emerald-800/40 rounded-lg px-3 py-2 flex items-center gap-2">
                   <IconFileText size={14} />
-                  <span className="truncate max-w-[200px]">{uploadedDocument.name}</span>
+                  <span className="truncate max-w-[200px]">
+                    {uploadedDocument.name}
+                  </span>
                 </div>
               )}
             </div>

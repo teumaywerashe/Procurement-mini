@@ -11,6 +11,7 @@ import {
   useUploadTenderDocumentMutation,
   useGetTenderDocumentsQuery,
   useDeleteDocumentMutation,
+  useLazyGetDocumentPresignedUrlQuery,
 } from "@/src/store/api/tenderApi";
 import { useSelector } from "react-redux";
 import { notifications } from "@mantine/notifications";
@@ -29,7 +30,9 @@ import VendorBidSection from "@/src/components/tender/VendorBidSection";
 import AdminBidsSection from "@/src/components/tender/AdminBidsSection";
 
 export default function TenderDetailPage() {
+  // const {showConfirm,setShowConfirm}=useState<boolean>(false)
   const { id } = useParams<{ id: string }>();
+  const [deletingDocId, setDeletingDocId] = useState<number>(0);
   const router = useRouter();
   const user = useSelector((s: RootState) => s.auth.user);
 
@@ -40,24 +43,21 @@ export default function TenderDetailPage() {
   const isSuperAdmin = user?.role === "SuperAdmin";
   const isAdmin = user?.role === "Admin";
   const isVendor = user?.role === "Vendor";
+  const [toBeDeleted, setToBeDeleted] = useState<string | null>(null);
   const isAdminOwner =
     isAdmin &&
     (tender?.createdBy === user?.id || (tender as any)?.createdBy === user?.id);
   const isPublishedTender = tender?.status === "published";
 
-  // Document upload (Admin only)
   const [uploadDocument, { isLoading: isUploadingDocument }] =
     useUploadTenderDocumentMutation();
-
-  // Fetch documents - admin owners can upload, everyone can view (if tender is public or they have access)
   const [downloadingDocId, setDownloadingDocId] = useState<number | null>(null);
-  const {
-    data: documents,
-    refetch: refetchDocuments,
-    isLoading: isDocumentsLoading,
-  } = useGetTenderDocumentsQuery(Number(id), {
-    skip: !isAdminOwner && !isPublishedTender,
-  });
+  const { data: documents, refetch: refetchDocuments } =
+    useGetTenderDocumentsQuery(Number(id), {
+      skip: !isAdminOwner && !isPublishedTender,
+    });
+
+  const [getDocumentPresignedUrl] = useLazyGetDocumentPresignedUrlQuery();
   const [deleteDocument] = useDeleteDocumentMutation();
 
   const handleDocumentUpload = async (file?: File) => {
@@ -86,18 +86,20 @@ export default function TenderDetailPage() {
   const handleDownloadDocument = async (docId: number) => {
     try {
       setDownloadingDocId(docId);
-      const apiBase =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const res = await fetch(`${apiBase}/documents/${docId}/url`, {
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (res.ok && data.url) {
+      // const apiBase =
+      //   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+      // const res = await fetch(`${apiBase}/documents/${docId}/url`, {
+      //   credentials: "include",
+      // });
+      // const data = await res.json();
+      const data = await getDocumentPresignedUrl(docId).unwrap();
+      if (data.url) {
         window.open(data.url, "_blank");
       } else {
         notifications.show({
           title: "Error",
-          message: data.message || "Failed to get download URL",
+          message: "Failed to get download URL",
           color: "red",
         });
       }
@@ -193,7 +195,10 @@ export default function TenderDetailPage() {
           closing={closing}
           isAdmin={isAdmin}
           isSuperAdmin={isSuperAdmin}
-          onDelete={() => setShowConfirm(true)}
+          onDelete={() => {
+            setShowConfirm(true);
+            setToBeDeleted("tender");
+          }}
         />
 
         <div className="px-8 py-4 bg-(--bg-surface) border border-(--border) rounded-b-2xl -mt-px flex items-center gap-2 text-xs text-(--text-faint)">
@@ -217,9 +222,6 @@ export default function TenderDetailPage() {
             day: "numeric",
           })}
         </div>
-
-        {isVendor && <VendorBidSection tender={tender} closing={closing} />}
-
         {/* Document Upload Section (Admin owner only) */}
         {(documents && documents.length > 0) || isAdminOwner ? (
           <div className="mt-6">
@@ -231,7 +233,7 @@ export default function TenderDetailPage() {
                 ((tender.status as string) === "draft" ||
                   (tender.status as string) === "published") && (
                   <FileInput
-                    label="Upload Document"
+                    label={isUploadingDocument ? "Uploading..." : "Upload Document"}
                     placeholder="Select a document to upload"
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
                     leftSection={<IconFileText size={18} />}
@@ -289,15 +291,19 @@ export default function TenderDetailPage() {
                           View File
                         </Button>
                         {isAdminOwner && (
-                          <Button
-                            size="xs"
-                            color="red"
-                            variant="default"
-                            onClick={() => handleDeleteDocument(doc.id)}
+                          <button
+                           
+                            color="red" className="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 rounded-lg border border-red-800/60 text-sm text-red-400 hover:bg-red-900/20 hover:border-red-600 transition-colors"
+                
+                            onClick={() => {
+                              setShowConfirm(true);
+                              setToBeDeleted("doc");
+                              setDeletingDocId(doc.id);
+                            }}
                             disabled={isUploadingDocument}
                           >
                             Delete
-                          </Button>
+                          </button>
                         )}
                       </Group>
                     </div>
@@ -311,6 +317,7 @@ export default function TenderDetailPage() {
             </Stack>
           </div>
         ) : null}
+        {isVendor && <VendorBidSection tender={tender} closing={closing} />}
 
         {isAdminOwner && <AdminBidsSection bids={tender.bids ?? []} />}
       </div>
@@ -323,13 +330,13 @@ export default function TenderDetailPage() {
                 <IconTrash size={18} className="text-red-400" />
               </div>
               <h3 className="font-semibold text-(--text-primary) text-base">
-                Delete tender?
+                Delete {toBeDeleted === "tender" ? "Tender" : "Document"}?
               </h3>
             </div>
             <p className="text-sm text-(--text-subtle) mb-5 leading-relaxed">
               This will permanently delete{" "}
               <span className="text-(--text-primary) font-medium">
-                {tender.title}
+                {toBeDeleted === "tender" ? tender.title : "this document"}
               </span>
               . This action cannot be undone.
             </p>
@@ -342,7 +349,14 @@ export default function TenderDetailPage() {
                 Cancel
               </button>
               <button
-                onClick={handleDelete}
+                onClick={() => {
+                  if (toBeDeleted === "tender") {
+                    handleDelete();
+                  } else {
+                    handleDeleteDocument(deletingDocId);
+                  }
+                  setShowConfirm(false);
+                }}
                 disabled={isDeleting}
                 className="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-sm font-medium text-white transition-colors disabled:opacity-50"
               >

@@ -32,18 +32,18 @@ export function DeleteBidModal({
           <button
             onClick={onCancel}
             disabled={isDeleting}
-            className="flex-1 py-2.5 rounded-lg border border-(--border-strong) text-sm text-(--text-muted) hover:text-(--text-primary) transition-colors"
+            className="flex-1 py-2.5 cursor-pointer rounded-lg border border-(--border-strong) text-sm text-(--text-muted) hover:text-(--text-primary) transition-colors"
           >
             Cancel
           </button>
-          <Button
+          <button
             onClick={onConfirm}
             disabled={isDeleting}
-            loading={isDeleting}
-            className="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-sm font-medium text-white transition-colors disabled:opacity-50"
+            // loading={isDeleting}
+            className="flex-1 py-2.5 cursor-pointer rounded-lg bg-red-600 hover:bg-red-700 text-sm font-medium text-white transition-colors disabled:opacity-50"
           >
             Delete bid
-          </Button>
+          </button>
         </div>
       </div>
     </div>

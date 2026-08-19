@@ -100,14 +100,14 @@ export function BidHeaderCard({
                 </button>
               )}
               {isOwnBid && (
-                <Button
+                <button
                   disabled={isDeleting}
-                  loading={isDeleting}
+                  // loading={isDeleting}
                   onClick={onOpenDelete}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-800/60 text-sm text-red-400 hover:bg-red-900/20 hover:border-red-600 transition-colors"
+                  className="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 rounded-lg border border-red-800/60 text-sm text-red-400 hover:bg-red-900/20 hover:border-red-600 transition-colors"
                 >
-                  <IconTrash size={14} /> Delete
-                </Button>
+                  <IconTrash size={14} /> {isDeleting ? "Deleting..." : "Delete"}
+                </button>
               )}
             </>
           )}

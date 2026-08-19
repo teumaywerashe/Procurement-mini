@@ -117,7 +117,6 @@ export class DocumentService {
   async deleteDocument(docId: number, user: JwtPayload) {
     const doc = await db.query.document.findFirst({
       where: { id: docId } as any,
-      with: { tender: true, bid: true },
     });
 
     if (!doc) {
@@ -125,7 +124,6 @@ export class DocumentService {
     }
 
     if (doc.bidId) {
-      // Bid documents can ONLY be deleted by the vendor who owns the bid
       const bidExists = await db.query.bid.findFirst({
         where: { id: doc.bidId } as any,
         with: { vendor: true },
@@ -138,7 +136,6 @@ export class DocumentService {
         throw new ForbiddenException('Only the vendor who created this bid can delete its documents');
       }
     } else if (doc.tenderId) {
-      // Tender documents can ONLY be deleted by the admin who created the tender
       if (user.role !== UserRole.ADMIN && user.role !== UserRole.SUPER_ADMIN) {
         throw new ForbiddenException('Only admins can delete tender documents');
       }
@@ -162,7 +159,7 @@ export class DocumentService {
       where: { id: docId } as any,
       with: { tender: true, bid: true },
     });
-    console.log(doc);
+    // console.log(doc);
     if (!doc) {
       throw new NotFoundException(`Document ${docId} not found`);
     }
@@ -242,17 +239,12 @@ export class DocumentService {
     if (!tenderExists) {
       throw new NotFoundException(`Tender ${tenderId} not found`);
     }
-
-    // Public access for published tenders
-    if (tenderExists.status === 'published') {
-      // Allow access - no user needed
-    } else if (user?.role === UserRole.ADMIN) {
+    else if (user?.role === UserRole.ADMIN) {
       // Admin access - must own the tender
       if (tenderExists.createdBy !== user.uid) {
         throw new ForbiddenException('This is not your tender');
       }
     } else if (user?.role === UserRole.VENDOR) {
-      // Vendor access - must have a bid on this tender
       const bidExists = await db.query.bid.findFirst({
         where: {
           tenderId,
@@ -263,7 +255,6 @@ export class DocumentService {
         throw new ForbiddenException('You do not have access to this tender');
       }
     } else if (!user) {
-      // No user - only allow if tender is published
       throw new ForbiddenException('This document requires authentication');
     }
 
