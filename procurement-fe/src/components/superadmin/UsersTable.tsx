@@ -239,10 +239,10 @@ export function UsersTable({
                           input: {
                             backgroundColor:
                               u.role === "SuperAdmin"
-                                ? "rgba(127, 29, 29, 0.5)"
+                                ? "rgba(127, 29, 29, 5)"
                                 : u.role === "Admin"
-                                  ? "rgba(49, 46, 129, 0.5)"
-                                  : "rgba(6, 78, 59, 0.5)",
+                                  ? "rgba(49, 46, 129, 5)"
+                                  : "rgba(6, 78, 59, 5)",
                             color:
                               u.role === "SuperAdmin"
                                 ? "#f87171"
@@ -253,8 +253,8 @@ export function UsersTable({
                               u.role === "SuperAdmin"
                                 ? "rgba(239, 68, 68, 0.3)"
                                 : u.role === "Admin"
-                                  ? "rgba(99, 102, 241, 0.3)"
-                                  : "rgba(16, 185, 129, 0.3)",
+                                  ? "rgba(99, 102, 241, 1)"
+                                  : "rgba(16, 185, 129, 0)",
                             fontWeight: 600,
                             fontSize: "11px",
                             borderRadius: "9999px",

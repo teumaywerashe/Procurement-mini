@@ -38,7 +38,7 @@ export default function Footer() {
 
       {/* Footer bar */}
       <footer className="bg-[var(--bg-base)] border-t border-[var(--border)] py-6 px-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between flex-wrap gap-3">
+        <div className="max-w-full mx-auto flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-2">
             <IconShoppingBag size={16} className="text-[#9fef00]" />
             <span className="text-sm font-bold text-[var(--text-primary)]">

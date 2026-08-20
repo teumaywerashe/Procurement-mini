@@ -65,7 +65,7 @@ export default function Hero() {
 
       {/* Feature cards */}
       <div className="border-t border-(--border)">
-        <div className="max-w-6xl  mx-auto px-6 py-10 grid md:grid-cols-3 gap-20 ">
+        <div className="max-w-7xl mx-auto px-20 py-10 grid md:grid-cols-3 gap-20 ">
           {features.map((f) => (
             <div key={f.title} className="rounded-2xl bg-(--border) border border-(--border) px-8 py-6">
               <div className="w-9 h-9 rounded-lg bg-(--bg-elevated) flex items-center justify-center mb-4">

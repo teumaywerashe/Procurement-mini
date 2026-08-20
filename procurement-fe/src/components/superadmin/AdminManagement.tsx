@@ -1,23 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { User } from "@/src/types";
-import {
-  Button,
-  Group,
-  Text,
-  ActionIcon,
-  Tooltip,
-  Modal,
-  Tabs,
-} from "@mantine/core";
-import {
-  IconPlus,
-  IconEdit,
-  IconTrash,
-  IconSearch,
-  IconShieldCheck,
-} from "@tabler/icons-react";
-import { useForm } from "@mantine/form";
+import { Button, Group, ActionIcon, Tooltip } from "@mantine/core";
+import { IconPlus, IconEdit, IconTrash, IconSearch } from "@tabler/icons-react";
 
 interface AdminManagementProps {
   admins: User[];
@@ -132,7 +117,7 @@ export function AdminManagement({
                       {admin.email}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-indigo-950/80 text-indigo-400">
+                      <span className="px-5 py-2 text-[11px] font-semibold rounded-sm bg-indigo-950/80 text-indigo-100">
                         {admin.role}
                       </span>
                     </td>

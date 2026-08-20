@@ -23,7 +23,7 @@ export default function VendorHeader({
 }: VendorHeaderProps) {
   const router = useRouter();
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-linear-to-r from-emerald-950/70 via-indigo-950/50 to-(--bg-surface) p-6 rounded-2xl border border-emerald-900/40 shadow-xl">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-linear-to-r from-emerald-600/20 via-indigo-100/20 to-(--bg-surface) p-6 rounded-2xl border border-emerald-900/40 shadow-xl">
       <div>
         <div className="flex items-center gap-2 mb-1">
           <Badge color="emerald" variant="filled" size="sm">

@@ -55,10 +55,11 @@ export default function EditBidModal({
           />
 
           <Group justify="flex-end" mt="md">
-            <Button variant="default" onClick={onClose}>
+            <Button disabled={isUpdatingBid} variant="default" onClick={onClose}>
               Cancel
             </Button>
             <Button
+              disabled={isUpdatingBid}
               onClick={() => {
                 deleteBid(editingBid?.id as number);
 

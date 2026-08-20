@@ -63,6 +63,7 @@ export class BidService {
           referenceNumber: `RF-BID-${Date.now()}${user.uid}`,
         })
         .returning();
+      console.log(createdBid, createdBid.tenderId);
       // console.log('Bid created successfully:', createdBid);
       await this.rabbitMQService.publishBidSubmitted({
         bidId: createdBid.id,

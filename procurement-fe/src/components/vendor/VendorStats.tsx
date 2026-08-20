@@ -29,9 +29,9 @@ export default function VendorStats({
   pendingBidsCount,
   rejectedBidsCount,
 }: VendorStatsProps) {
-  const loadingSpan = (
-    <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
-  );
+  // const loadingSpan = (
+  //   <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
+  // );
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
       <StatusCard

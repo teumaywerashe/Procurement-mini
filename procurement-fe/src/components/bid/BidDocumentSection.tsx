@@ -6,6 +6,7 @@ import { IconFileText, IconTrash } from "@tabler/icons-react";
 
 interface BidDocumentSectionProps {
   bidStatus: string;
+  tenderStatus?: string;
   isOwnBid: boolean;
   bidDocuments?: any[];
   isUploadingDocument: boolean;
@@ -20,6 +21,7 @@ interface BidDocumentSectionProps {
 
 export function BidDocumentSection({
   bidStatus,
+  tenderStatus,
   isOwnBid,
   bidDocuments,
   isUploadingDocument,
@@ -81,7 +83,7 @@ export function BidDocumentSection({
         Bid Documents
       </Text>
       <Stack gap="md">
-        {isOwnBid && bidStatus === "pending" && (
+        {isOwnBid && bidStatus === "pending" && (tenderStatus === "published" || tenderStatus === "draft") && (
           <FileInput
             label={isUploadingDocument ? "Uploading..." : "Upload Document"}
             placeholder="Select a document to upload"
@@ -151,9 +153,9 @@ export function BidDocumentSection({
             ))}
           </div>
         ) : (
-          !isOwnBid && (
+          isOwnBid && (
             <Text size="xs" c="dimmed">
-              No documents attached to this bid.
+              No documents is attached to this bid.
             </Text>
           )
         )}

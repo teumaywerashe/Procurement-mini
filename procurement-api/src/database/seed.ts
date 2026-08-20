@@ -419,7 +419,7 @@
 //       const status = statuses[bIndex % statuses.length];
 
 //       await db.insert(bid).values({
-//         vendorId: v?.id ?? ${i + 1},
+//         vendorId: v?.id ?? `${i + 1}`,
 //         tenderId: targetTender?.id,
 //         amount: bidAmount,
 //         bidStatus: status,

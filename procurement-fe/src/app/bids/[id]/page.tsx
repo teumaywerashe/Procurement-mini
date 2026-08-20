@@ -104,7 +104,6 @@ export default function BidDetailPage() {
       </div>
     );
   }
- 
 
   if (isError || !bid) {
     return (
@@ -155,6 +154,7 @@ export default function BidDetailPage() {
 
         {canViewBidDocuments && (
           <BidDocumentSection
+            tenderStatus={bid.tender?.status}
             bidStatus={bid.bidStatus}
             isOwnBid={isOwnBid}
             setShowConfirm={docState.setShowConfirm}

@@ -5,7 +5,10 @@ import Link from "next/link";
 import Navbar from "@/src/components/layout/Navbar";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/src/store/store";
-import { useDeleteBidMutation, useGetBidsByVendorQuery } from "@/src/store/api/bidApi";
+import {
+  useDeleteBidMutation,
+  useGetBidsByVendorQuery,
+} from "@/src/store/api/bidApi";
 import { useGetMyVendorQuery } from "@/src/store/api/vendorApi";
 import type { Bid } from "@/src/types";
 import {
@@ -21,11 +24,16 @@ import MyBidsRightSidebar from "@/src/components/bids/MyBidsRightSidebar";
 export default function MyBidsPage() {
   const { user } = useSelector((s: RootState) => s.auth);
   const isVendor = user?.role === "Vendor";
-  const [deleteBid,{isLoading:isBidDeleting}] = useDeleteBidMutation();
-
+  const [deleteBid, { isLoading: isBidDeleting }] = useDeleteBidMutation();
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<Bid["bidStatus"] | "">("");
+
+  const handleDelete = async (id: number) => {
+    await deleteBid(id);
+    setShowConfirm(false);
+  };
 
   const { data: vendor } = useGetMyVendorQuery(undefined, {
     skip: !isVendor,
@@ -85,7 +93,7 @@ export default function MyBidsPage() {
                 <span>Amount</span>
                 <span>Submitted</span>
                 <span>Status</span>
-                 <span>action</span>
+                <span>action</span>
               </div>
 
               {isLoading ? (
@@ -124,9 +132,11 @@ export default function MyBidsPage() {
               ) : (
                 filtered.map((bid) => (
                   <BidTableRow
+                    showConfirm={showConfirm}
+                    setShowConfirm={setShowConfirm}
                     key={bid.id}
                     bid={bid}
-                    deleteBid={deleteBid}
+                    handleDelete={handleDelete}
                     isBidDeleting={isBidDeleting}
                   />
                 ))

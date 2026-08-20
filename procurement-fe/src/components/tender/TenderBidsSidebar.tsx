@@ -16,10 +16,14 @@ import { useRouter } from "next/navigation";
 interface Props {
   userId: number;
   isVendor: boolean;
-  isAdmin:boolean;
+  isAdmin: boolean;
 }
 
-export default function TenderBidsSidebar({ userId, isVendor,isAdmin }: Props) {
+export default function TenderBidsSidebar({
+  userId,
+  isVendor,
+  isAdmin,
+}: Props) {
   const { data: vendor, isLoading: isVendorLoading } = useGetMyVendorQuery(
     undefined,
     { skip: !isVendor },
@@ -44,7 +48,7 @@ export default function TenderBidsSidebar({ userId, isVendor,isAdmin }: Props) {
           <div className="flex items-center gap-2">
             <IconGavel size={15} className="text-indigo-400" />
             <p className="text-xs font-semibold text-(--text-primary)">
-              {isVendor ? "My Recent Bids" : isAdmin? "Recent Bids":""}
+              {isVendor ? "My Recent Bids" : isAdmin ? "Recent Bids" : ""}
             </p>
           </div>
           {totalCount > 0 && (
@@ -55,74 +59,71 @@ export default function TenderBidsSidebar({ userId, isVendor,isAdmin }: Props) {
         </div>
         <div className="h-px bg-(--border)" />
 
-          {/* Content Body */}
-          {isLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="animate-pulse space-y-1.5 px-1">
-                  <div className="h-2.5 bg-(--bg-elevated) rounded w-3/4" />
-                  <div className="h-2 bg-(--bg-elevated) rounded w-1/2" />
-                </div>
-              ))}
-            </div>
-          ) : displayBids.length === 0 ? (
-            <div className="px-1 py-4 text-center space-y-2">
-              <div className="w-10 h-10 rounded-full bg-(--bg-elevated) flex items-center justify-center mx-auto">
-                <IconGavel size={18} className="text-(--text-faint)" />
+        {/* Content Body */}
+        {isLoading ? (
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="animate-pulse space-y-1.5 px-1">
+                <div className="h-2.5 bg-(--bg-elevated) rounded w-3/4" />
+                <div className="h-2 bg-(--bg-elevated) rounded w-1/2" />
               </div>
-              <p className="text-xs text-(--text-subtle)">
-                No bids submitted yet.
-              </p>
+            ))}
+          </div>
+        ) : displayBids.length === 0 ? (
+          <div className="px-1 py-4 text-center space-y-2">
+            <div className="w-10 h-10 rounded-full bg-(--bg-elevated) flex items-center justify-center mx-auto">
+              <IconGavel size={18} className="text-(--text-faint)" />
             </div>
-          ) : (
-            <div className="space-y-2">
-              {displayBids.map((bid) => {
-                const colors = BID_STATUS_STYLES[bid.bidStatus];
-                return (
-                  <div
-                    onClick={() => {
-                      route.push(`/bids/${bid.id}`);
-                    }}
-                    key={bid.id}
-                    className="px-3 py-3 cursor-pointer rounded-lg bg-(--bg-elevated) border border-(--border) space-y-1.5"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] text-(--text-faint) font-medium truncate">
-                        {bid.tender?.title ?? `Tender #${bid.tenderId}`}
-                      </span>
-                      <span
-                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${colors?.bg ?? "bg-zinc-800"} ${colors?.text ?? "text-zinc-400"}`}
-                      >
-                        {bid.bidStatus.charAt(0).toUpperCase() +
-                          bid.bidStatus.slice(1)}
-                      </span>
-                    </div>
-                    <p className="text-sm font-semibold text-(--text-primary)">
-                      ${Number(bid.amount).toLocaleString()}
-                    </p>
-                    <p className="text-[10px] text-(--text-faint)">
-                      {new Date(bid.submittedAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </p>
+            <p className="text-xs text-(--text-subtle)">
+              No bids submitted yet.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {displayBids.map((bid) => {
+              const colors = BID_STATUS_STYLES[bid.bidStatus];
+              return (
+                <div
+                  onClick={() => {
+                    router.push(`/bids/${bid.id}`);
+                  }}
+                  key={bid.id}
+                  className="px-3 py-3 cursor-pointer rounded-lg bg-(--bg-elevated) border border-(--border) space-y-1.5"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] text-(--text-faint) font-medium truncate">
+                      {bid.tender?.title ?? `Tender #${bid.tenderId}`}
+                    </span>
+                    <span
+                      className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${colors?.bg ?? "bg-zinc-800"} ${colors?.text ?? "text-zinc-400"}`}
+                    >
+                      {bid.bidStatus.charAt(0).toUpperCase() +
+                        bid.bidStatus.slice(1)}
+                    </span>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                  <p className="text-sm font-semibold text-(--text-primary)">
+                    ${Number(bid.amount).toLocaleString()}
+                  </p>
+                  <p className="text-[10px] text-(--text-faint)">
+                    {new Date(bid.submittedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
-      
-
-      
-         <Link
+        <Link
           href={isVendor ? "/bids/my" : "/bids"}
           className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border border-(--border) text-xs font-medium text-(--text-subtle) hover:text-(--text-primary) hover:border-(--border-strong) transition-colors"
         >
-          {isVendor ? "My Bids" : isAdmin? "View all bids":""} <IconArrowRight size={13} />
-         </Link>
-        
+          {isVendor ? "My Bids" : isAdmin ? "View all bids" : ""}{" "}
+          <IconArrowRight size={13} />
+        </Link>
       </div>
     </aside>
   );

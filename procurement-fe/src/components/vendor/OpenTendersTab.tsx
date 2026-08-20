@@ -53,7 +53,10 @@ export default function OpenTendersTab({
       {tendersLoading ? (
         <div className="p-6 space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-12 bg-(--bg-elevated) rounded-lg animate-pulse" />
+            <div
+              key={i}
+              className="h-12 bg-(--bg-elevated) rounded-lg animate-pulse"
+            />
           ))}
         </div>
       ) : filteredTenders.length === 0 ? (
@@ -69,6 +72,8 @@ export default function OpenTendersTab({
                 <th className="px-6 py-3.5">Tender Title</th>
                 <th className="px-6 py-3.5">Est. Value</th>
                 <th className="px-6 py-3.5">Closing Date</th>
+                {/* <th className="px-6 py-3.5">Status</th> */}
+
                 <th className="px-6 py-3.5">My Bid Status</th>
                 <th className="px-6 py-3.5 text-right">Actions</th>
               </tr>
@@ -77,8 +82,14 @@ export default function OpenTendersTab({
               {filteredTenders.map((t: Tender) => {
                 const existingBid = myBids.find((b) => b.tenderId === t.id);
                 return (
-                  <tr  key={t.id} className="hover:bg-(--bg-elevated) cursor-pointer transition-colors">
-                    <td onClick={()=>router.push(`/tenders/${t.id}`)} className="px-6 py-4 font-mono text-(--text-faint) hover:text-blue-500">
+                  <tr
+                    key={t.id}
+                    className="hover:bg-(--bg-elevated) cursor-pointer transition-colors"
+                  >
+                    <td
+                      onClick={() => router.push(`/tenders/${t.id}`)}
+                      className="px-6 py-4 font-mono text-(--text-faint) hover:text-blue-500"
+                    >
                       {t.referenceNumber}
                     </td>
                     <td className="px-6 py-4 font-semibold text-(--text-primary)">
@@ -90,23 +101,64 @@ export default function OpenTendersTab({
                     <td className="px-6 py-4 text-(--text-subtle)">
                       {new Date(t.closingDate).toLocaleDateString()}
                     </td>
+                    {/* <td className="px-6 py-4">
+                      <Badge
+                        color={
+                          t.status === "published"
+                            ? "green"
+                            : t.status === "draft"
+                            ? "gray"
+                            : "red"
+                        }
+                        variant="light"
+                      >
+                        {t.status}
+                      </Badge>
+                    </td> */}
+                    {/* <td className="px-6 py-4">
+                      {existingBid ? (
+                        <Badge color="indigo" variant="light">
+                          Bid Placed: $
+                          {Number(
+                            existingBid.amount ||
+                              existingBid.proposedPrice ||
+                              0,
+                          ).toLocaleString()}
+                        </Badge>
+                      ) : (
+                        <Badge color="gray" variant="dot">
+                          Not Bidden Yet
+                        </Badge>
+                      )}
+                    </td> */}
                     <td className="px-6 py-4">
                       {existingBid ? (
                         <Badge color="indigo" variant="light">
-                          Bid Placed: ${Number(existingBid.amount || existingBid.proposedPrice || 0).toLocaleString()}
+                          Bid Placed: $
+                          {Number(
+                            existingBid.amount ||
+                              existingBid.proposedPrice ||
+                              0,
+                          ).toLocaleString()}
                         </Badge>
                       ) : (
-                        <Badge color="gray" variant="dot">Not Bidden Yet</Badge>
+                        <Badge color="gray" variant="dot">
+                          Not Bidden Yet
+                        </Badge>
                       )}
                     </td>
                     <td className="px-0 py-4">
                       <Group justify="flex" gap="xs">
                         <Link href={`/tenders/${t.id}`}>
-                          <Button variant="subtle" size="xs" leftSection={<IconEye size={14} />}>
+                          <Button
+                            variant="subtle"
+                            size="xs"
+                            leftSection={<IconEye size={14} />}
+                          >
                             View
                           </Button>
                         </Link>
-                        {existingBid ? (
+                        {existingBid  ?  (
                           <Button
                             variant="light"
                             color="indigo"
@@ -118,7 +170,7 @@ export default function OpenTendersTab({
                           </Button>
                         ) : (
                           <Button
-                            color="emerald"
+                            color="black"
                             size="xs"
                             // leftSection={<IconGavel size={14} />}
                             onClick={() => onOpenPlaceBid(t)}

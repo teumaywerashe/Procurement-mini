@@ -69,10 +69,10 @@ export default function PlaceBidModal({
           </div>
 
           <Group justify="flex-end" mt="md">
-            <Button variant="default" onClick={onClose}>
+            <Button disabled={isCreatingBid} variant="default" onClick={onClose}>
               Cancel
             </Button>
-            <Button color="emerald" type="submit" loading={isCreatingBid}>
+            <Button disabled={isCreatingBid} color="green" type="submit" loading={isCreatingBid}>
               Submit Proposal
             </Button>
           </Group>

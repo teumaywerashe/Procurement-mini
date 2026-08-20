@@ -86,13 +86,6 @@ export default function TenderDetailPage() {
   const handleDownloadDocument = async (docId: number) => {
     try {
       setDownloadingDocId(docId);
-      // const apiBase =
-      //   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
-      // const res = await fetch(`${apiBase}/documents/${docId}/url`, {
-      //   credentials: "include",
-      // });
-      // const data = await res.json();
       const data = await getDocumentPresignedUrl(docId).unwrap();
       if (data.url) {
         window.open(data.url, "_blank");

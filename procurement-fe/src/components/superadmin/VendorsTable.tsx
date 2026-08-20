@@ -123,7 +123,8 @@ export function VendorsTable({
                     {vendor.phoneNumber || "—"}
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-yellow-950/80 text-yellow-400">
+                    <span className="px-5 py-2
+                     text-[11px] font-semibold rounded-full bg-yellow-950/80 text-yellow-400">
                       {vendor.bids?.length ?? 0} Bids
                     </span>
                   </td>

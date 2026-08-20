@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import LoadingSpan from "@/src/utilis/LoadingSpan";
 import {
   IconFileText,
   IconGavel,
@@ -94,23 +95,23 @@ function DashboardLeftSidebar({
           {[
             {
               label: "Total tenders",
-              value: tendersLoading ? "—" : tenders.length,
+              value: tendersLoading ? <LoadingSpan /> : tenders.length,
             },
-            { label: "Active", value: tendersLoading ? "—" : published.length },
+            { label: "Active", value: tendersLoading ? <LoadingSpan /> : published.length },
             {
               label: "Closing soon",
-              value: tendersLoading ? "—" : closingSoon.length,
+              value: tendersLoading ? <LoadingSpan /> : closingSoon.length,
             },
             ...(isSuperAdmin
               ? [
                   {
                     label: "Vendors",
-                    value: vendorsLoading ? "—" : vendors.length,
+                    value: vendorsLoading ? <LoadingSpan /> : vendors.length,
                   },
                 ]
               : []),
             ...(isVendor
-              ? [{ label: "My bids", value: bidsLoading ? "—" : myBids.length }]
+              ? [{ label: "My bids", value: bidsLoading ? <LoadingSpan /> : myBids.length }]
               : []),
           ].map((s) => (
             <div

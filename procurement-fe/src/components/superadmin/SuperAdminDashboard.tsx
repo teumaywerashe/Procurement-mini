@@ -5,13 +5,9 @@ import React, { useState } from "react";
 import { Button, Tabs, Badge } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
-  IconBuildingStore,
   IconShieldCheck,
   IconUsers,
-  IconFileText,
   IconPlus,
-  IconCheck,
-  IconX,
 } from "@tabler/icons-react";
 import {
   useGetUsersQuery,
@@ -155,7 +151,7 @@ export default function SuperAdminDashboard({
     <main className="flex-1 flex flex-col min-w-0 overflow-y-auto bg-(--bg-base)">
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 space-y-8">
         {/* Banner / Header */}
-        <div className=" flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-linear-to-r from-indigo-950/70 via-purple-950/40 to-(--bg-surface) p-6 rounded-2xl border border-indigo-900/50 shadow-xl">
+        <div className=" flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-linear-to-r from-indigo-950/20 via-purple-950/20 to-(--bg-surface) p-6 rounded-2xl border border-indigo-900/50 shadow-xl">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Badge color="indigo" variant="filled" size="sm">

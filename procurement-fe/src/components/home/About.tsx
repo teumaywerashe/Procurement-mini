@@ -25,15 +25,15 @@ const steps = [
 export default function About() {
   return (
     <section className="bg-[var(--bg-base)] border-b border-[var(--border)] py-20 px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-12">
+      <div className="max-w-full px-20 mx-auto">
+        <div className="mb-12 mx-auto max-w-6xl flex flex-col items-center">
           <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">How ProcureHub works</h2>
           <p className="text-sm text-[var(--text-subtle)] max-w-lg">
             From publishing a tender to awarding a contract — everything in one place.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid w-6xl mx-auto md:grid-cols-3 gap-4">
           {steps.map((item, i) => (
             <div key={item.step} className="relative bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl p-6">
               {/* Step connector line */}
